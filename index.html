@@ -1,1751 +1,1168 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.6">
-  <style type="text/css">
-    body {background-color: #b9bdc3}
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #121815; -webkit-text-stroke: #121815; min-height: 15.0px}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; min-height: 15.0px}
-    span.s1 {font-kerning: none}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Luckee Track</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Luckee Track">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+:root{
+  --green:#1f7a4d; --green-dark:#175c3a; --green-light:#e6f3ec;
+  --bg:#c5c9ce; --card:#ffffff; --text:#16201b; --muted:#6b7972; --border:#e2e6e3; --danger:#c0453a;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12140f; --card:#1b1f18; --text:#eef1ec; --muted:#9aa79f; --border:#2a2f28; --green-light:#173427;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12140f; --card:#1b1f18; --text:#eef1ec; --muted:#9aa79f; --border:#2a2f28; --green-light:#173427;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+*{box-sizing:border-box;}
+body{margin:0; min-height:100%; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:640px; margin:0 auto; padding:16px 16px 60px;}
+header{padding-top:calc(env(safe-area-inset-top,0px) + 8px); margin-bottom:14px;}
+.headtop{display:flex; justify-content:space-between; align-items:flex-start;}
+h1{font-size:22px; margin:0 0 2px; font-weight:700; letter-spacing:-0.01em;}
+.role{color:var(--muted); font-size:14px;}
+.linkbtn{background:none; border:none; color:var(--green); font-size:14px; font-weight:600; cursor:pointer; padding:6px 0;}
+.lockrow{display:flex; align-items:center; gap:6px; color:var(--green); font-size:14px; font-weight:600; margin:10px 0 14px; cursor:pointer;}
+.pillrow{display:flex; gap:8px; overflow-x:auto; margin-bottom:10px; padding-bottom:2px;}
+.pill{flex:none; padding:9px 16px; border-radius:20px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:14px; cursor:pointer; white-space:nowrap;}
+.pill.active{background:var(--green); border-color:var(--green); color:#fff;}
+input[type=text], input[type=number]{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:15px; outline:none;}
+input:focus{border-color:var(--green);}
+.search{margin-bottom:14px;}
+.summary{background:var(--green-light); border-radius:14px; padding:14px 16px; margin-bottom:16px;}
+.summary .label{color:var(--green-dark); font-weight:700; font-size:13px; margin-bottom:6px;}
+.summary .empty{color:var(--muted); font-size:14px;}
+.entry-row{display:flex; justify-content:space-between; align-items:center; padding:8px 6px; border-radius:8px; border-bottom:1px solid rgba(0,0,0,.06); font-size:14px; gap:8px;}
+.entry-row.marked{background:var(--green); color:#fff; border-bottom-color:transparent;}
+.entry-row.marked .del{color:#fff; text-decoration:underline;}
+.entry-row:last-child{border-bottom:none;}
+.entry-row .del{color:var(--danger); background:none; border:none; font-size:13px; cursor:pointer; padding:4px 6px; flex:none;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.card .name{font-weight:600; font-size:15px; margin-bottom:2px;}
+.tags{display:flex; gap:6px; flex-wrap:wrap;}
+.tag{background:#eef0f2; border:1px solid var(--border); color:var(--muted); font-size:12px; padding:2px 8px; border-radius:6px;}
+.addbtn{width:36px; height:36px; border-radius:50%; background:var(--green); color:#fff; border:none; font-size:20px; line-height:1; cursor:pointer; flex:none;}
+.qtybox{display:flex; align-items:center; gap:8px; flex:none;}
+.qtybox input{width:64px; padding:8px; text-align:center;}
+.qtybox button{background:var(--green); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:13px; font-weight:600; cursor:pointer;}
+.qtybox .cancel{background:none; color:var(--muted); font-size:13px; border:none; cursor:pointer;}
+.addcatalog{color:var(--green); font-weight:600; font-size:15px; cursor:pointer; background:none; border:none; padding:4px 0; margin-bottom:6px; display:block;}
+.empty-state{color:var(--muted); font-size:14px; padding:4px 0 12px;}
+.form-card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:14px;}
+.form-row{display:flex; gap:8px; margin-bottom:10px;}
+.form-row > *{flex:1;}
+.primary-btn{background:var(--green); color:#fff; border:none; border-radius:10px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; width:100%;}
+.ghost-btn{background:none; border:1px solid var(--border); color:var(--text); border-radius:10px; padding:11px; font-size:14px; font-weight:600; cursor:pointer; width:100%;}
+.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:flex-end; justify-content:center; z-index:20;}
+.modal{background:var(--card); border-radius:18px 18px 0 0; padding:20px; width:100%; max-width:640px; max-height:80vh; overflow:auto; padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));}
+.modal h3{margin:0 0 14px;}
+.modal .close{display:block; margin:14px auto 0; background:none; border:none; color:var(--muted); font-size:14px;}
+.code-row{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border);}
+.code-row:last-child{border-bottom:none;}
+.code-row span{font-size:14px;}
+.code-row input{width:110px; padding:8px; text-align:center;}
+.msg{font-size:13px; color:var(--danger); margin-top:8px; min-height:16px;}
+/* login */
+#loginScreen{max-width:420px; margin:0 auto; padding:40px 20px; padding-top:calc(40px + env(safe-area-inset-top,0px));}
+#loginScreen h1{text-align:center; margin-bottom:24px;}
+.roletabs{display:flex; gap:8px; margin-bottom:20px;}
+.roletab{flex:1; text-align:center; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--card); cursor:pointer; font-weight:600; font-size:14px; color:var(--muted);}
+.roletab.active{background:var(--green-light); color:var(--green-dark); border-color:var(--green);}
+select{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:15px;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px;}
+.hint{font-size:12px; color:var(--muted); margin-top:10px; text-align:center;}
+input,select,textarea{font-size:16px !important;}
+</style>
 </head>
 <body>
-<p class="p1"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"></span><br></p>
-<p class="p2">/**</p>
-<p class="p2"><span class="Apple-converted-space"> </span>* LUCKEE TRACK — сервер на Google Apps Script поверх Google Таблицы.</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*</p>
-<p class="p2"><span class="Apple-converted-space"> </span>* КАК ПОДКЛЮЧИТЬ (подробно — в инструкции):</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*<span class="Apple-converted-space">  </span>1) Откройте Google Таблицу → «Расширения» → «Apps Script».</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*<span class="Apple-converted-space">  </span>2) Удалите всё, что там есть, вставьте этот файл целиком, нажмите «Сохранить».</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*<span class="Apple-converted-space">  </span>3) Вверху выберите функцию «setup» и нажмите «Выполнить». Разрешите доступ.</p>
-<p class="p2"><span class="Apple-converted-space"> </span>* <span class="Apple-converted-space">    </span>Она создаст листы «Товары», «Записи», «Коды» и заполнит каталог.</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*<span class="Apple-converted-space">  </span>4) «Развёртывание» → «Новое развёртывание» → тип «Веб-приложение»:</p>
-<p class="p2"><span class="Apple-converted-space"> </span>* <span class="Apple-converted-space">    </span>«Выполнять от имени» = Я, «У кого есть доступ» = Все → «Развернуть».</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*<span class="Apple-converted-space">  </span>5) Скопируйте «URL веб-приложения» и вставьте его в index.html (API_URL).</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*</p>
-<p class="p2"><span class="Apple-converted-space"> </span>* После ЛЮБОГО изменения этого кода: «Развёртывание» → «Управление развёртываниями» →</p>
-<p class="p2"><span class="Apple-converted-space"> </span>* карандаш → «Версия: Новая версия» → «Развернуть». Иначе сайт продолжит работать по старому коду.</p>
-<p class="p2"><span class="Apple-converted-space"> </span>*/</p>
-<p class="p3"><br></p>
-<p class="p2">var RESTAURANTS = [</p>
-<p class="p2"><span class="Apple-converted-space">  </span>{id: 'dostyk', <span class="Apple-converted-space">      </span>name: 'Luckee Yu Достык'},</p>
-<p class="p2"><span class="Apple-converted-space">  </span>{id: 'dostyk-plaza', name: 'Luckee Yu Достык Плаза'},</p>
-<p class="p2"><span class="Apple-converted-space">  </span>{id: 'mega-almaty',<span class="Apple-converted-space">  </span>name: 'Luckee Yu Мега Алматы'},</p>
-<p class="p2"><span class="Apple-converted-space">  </span>{id: 'mega-astana',<span class="Apple-converted-space">  </span>name: 'Luckee Yu Мега Астана'}</p>
-<p class="p2">];</p>
-<p class="p2">var TOV_NAME = 'Товаровед';</p>
-<p class="p2">var CATEGORIES = ['Отработка', 'Порча', 'Бракераж', 'Стафф', 'Невозвратные отходы'];</p>
-<p class="p2">var UNITS = ['кг', 'л', 'шт', 'г', 'порц'];</p>
-<p class="p3"><br></p>
-<p class="p2">var SH_CATALOG = 'Товары';</p>
-<p class="p2">var SH_ENTRIES = 'Записи';</p>
-<p class="p2">var SH_CODES <span class="Apple-converted-space">  </span>= 'Коды';</p>
-<p class="p2">var CAT_HEADERS<span class="Apple-converted-space">  </span>= ['Категория', 'Артикул', 'Название', 'Ед.изм.', 'ID'];</p>
-<p class="p2">var ENT_HEADERS<span class="Apple-converted-space">  </span>= ['ID', 'Дата', 'Ресторан', 'Категория', 'Название', 'Ед.изм.', 'Количество', 'Кто списал', 'Внесено в iiko', 'В корзине', 'Время'];</p>
-<p class="p2">var CODE_HEADERS = ['Роль/Ресторан', 'Код'];</p>
-<p class="p2">var ENTRY_ROWS_WINDOW = 15000; // сколько последних строк «Записей» отдаём сайту</p>
-<p class="p2">var DEFAULT_CODE_BY_NAME = {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>'Товаровед': '0000',</p>
-<p class="p2"><span class="Apple-converted-space">  </span>'Luckee Yu Достык': '1111',</p>
-<p class="p2"><span class="Apple-converted-space">  </span>'Luckee Yu Достык Плаза': '2222',</p>
-<p class="p2"><span class="Apple-converted-space">  </span>'Luckee Yu Мега Алматы': '3333',</p>
-<p class="p2"><span class="Apple-converted-space">  </span>'Luckee Yu Мега Астана': '4444'</p>
-<p class="p2">};</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Вспомогательное ─────────────────────────</p>
-<p class="p3"><br></p>
-<p class="p2">function ss_() { return SpreadsheetApp.getActiveSpreadsheet(); }</p>
-<p class="p3"><br></p>
-<p class="p2">function sheet_(name) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = ss_().getSheetByName(name);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!s) throw new Error('Нет листа «' + name + '». Запустите функцию setup.');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return s;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function out_(obj) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function restName_(id) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>for (var i = 0; i &lt; RESTAURANTS.length; i++) if (RESTAURANTS[i].id === id) return RESTAURANTS[i].name;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return null;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function withLock_(fn) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var lock = LockService.getScriptLock();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>lock.waitLock(25000);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>try { return fn(); } finally { lock.releaseLock(); }</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function normDate_(v) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (Object.prototype.toString.call(v) === '[object Date]') {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return String(v).slice(0, 10);</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function isTrue_(v) { return v === true || String(v).toUpperCase() === 'TRUE'; }</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Точки входа ─────────────────────────</p>
-<p class="p3"><br></p>
-<p class="p2">function doGet(e) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return out_({ok: true, service: 'luckee-track', hint: 'Это сервер. Откройте сайт, а не эту ссылку.'});</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function doPost(e) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var req;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>try { req = JSON.parse(e.postData.contents); }</p>
-<p class="p2"><span class="Apple-converted-space">  </span>catch (err) { return out_({ok: false, error: 'bad_request'}); }</p>
-<p class="p2"><span class="Apple-converted-space">  </span>try { return out_(route_(req)); }</p>
-<p class="p2"><span class="Apple-converted-space">  </span>catch (err) { return out_({ok: false, error: 'server', message: String(err &amp;&amp; err.message || err)}); }</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function route_(req) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var action = req.action;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (action === 'login') return login_(req);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var auth = checkAuth_(req.auth);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth) return {ok: false, error: 'auth'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>switch (action) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>case 'getState': <span class="Apple-converted-space">  </span>return getState_(auth, req);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>case 'entryOps': <span class="Apple-converted-space">  </span>return withLock_(function () { return entryOps_(auth, req); });</p>
-<p class="p2"><span class="Apple-converted-space">    </span>case 'catalogOps': return withLock_(function () { return catalogOps_(auth, req); });</p>
-<p class="p2"><span class="Apple-converted-space">    </span>case 'getCodes': <span class="Apple-converted-space">  </span>return getCodes_(auth);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>case 'setCodes': <span class="Apple-converted-space">  </span>return withLock_(function () { return setCodes_(auth, req); });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {ok: false, error: 'unknown_action'};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Коды и права ─────────────────────────</p>
-<p class="p3"><br></p>
-<p class="p2">var codeIsNum_ = {};</p>
-<p class="p2">function readCodes_() {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_CODES), n = s.getLastRow(), map = {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>codeIsNum_ = {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (n &gt;= 2) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 1, n - 1, 2).getValues().forEach(function (r) {</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var k = String(r[0]).trim();</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (!k) return;</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (typeof r[1] === 'number') codeIsNum_[k] = true; // Таблица превратила "0000" в число 0</p>
-<p class="p2"><span class="Apple-converted-space">      </span>map[k] = String(r[1]).trim();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return map;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// Совпадение кода. Если в ячейке число (потеряны нули впереди) — сравниваем как числа.</p>
-<p class="p2">function codeMatches_(stored, key, given) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!stored) return false;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (stored === given) return true;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return !!codeIsNum_[key] &amp;&amp; /^\d+$/.test(given) &amp;&amp; Number(given) === Number(stored);</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// Возвращает {tov: bool, restaurant: id|null} или null, если код неверный</p>
-<p class="p2">function checkAuth_(auth) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth || !auth.code) return null;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var given = String(auth.code).trim();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!given) return null;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var codes = readCodes_();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (auth.role === 'tovaroved') {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>return codeMatches_(codes[TOV_NAME], TOV_NAME, given) ? {tov: true, restaurant: null} : null;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (auth.role === 'chef') {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var name = restName_(auth.restaurant);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>return (name &amp;&amp; codeMatches_(codes[name], name, given)) ? {tov: false, restaurant: auth.restaurant} : null;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return null;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function login_(req) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var cache = CacheService.getScriptCache();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var fails = Number(cache.get('fails') || 0);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (fails &gt;= 30) return {ok: false, error: 'throttled'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var a = checkAuth_({role: req.role, restaurant: req.restaurant, code: req.code});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!a) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>cache.put('fails', String(fails + 1), 60);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>return {ok: false, error: 'auth'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {ok: true};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function getCodes_(auth) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth.tov) return {ok: false, error: 'forbidden'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var codes = readCodes_(), out = {tovaroved: codes[TOV_NAME] || ''};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>RESTAURANTS.forEach(function (r) { out[r.id] = codes[r.name] || ''; });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {ok: true, codes: out};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function setCodes_(auth, req) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth.tov) return {ok: false, error: 'forbidden'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var input = req.codes || {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var pairs = [[TOV_NAME, input.tovaroved]];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>RESTAURANTS.forEach(function (r) { pairs.push([r.name, input[r.id]]); });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_CODES);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var n = s.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var vals = n &gt;= 2 ? s.getRange(2, 1, n - 1, 2).getValues() : [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>pairs.forEach(function (p) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var code = String(p[1] == null ? '' : p[1]).trim();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!code) return;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (code.length &gt; 30) throw new Error('Код слишком длинный');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var found = false;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>for (var i = 0; i &lt; vals.length; i++) {</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (String(vals[i][0]).trim() === p[0]) { vals[i][1] = code; found = true; break; }</p>
-<p class="p2"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!found) vals.push([p[0], code]);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (vals.length) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 2, vals.length, 1).setNumberFormat('@');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 1, vals.length, 2).setValues(vals);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {ok: true};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Состояние (чтение) ─────────────────────────</p>
-<p class="p3"><br></p>
-<p class="p2">function getState_(auth, req) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var rid = req.restaurant;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!restName_(rid)) return {ok: false, error: 'bad_restaurant'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth.tov &amp;&amp; auth.restaurant !== rid) return {ok: false, error: 'forbidden'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var props = PropertiesService.getScriptProperties();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var ev = String(props.getProperty('ev_' + rid) || '0');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var cv = String(props.getProperty('cv') || '0');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var res = {ok: true, entriesVersion: ev, catalogVersion: cv, entries: null, catalog: null};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (String(req.entriesVersion) !== ev) res.entries = readEntries_(rid);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (String(req.catalogVersion) !== cv) res.catalog = readCatalog_();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return res;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function readEntries_(rid) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_ENTRIES), last = s.getLastRow(), out = [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (last &lt; 2) return out;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var start = Math.max(2, last - ENTRY_ROWS_WINDOW + 1);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var vals = s.getRange(start, 1, last - start + 1, 11).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var name = restName_(rid);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>for (var i = 0; i &lt; vals.length; i++) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var r = vals[i];</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!r[0] || String(r[2]) !== name) continue;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>out.push({</p>
-<p class="p2"><span class="Apple-converted-space">      </span>id: String(r[0]), date: normDate_(r[1]), category: String(r[3]), name: String(r[4]),</p>
-<p class="p2"><span class="Apple-converted-space">      </span>unit: String(r[5]), qty: Number(r[6]), author: String(r[7] || ''),</p>
-<p class="p2"><span class="Apple-converted-space">      </span>archived: isTrue_(r[8]), trashed: isTrue_(r[9]), ts: Date.parse(String(r[10])) || 0</p>
-<p class="p2"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return out;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function readCatalog_() {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_CATALOG), last = s.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (last &lt; 2) return [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var vals = s.getRange(2, 1, last - 1, 5).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var missing = false;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>for (var i = 0; i &lt; vals.length; i++) if (vals[i][2] &amp;&amp; !vals[i][4]) { missing = true; break; }</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (missing) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>withLock_(fillMissingCatalogIds_);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>vals = s.getRange(2, 1, last - 1, 5).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var out = [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>vals.forEach(function (r) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!r[2] || !r[4]) return;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>out.push({id: String(r[4]), category: String(r[0]).trim(), article: String(r[1] || '').trim(),</p>
-<p class="p2"><span class="Apple-converted-space">              </span>name: String(r[2]).trim(), unit: String(r[3]).trim()});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return out;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// Если вы вставили новые строки в лист «Товары» руками — им нужен ID. Присваиваем.</p>
-<p class="p2">function fillMissingCatalogIds_() {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_CATALOG), last = s.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (last &lt; 2) return;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var vals = s.getRange(2, 1, last - 1, 5).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var used = {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>vals.forEach(function (r) { if (r[4]) used[String(r[4])] = true; });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var n = 0, changed = false;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>vals.forEach(function (r) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (r[2] &amp;&amp; !r[4]) {</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var id;</p>
-<p class="p2"><span class="Apple-converted-space">      </span>do { id = 'n' + (Date.now().toString(36)) + (n++); } while (used[id]);</p>
-<p class="p2"><span class="Apple-converted-space">      </span>used[id] = true; r[4] = id; changed = true;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (changed) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 5, vals.length, 1).setNumberFormat('@');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 1, vals.length, 5).setValues(vals);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// В Google Таблицах нельзя писать за пределы существующих строк листа — сначала расширяем.</p>
-<p class="p2">function ensureRows_(s, needed) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var max = s.getMaxRows();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (max &lt; needed) s.insertRowsAfter(max, needed - max);</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">function bump_(key) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var p = PropertiesService.getScriptProperties();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>p.setProperty(key, String(Number(p.getProperty(key) || 0) + 1));</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Записи (запись) ─────────────────────────</p>
-<p class="p2">// req: {restaurant, add:[{id,date,category,name,unit,qty,author}], update:[{id,fields:{archived,trashed}}], del:[id]}</p>
-<p class="p3"><br></p>
-<p class="p2">function entryOps_(auth, req) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var rid = req.restaurant, rname = restName_(rid);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!rname) return {ok: false, error: 'bad_restaurant'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth.tov &amp;&amp; auth.restaurant !== rid) return {ok: false, error: 'forbidden'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var adds = req.add || [], updates = req.update || [], dels = req.del || [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth.tov &amp;&amp; updates.length) return {ok: false, error: 'forbidden'};</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_ENTRIES);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var last = s.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var ids = last &gt;= 2 ? s.getRange(2, 1, last - 1, 1).getValues() : [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var rowOf = {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>for (var i = 0; i &lt; ids.length; i++) rowOf[String(ids[i][0])] = i + 2;</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>// 1) добавление</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var rows = [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>adds.forEach(function (a) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var qty = Number(a.qty);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var id = String(a.id || '');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!(qty &gt; 0) || qty &gt; 1e6) throw new Error('Некорректное количество');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (CATEGORIES.indexOf(a.category) &lt; 0) throw new Error('Некорректная категория');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (UNITS.indexOf(a.unit) &lt; 0) throw new Error('Некорректная единица');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!a.name || String(a.name).length &gt; 200) throw new Error('Некорректное название');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!/^\d{4}-\d{2}-\d{2}$/.test(String(a.date))) throw new Error('Некорректная дата');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!/^[A-Za-z0-9_\-]{1,60}$/.test(id)) throw new Error('Некорректный id');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (rowOf[id]) return; // уже есть — повторную отправку игнорируем</p>
-<p class="p2"><span class="Apple-converted-space">    </span>rows.push([id, String(a.date), rname, a.category, String(a.name), a.unit, qty,</p>
-<p class="p2"><span class="Apple-converted-space">               </span>String(a.author || '').slice(0, 40), false, false, new Date().toISOString()]);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>rowOf[id] = -1;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (rows.length) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>ensureRows_(s, last + rows.length);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(last + 1, 1, rows.length, 11).setValues(rows);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>last += rows.length;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>// 2) флаги «внесено» / «в корзине» (только товаровед)</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (updates.length &amp;&amp; last &gt;= 2) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var rest = s.getRange(2, 3, last - 1, 1).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var flags = s.getRange(2, 9, last - 1, 2).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var touched = false;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>updates.forEach(function (u) {</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var row = rowOf[String(u.id)];</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (!(row &gt; 0) || String(rest[row - 2][0]) !== rname) return;</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var f = u.fields || {};</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (f.archived !== undefined) { flags[row - 2][0] = !!f.archived; touched = true; }</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (f.trashed !== undefined) { flags[row - 2][1] = !!f.trashed; touched = true; }</p>
-<p class="p2"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (touched) s.getRange(2, 9, flags.length, 2).setValues(flags);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>// 3) окончательное удаление</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (dels.length &amp;&amp; last &gt;= 2) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var rest2 = s.getRange(2, 3, last - 1, 1).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var fl2 = s.getRange(2, 9, last - 1, 1).getValues();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var toDelete = [];</p>
-<p class="p2"><span class="Apple-converted-space">    </span>dels.forEach(function (id) {</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var row = rowOf[String(id)];</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (!(row &gt; 0) || String(rest2[row - 2][0]) !== rname) return;</p>
-<p class="p2"><span class="Apple-converted-space">      </span>if (!auth.tov &amp;&amp; isTrue_(fl2[row - 2][0])) return; // шеф не удаляет уже внесённое</p>
-<p class="p2"><span class="Apple-converted-space">      </span>toDelete.push(row);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><span class="Apple-converted-space">    </span>toDelete.sort(function (a, b) { return b - a; });</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var k = 0;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>while (k &lt; toDelete.length) { // склеиваем подряд идущие строки</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var end = toDelete[k], start = end;</p>
-<p class="p2"><span class="Apple-converted-space">      </span>while (k + 1 &lt; toDelete.length &amp;&amp; toDelete[k + 1] === start - 1) { start = toDelete[++k]; }</p>
-<p class="p2"><span class="Apple-converted-space">      </span>s.deleteRows(start, end - start + 1);</p>
-<p class="p2"><span class="Apple-converted-space">      </span>k++;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>bump_('ev_' + rid);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var p = PropertiesService.getScriptProperties();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {ok: true, entries: readEntries_(rid), entriesVersion: String(p.getProperty('ev_' + rid))};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Каталог (запись, только товаровед) ─────────────────────────</p>
-<p class="p2">// req: {add:[{id,category,name,unit,article}], update:[{id,fields:{name,unit,article}}], del:[id]}</p>
-<p class="p3"><br></p>
-<p class="p2">function catalogOps_(auth, req) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (!auth.tov) return {ok: false, error: 'forbidden'};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var s = sheet_(SH_CATALOG);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>fillMissingCatalogIds_();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var last = s.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var vals = last &gt;= 2 ? s.getRange(2, 1, last - 1, 5).getValues() : [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var rowOf = {}, dup = {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>vals.forEach(function (r, i) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>rowOf[String(r[4])] = i;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>dup[String(r[0]).trim() + '|' + String(r[2]).trim() + '|' + String(r[3]).trim()] = true;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>var newRows = [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>(req.add || []).forEach(function (a) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var id = String(a.id || '');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (CATEGORIES.indexOf(a.category) &lt; 0) throw new Error('Некорректная категория');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (UNITS.indexOf(a.unit) &lt; 0) throw new Error('Некорректная единица');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var name = String(a.name || '').trim();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!name || name.length &gt; 200) throw new Error('Некорректное название');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!/^[A-Za-z0-9_\-]{1,60}$/.test(id) || rowOf[id] !== undefined) return;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var key = a.category + '|' + name + '|' + a.unit;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (dup[key]) return;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>dup[key] = true;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>newRows.push([a.category, String(a.article || '').trim(), name, a.unit, id]);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>var changed = false;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>(req.update || []).forEach(function (u) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var i = rowOf[String(u.id)];</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (i === undefined) return;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var f = u.fields || {};</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (f.name !== undefined &amp;&amp; String(f.name).trim()) vals[i][2] = String(f.name).trim();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (f.unit !== undefined &amp;&amp; UNITS.indexOf(f.unit) &gt;= 0) vals[i][3] = f.unit;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (f.article !== undefined) vals[i][1] = String(f.article || '').trim();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>changed = true;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (changed) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 2, vals.length, 1).setNumberFormat('@');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(2, 1, vals.length, 5).setValues(vals);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>var toDelete = [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>(req.del || []).forEach(function (id) { var i = rowOf[String(id)]; if (i !== undefined) toDelete.push(i + 2); });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>toDelete.sort(function (a, b) { return b - a; });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var k = 0;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>while (k &lt; toDelete.length) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var end = toDelete[k], start = end;</p>
-<p class="p2"><span class="Apple-converted-space">    </span>while (k + 1 &lt; toDelete.length &amp;&amp; toDelete[k + 1] === start - 1) { start = toDelete[++k]; }</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.deleteRows(start, end - start + 1);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>k++;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (newRows.length) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var now = s.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">    </span>ensureRows_(s, now + newRows.length);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(now + 1, 2, newRows.length, 1).setNumberFormat('@');</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.getRange(now + 1, 1, newRows.length, 5).setValues(newRows);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>bump_('cv');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var p = PropertiesService.getScriptProperties();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {ok: true, catalog: readCatalog_(), catalogVersion: String(p.getProperty('cv'))};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Первичная настройка ─────────────────────────</p>
-<p class="p3"><br></p>
-<p class="p2">function ensureSheet_(name, headers) {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var ss = ss_(), s = ss.getSheetByName(name);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (s) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var cur = s.getLastRow() &gt;= 1 ? s.getRange(1, 1, 1, headers.length).getValues()[0] : [];</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var same = headers.every(function (h, i) { return String(cur[i]).trim() === h; });</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (same) return {sheet: s, created: false};</p>
-<p class="p2"><span class="Apple-converted-space">    </span>// Лист с таким именем уже есть, но устроен иначе — не удаляем, а переименовываем</p>
-<p class="p2"><span class="Apple-converted-space">    </span>s.setName(name + ' (старый ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd.MM HH-mm') + ')');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>s = ss.insertSheet(name);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>s.getRange(1, 1, 1, headers.length).setValues([headers]);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>s.getRange(1, 1, 1, headers.length).setFontWeight('bold');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>s.setFrozenRows(1);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return {sheet: s, created: true};</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">/** Запустите ОДИН раз. Безопасно запускать повторно: данные не затираются. */</p>
-<p class="p2">function setup() {</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var log = [];</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>// Товары</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var c = ensureSheet_(SH_CATALOG, CAT_HEADERS);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>c.sheet.getRange(1, 2, c.sheet.getMaxRows(), 1).setNumberFormat('@');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (c.sheet.getLastRow() &lt; 2) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>var rows = SEED_CATALOG.map(function (r, i) { return [r[0], r[1], r[2], r[3], 'p' + (i + 1)]; });</p>
-<p class="p2"><span class="Apple-converted-space">    </span>ensureRows_(c.sheet, rows.length + 1);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>c.sheet.getRange(2, 1, rows.length, 5).setValues(rows);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>log.push('Каталог заполнен: ' + rows.length + ' позиций');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>} else {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>log.push('Каталог уже заполнен — не тронут');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>// Записи</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var e = ensureSheet_(SH_ENTRIES, ENT_HEADERS);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>e.sheet.getRange(1, 2, e.sheet.getMaxRows(), 1).setNumberFormat('@'); <span class="Apple-converted-space">  </span>// Дата</p>
-<p class="p2"><span class="Apple-converted-space">  </span>e.sheet.getRange(1, 11, e.sheet.getMaxRows(), 1).setNumberFormat('@');<span class="Apple-converted-space">  </span>// Время</p>
-<p class="p2"><span class="Apple-converted-space">  </span>log.push(e.created ? 'Лист «Записи» создан' : 'Лист «Записи» уже есть');</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>// Коды</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var k = ensureSheet_(SH_CODES, CODE_HEADERS);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>k.sheet.getRange(1, 2, k.sheet.getMaxRows(), 1).setNumberFormat('@');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var n = k.sheet.getLastRow();</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var vals = n &gt;= 2 ? k.sheet.getRange(2, 1, n - 1, 2).getValues() : [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var have = {};</p>
-<p class="p2"><span class="Apple-converted-space">  </span>vals.forEach(function (r) { have[String(r[0]).trim()] = true; });</p>
-<p class="p2"><span class="Apple-converted-space">  </span>var added = 0;</p>
-<p class="p2"><span class="Apple-converted-space">  </span>Object.keys(DEFAULT_CODE_BY_NAME).forEach(function (name) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (!have[name]) { vals.push([name, DEFAULT_CODE_BY_NAME[name]]); added++; }</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>// Если коды раньше были записаны как числа (0000 → 0), возвращаем им текстовый вид</p>
-<p class="p2"><span class="Apple-converted-space">  </span>vals.forEach(function (r) {</p>
-<p class="p2"><span class="Apple-converted-space">    </span>if (typeof r[1] === 'number') {</p>
-<p class="p2"><span class="Apple-converted-space">      </span>var def = DEFAULT_CODE_BY_NAME[String(r[0]).trim()];</p>
-<p class="p2"><span class="Apple-converted-space">      </span>r[1] = (def !== undefined &amp;&amp; Number(def) === r[1]) ? def : String(r[1]);</p>
-<p class="p2"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><span class="Apple-converted-space">  </span>if (vals.length) k.sheet.getRange(2, 1, vals.length, 2).setValues(vals);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>log.push('Коды: добавлено ' + added + ' (стартовые: товаровед 0000, рестораны 1111–4444 — СМЕНИТЕ их в приложении)');</p>
-<p class="p3"><br></p>
-<p class="p2"><span class="Apple-converted-space">  </span>var msg = log.join('\n');</p>
-<p class="p2"><span class="Apple-converted-space">  </span>Logger.log(msg);</p>
-<p class="p2"><span class="Apple-converted-space">  </span>return msg;</p>
-<p class="p2">}</p>
-<p class="p3"><br></p>
-<p class="p2">// ───────────────────────── Начальный каталог (из работающей версии) ─────────────────────────</p>
-<p class="p2">var SEED_CATALOG = [</p>
-<p class="p2">["Отработка","29507","Анис звездочками","кг"],</p>
-<p class="p2">["Отработка","13601","Кардамон","кг"],</p>
-<p class="p2">["Отработка","17552","Корица палочка","кг"],</p>
-<p class="p2">["Отработка","13258","Листья лайма","кг"],</p>
-<p class="p2">["Отработка","13710","Сахар тростниковый","кг"],</p>
-<p class="p2">["Отработка","16367","Вино Тбилиси Долины Грузии белое сухое","л"],</p>
-<p class="p2">["Отработка","391530195469","Вино Rebelle, Blanc (0,75л)","л"],</p>
-<p class="p2">["Отработка","17925","Вино CHOYA Sake (0,75л)","л"],</p>
-<p class="p2">["Отработка","380784","Сироп Бузина Sk bar","л"],</p>
-<p class="p2">["Отработка","39152387","Сироп Глюкозный","л"],</p>
-<p class="p2">["Отработка","25144","Сок юдзу","л"],</p>
-<p class="p2">["Отработка","29733","Чай зеленый матча","кг"],</p>
-<p class="p2">["Отработка","16525","Чай матча голубой","кг"],</p>
-<p class="p2">["Отработка","22861","Бадьян хаджо","кг"],</p>
-<p class="p2">["Отработка","12084","Горох","кг"],</p>
-<p class="p2">["Отработка","19948","Гречка","кг"],</p>
-<p class="p2">["Отработка","29466","Крупа манная","кг"],</p>
-<p class="p2">["Отработка","30145","Овсяные хлопья","кг"],</p>
-<p class="p2">["Отработка","30007","Рис для суши","кг"],</p>
-<p class="p2">["Отработка","30279","Рис жасмин","кг"],</p>
-<p class="p2">["Отработка","28344","Бумага рисовая 22см","кг"],</p>
-<p class="p2">["Отработка","29804","Лапша рисовая","кг"],</p>
-<p class="p2">["Отработка","22832","Лапша фунчоза","кг"],</p>
-<p class="p2">["Отработка","30135","Лапша фунчоза стеклянная","кг"],</p>
-<p class="p2">["Отработка","39147578","Паста Тамариндовая","кг"],</p>
-<p class="p2">["Отработка","29726","Мука в/с","кг"],</p>
-<p class="p2">["Отработка","30150","Мука рисовая","кг"],</p>
-<p class="p2">["Отработка","16342","Мука темпура","кг"],</p>
-<p class="p2">["Отработка","13406","Джем алоэ","кг"],</p>
-<p class="p2">["Отработка","29609","Глюкоза","кг"],</p>
-<p class="p2">["Отработка","29429","Дрожжи сухие","кг"],</p>
-<p class="p2">["Отработка","13334","Разрыхлитель для теста","кг"],</p>
-<p class="p2">["Отработка","30122","Сода пищевая","кг"],</p>
-<p class="p2">["Отработка","29542","Краситель пищевой","кг"],</p>
-<p class="p2">["Отработка","20786","Агар-агар","кг"],</p>
-<p class="p2">["Отработка","29983","Желатин","кг"],</p>
-<p class="p2">["Отработка","29452","Крахмал кукурузный","кг"],</p>
-<p class="p2">["Отработка","20745","Крахмал топиоковый","кг"],</p>
-<p class="p2">["Отработка","16337","Шоколад белый плитка","кг"],</p>
-<p class="p2">["Отработка","39145687","Дайкон маринованный","кг"],</p>
-<p class="p2">["Отработка","29313","Кабачковая икра","кг"],</p>
-<p class="p2">["Отработка","18063","Паста карри","кг"],</p>
-<p class="p2">["Отработка","16423","Паста Криспи Чили","кг"],</p>
-<p class="p2">["Отработка","30048","Паста мисо","кг"],</p>
-<p class="p2">["Отработка","30103","Паста перечная Кучуджан","кг"],</p>
-<p class="p2">["Отработка","29691","Паста Табаджан","кг"],</p>
-<p class="p2">["Отработка","29706","Паста тахини","кг"],</p>
-<p class="p2">["Отработка","18631","Паста том ям","кг"],</p>
-<p class="p2">["Отработка","22800","Паста трюфельная","кг"],</p>
-<p class="p2">["Отработка","29862","Перец халапеньо консервированный","кг"],</p>
-<p class="p2">["Отработка","29414","Томатная паста","кг"],</p>
-<p class="p2">["Отработка","29520","Тунец консервированный","кг"],</p>
-<p class="p2">["Отработка","22833","Пюре манго (Mango puree)","кг"],</p>
-<p class="p2">["Отработка","29693","Пюре маракуйя","кг"],</p>
-<p class="p2">["Отработка","30190","Жир фритюрный","л"],</p>
-<p class="p2">["Отработка","17827","Масло кунжутное","л"],</p>
-<p class="p2">["Отработка","29694","Масло подсолнечное рафинированное","л"],</p>
-<p class="p2">["Отработка","13244","Масло трюфельное","кг"],</p>
-<p class="p2">["Отработка","29867","Йогурт","кг"],</p>
-<p class="p2">["Отработка","18044","Курт копченый","кг"],</p>
-<p class="p2">["Отработка","17090","Масло президент","кг"],</p>
-<p class="p2">["Отработка","29483","Масло сливочное","кг"],</p>
-<p class="p2">["Отработка","30015","Молоко кокосовое","л"],</p>
-<p class="p2">["Отработка","21426","Молоко соевое","л"],</p>
-<p class="p2">["Отработка","29963","Сыр Маскарпоне","кг"],</p>
-<p class="p2">["Отработка","12356","Сыр Сулугуни","кг"],</p>
-<p class="p2">["Отработка","30242","Сыр творожный DenCheese","кг"],</p>
-<p class="p2">["Отработка","11223","Сыр Тофу","кг"],</p>
-<p class="p2">["Отработка","387162","Сыр Чеддер слайсы хохланд","кг"],</p>
-<p class="p2">["Отработка","14212","Сыр Грана Падано","кг"],</p>
-<p class="p2">["Отработка","18013","Яйцо куриное","шт"],</p>
-<p class="p2">["Отработка","381245","Куриная окорочка копченая","кг"],</p>
-<p class="p2">["Отработка","17717","Баранина мякоть не очищенная","кг"],</p>
-<p class="p2">["Отработка","385929","Говядина ВС Экстра зачищенная","кг"],</p>
-<p class="p2">["Отработка","19057","Говядина мякоть голень","кг"],</p>
-<p class="p2">["Отработка","18346","Говядина мякоть незачищенная","кг"],</p>
-<p class="p2">["Отработка","22896","Говяжий жир","кг"],</p>
-<p class="p2">["Отработка","11473","Говяжий фарш","кг"],</p>
-<p class="p2">["Отработка","11148","Говяжьи кости (суп набор)","кг"],</p>
-<p class="p2">["Отработка","20831","Куриное бедро без кости и без кожи","кг"],</p>
-<p class="p2">["Отработка","11140","Куриное филе","кг"],</p>
-<p class="p2">["Отработка","18408","Куриные крылья","кг"],</p>
-<p class="p2">["Отработка","19032","Куриные окорочка","кг"],</p>
-<p class="p2">["Отработка","383942","Куриный каркас","кг"],</p>
-<p class="p2">["Отработка","17115","Утка окорочка","кг"],</p>
-<p class="p2">["Отработка","17113","Вино Красное для кухни","л"],</p>
-<p class="p2">["Отработка","11828","Грибы вешенки","кг"],</p>
-<p class="p2">["Отработка","11795","Грибы древесные","кг"],</p>
-<p class="p2">["Отработка","18565","Грибы шампиньоны","кг"],</p>
-<p class="p2">["Отработка","22835","Грибы шитаки сухие","кг"],</p>
-<p class="p2">["Отработка","30027","Базилик красный свежий","кг"],</p>
-<p class="p2">["Отработка","18787","Бобовые ростки","кг"],</p>
-<p class="p2">["Отработка","19686","Имбирь корень","кг"],</p>
-<p class="p2">["Отработка","17610","Кинза свежая","кг"],</p>
-<p class="p2">["Отработка","29776","Лемонграсс","кг"],</p>
-<p class="p2">["Отработка","16218","Лист Салата","кг"],</p>
-<p class="p2">["Отработка","12007","Лук зеленый","кг"],</p>
-<p class="p2">["Отработка","16891","Мята свежая","кг"],</p>
-<p class="p2">["Отработка","13552","Салат Микс","кг"],</p>
-<p class="p2">["Отработка","21002","Сельдерей стебель","кг"],</p>
-<p class="p2">["Отработка","13574","Чесночные стрелки","кг"],</p>
-<p class="p2">["Отработка","29683","Шпинат св.","кг"],</p>
-<p class="p2">["Отработка","29652","Бобы эдамаме","кг"],</p>
-<p class="p2">["Отработка","17141","Горошек зеленый с/м","кг"],</p>
-<p class="p2">["Отработка","39150298","Картофель фри McCain CRISPERS 2*5","кг"],</p>
-<p class="p2">["Отработка","13673","Картофель фри 8*12 с/м (лодочки)","кг"],</p>
-<p class="p2">["Отработка","16657","Кукуруза початок с/м","кг"],</p>
-<p class="p2">["Отработка","22873","Баклажаны","кг"],</p>
-<p class="p2">["Отработка","18686","Дайкон редька белая","кг"],</p>
-<p class="p2">["Отработка","10561","Кабачки св","кг"],</p>
-<p class="p2">["Отработка","11145","Капуста белокачанная","кг"],</p>
-<p class="p2">["Отработка","29627","Капуста корейская кимчи","кг"],</p>
-<p class="p2">["Отработка","21050","Капуста пекинская","кг"],</p>
-<p class="p2">["Отработка","13759","Картофель св","кг"],</p>
-<p class="p2">["Отработка","18661","Лук красный","кг"],</p>
-<p class="p2">["Отработка","13895","Лук репчатый","кг"],</p>
-<p class="p2">["Отработка","14086","Лук шалот","кг"],</p>
-<p class="p2">["Отработка","16534","Морковь св","кг"],</p>
-<p class="p2">["Отработка","14831","Огурцы св","кг"],</p>
-<p class="p2">["Отработка","13279","Перец болгарский светофор (зеленый)","кг"],</p>
-<p class="p2">["Отработка","17630","Перец болгарский светофор (красный)","кг"],</p>
-<p class="p2">["Отработка","18636","Перец полу горький (зеленый)","кг"],</p>
-<p class="p2">["Отработка","18654","Перец Чили Зеленый свежий","кг"],</p>
-<p class="p2">["Отработка","11704","Перец Чили Красный свежий","кг"],</p>
-<p class="p2">["Отработка","18894","Помидоры черри","кг"],</p>
-<p class="p2">["Отработка","17733","Фасоль стручковая св","кг"],</p>
-<p class="p2">["Отработка","19419","Чеснок св","кг"],</p>
-<p class="p2">["Отработка","23226","Чеснок св очищенный","кг"],</p>
-<p class="p2">["Отработка","29428","Водоросли Вакаме","кг"],</p>
-<p class="p2">["Отработка","13255","Водоросли Комбу","кг"],</p>
-<p class="p2">["Отработка","22244","Водоросли Нори","кг"],</p>
-<p class="p2">["Отработка","29553","Водоросли Нори соленые","кг"],</p>
-<p class="p2">["Отработка","11938","Имбирь маринованный","кг"],</p>
-<p class="p2">["Отработка","29445","Салат чукка","кг"],</p>
-<p class="p2">["Отработка","31776","Кокосовая стружка","кг"],</p>
-<p class="p2">["Отработка","39145257","Кунжут с кимчи","кг"],</p>
-<p class="p2">["Отработка","12479","Семена кунжутные","кг"],</p>
-<p class="p2">["Отработка","10459","Вонголе","кг"],</p>
-<p class="p2">["Отработка","22888","Кальмары кольца с/м","кг"],</p>
-<p class="p2">["Отработка","29463","Крабовые палочки","кг"],</p>
-<p class="p2">["Отработка","29566","Креветки корол. с/м б/г 21/25","кг"],</p>
-<p class="p2">["Отработка","386367","Мидии на полустворке","кг"],</p>
-<p class="p2">["Отработка","20217","Мясо краба","кг"],</p>
-<p class="p2">["Отработка","13270","Тунец с/м","кг"],</p>
-<p class="p2">["Отработка","11915","Угорь жареный \"унаги\"","кг"],</p>
-<p class="p2">["Отработка","19742","Рыба голова семги","кг"],</p>
-<p class="p2">["Отработка","24686","Рыба семга тушка охл","кг"],</p>
-<p class="p2">["Отработка","22806","Рыба сибас с/м","шт"],</p>
-<p class="p2">["Отработка","22807","Рыба филе семга на шкуре с/м","кг"],</p>
-<p class="p2">["Отработка","30189","Икра красная","кг"],</p>
-<p class="p2">["Отработка","20049","Икра Тобико","кг"],</p>
-<p class="p2">["Отработка","12542","Стружка тунца","кг"],</p>
-<p class="p2">["Отработка","16602","Горчица дижон зернистая","кг"],</p>
-<p class="p2">["Отработка","16522","Кетчуп томатный Heinz","кг"],</p>
-<p class="p2">["Отработка","29597","Майонез","кг"],</p>
-<p class="p2">["Отработка","29527","Майонез Японский","кг"],</p>
-<p class="p2">["Отработка","31569","Соус QP юдзу","л"],</p>
-<p class="p2">["Отработка","30185","Соус Бульгоги","кг"],</p>
-<p class="p2">["Отработка","11236","Соус ворчестер","л"],</p>
-<p class="p2">["Отработка","29513","Соус Кимчи","л"],</p>
-<p class="p2">["Отработка","39153018175","Соус кисло-сладкий AROY-D","кг"],</p>
-<p class="p2">["Отработка","25744","Соус кунжутный","л"],</p>
-<p class="p2">["Отработка","30114","Соус Мирин","л"],</p>
-<p class="p2">["Отработка","29645","Соус Рыбный","л"],</p>
-<p class="p2">["Отработка","25798","Соус сладкий чили","кг"],</p>
-<p class="p2">["Отработка","22887","Соус соевый Киккоман","л"],</p>
-<p class="p2">["Отработка","30070","Соус соевый Китайский (1,72л)","л"],</p>
-<p class="p2">["Отработка","391530202286","Соус Соевый сладкий","кг"],</p>
-<p class="p2">["Отработка","29508","Соус сырный","л"],</p>
-<p class="p2">["Отработка","30066","Соус терияки","л"],</p>
-<p class="p2">["Отработка","29458","Соус Тонкацу","кг"],</p>
-<p class="p2">["Отработка","29547","Соус устричный","л"],</p>
-<p class="p2">["Отработка","29833","Соус Хой Син","л"],</p>
-<p class="p2">["Отработка","31157","Соус шисо","кг"],</p>
-<p class="p2">["Отработка","30200","Соус Шрирача","кг"],</p>
-<p class="p2">["Отработка","18617","Уксус китайский ЮН","л"],</p>
-<p class="p2">["Отработка","30161","Уксус красный винный","л"],</p>
-<p class="p2">["Отработка","12483","Уксус мицукан","л"],</p>
-<p class="p2">["Отработка","16135","Уксусная кислота 70%","л"],</p>
-<p class="p2">["Отработка","29601","Кукуруза консервированная стафф бондюэль","кг"],</p>
-<p class="p2">["Отработка","29404","Макароны стафф","кг"],</p>
-<p class="p2">["Отработка","17043","Авокадо","кг"],</p>
-<p class="p2">["Отработка","16186","Апельсин св","кг"],</p>
-<p class="p2">["Отработка","13957","Лайм","кг"],</p>
-<p class="p2">["Отработка","13992","Лимон св","кг"],</p>
-<p class="p2">["Отработка","30125","Сухари панировочные Панко","кг"],</p>
-<p class="p2">["Отработка","378328","Печенье BISCOFF карамельное LOTUS","шт"],</p>
-<p class="p2">["Отработка","17393","Хлеб бородинский","кг"],</p>
-<p class="p2">["Отработка","29504","Вишня с/м","кг"],</p>
-<p class="p2">["Отработка","20390","Клубника с/м","кг"],</p>
-<p class="p2">["Отработка","29823","Малина с/м","кг"],</p>
-<p class="p2">["Отработка","32427","Приправа дашидо","кг"],</p>
-<p class="p2">["Отработка","11579","Приправа для курицы","кг"],</p>
-<p class="p2">["Отработка","29395","Приправа карри","кг"],</p>
-<p class="p2">["Отработка","14529","Приправа смесь 15 перцев","кг"],</p>
-<p class="p2">["Отработка","39146065","Приправа Фурикаки","кг"],</p>
-<p class="p2">["Отработка","25135","Приправа хондаши","кг"],</p>
-<p class="p2">["Отработка","11892","Соль крупная","кг"],</p>
-<p class="p2">["Отработка","14016","Соль морская","кг"],</p>
-<p class="p2">["Отработка","30194","Васаби порошок","кг"],</p>
-<p class="p2">["Отработка","39153012188","Кансуй японская добавка к тесту","кг"],</p>
-<p class="p2">["Отработка","22809","Кинза сухая","кг"],</p>
-<p class="p2">["Отработка","16760","Кумин (зира)","кг"],</p>
-<p class="p2">["Отработка","30047","Куркума","кг"],</p>
-<p class="p2">["Отработка","29936","Лук жареный","кг"],</p>
-<p class="p2">["Отработка","29459","Пектин","кг"],</p>
-<p class="p2">["Отработка","12904","Перец душистый","кг"],</p>
-<p class="p2">["Отработка","22906","Перец кр. стручковый острый сушеный","кг"],</p>
-<p class="p2">["Отработка","20777","Перец сычуаньский","кг"],</p>
-<p class="p2">["Отработка","16554","Перец черный горошек","кг"],</p>
-<p class="p2">["Отработка","391530201328","Перчик китайский с арахисом","кг"],</p>
-<p class="p2">["Отработка","11228","Специи тогараши","кг"],</p>
-<p class="p2">["Отработка","18488","Усилитель вкуса (кристаллики)","кг"],</p>
-<p class="p2">["Отработка","12581","Молоко до 3,2%","л"],</p>
-<p class="p2">["Отработка","29883","Молоко сгущеное","кг"],</p>
-<p class="p2">["Отработка","16795","Сливки взбитые в баллонах","кг"],</p>
-<p class="p2">["Отработка","30149","Сливки не сладкие до 35%","л"],</p>
-<p class="p2">["Отработка","29309","Сливки растительные","л"],</p>
-<p class="p2">["Отработка","16190","Орех арахис очищенный","кг"],</p>
-<p class="p2">["Отработка","30166","Кориандр сухой","кг"],</p>
-<p class="p2">["Отработка","14241","Перец белый молотый","кг"],</p>
-<p class="p2">["Отработка","14633","Перец черный молотый","кг"],</p>
-<p class="p2">["Отработка","22890","Перец чили острый хлопья","кг"],</p>
-<p class="p2">["Отработка","387163","Мед горный разнотравье","кг"],</p>
-<p class="p2">["Отработка","30182","Сахар песок","кг"],</p>
-<p class="p2">["Отработка","19665","Эконом (для чистки овощей)","шт"],</p>
-<p class="p2">["Отработка","377735","Циновка (коврик для суши)","шт"],</p>
-<p class="p2">["Порча","29507","Анис звездочками","кг"],</p>
-<p class="p2">["Порча","13601","Кардамон","кг"],</p>
-<p class="p2">["Порча","17552","Корица палочка","кг"],</p>
-<p class="p2">["Порча","13258","Листья лайма","кг"],</p>
-<p class="p2">["Порча","13710","Сахар тростниковый","кг"],</p>
-<p class="p2">["Порча","16367","Вино Тбилиси Долины Грузии белое сухое","л"],</p>
-<p class="p2">["Порча","391530195469","Вино Rebelle, Blanc (0,75л)","л"],</p>
-<p class="p2">["Порча","17925","Вино CHOYA Sake (0,75л)","л"],</p>
-<p class="p2">["Порча","380784","Сироп Бузина Sk bar","л"],</p>
-<p class="p2">["Порча","39152387","Сироп Глюкозный","л"],</p>
-<p class="p2">["Порча","25144","Сок юдзу","л"],</p>
-<p class="p2">["Порча","29733","Чай зеленый матча","кг"],</p>
-<p class="p2">["Порча","16525","Чай матча голубой","кг"],</p>
-<p class="p2">["Порча","22861","Бадьян хаджо","кг"],</p>
-<p class="p2">["Порча","12084","Горох","кг"],</p>
-<p class="p2">["Порча","19948","Гречка","кг"],</p>
-<p class="p2">["Порча","29466","Крупа манная","кг"],</p>
-<p class="p2">["Порча","30145","Овсяные хлопья","кг"],</p>
-<p class="p2">["Порча","30007","Рис для суши","кг"],</p>
-<p class="p2">["Порча","30279","Рис жасмин","кг"],</p>
-<p class="p2">["Порча","28344","Бумага рисовая 22см","кг"],</p>
-<p class="p2">["Порча","29804","Лапша рисовая","кг"],</p>
-<p class="p2">["Порча","22832","Лапша фунчоза","кг"],</p>
-<p class="p2">["Порча","30135","Лапша фунчоза стеклянная","кг"],</p>
-<p class="p2">["Порча","39147578","Паста Тамариндовая","кг"],</p>
-<p class="p2">["Порча","29726","Мука в/с","кг"],</p>
-<p class="p2">["Порча","30150","Мука рисовая","кг"],</p>
-<p class="p2">["Порча","16342","Мука темпура","кг"],</p>
-<p class="p2">["Порча","13406","Джем алоэ","кг"],</p>
-<p class="p2">["Порча","29609","Глюкоза","кг"],</p>
-<p class="p2">["Порча","29429","Дрожжи сухие","кг"],</p>
-<p class="p2">["Порча","13334","Разрыхлитель для теста","кг"],</p>
-<p class="p2">["Порча","30122","Сода пищевая","кг"],</p>
-<p class="p2">["Порча","29542","Краситель пищевой","кг"],</p>
-<p class="p2">["Порча","20786","Агар-агар","кг"],</p>
-<p class="p2">["Порча","29983","Желатин","кг"],</p>
-<p class="p2">["Порча","29452","Крахмал кукурузный","кг"],</p>
-<p class="p2">["Порча","20745","Крахмал топиоковый","кг"],</p>
-<p class="p2">["Порча","16337","Шоколад белый плитка","кг"],</p>
-<p class="p2">["Порча","39145687","Дайкон маринованный","кг"],</p>
-<p class="p2">["Порча","29313","Кабачковая икра","кг"],</p>
-<p class="p2">["Порча","18063","Паста карри","кг"],</p>
-<p class="p2">["Порча","16423","Паста Криспи Чили","кг"],</p>
-<p class="p2">["Порча","30048","Паста мисо","кг"],</p>
-<p class="p2">["Порча","30103","Паста перечная Кучуджан","кг"],</p>
-<p class="p2">["Порча","29691","Паста Табаджан","кг"],</p>
-<p class="p2">["Порча","29706","Паста тахини","кг"],</p>
-<p class="p2">["Порча","18631","Паста том ям","кг"],</p>
-<p class="p2">["Порча","22800","Паста трюфельная","кг"],</p>
-<p class="p2">["Порча","29862","Перец халапеньо консервированный","кг"],</p>
-<p class="p2">["Порча","29414","Томатная паста","кг"],</p>
-<p class="p2">["Порча","29520","Тунец консервированный","кг"],</p>
-<p class="p2">["Порча","22833","Пюре манго (Mango puree)","кг"],</p>
-<p class="p2">["Порча","29693","Пюре маракуйя","кг"],</p>
-<p class="p2">["Порча","30190","Жир фритюрный","л"],</p>
-<p class="p2">["Порча","17827","Масло кунжутное","л"],</p>
-<p class="p2">["Порча","29694","Масло подсолнечное рафинированное","л"],</p>
-<p class="p2">["Порча","13244","Масло трюфельное","кг"],</p>
-<p class="p2">["Порча","29867","Йогурт","кг"],</p>
-<p class="p2">["Порча","18044","Курт копченый","кг"],</p>
-<p class="p2">["Порча","17090","Масло президент","кг"],</p>
-<p class="p2">["Порча","29483","Масло сливочное","кг"],</p>
-<p class="p2">["Порча","30015","Молоко кокосовое","л"],</p>
-<p class="p2">["Порча","21426","Молоко соевое","л"],</p>
-<p class="p2">["Порча","29963","Сыр Маскарпоне","кг"],</p>
-<p class="p2">["Порча","12356","Сыр Сулугуни","кг"],</p>
-<p class="p2">["Порча","30242","Сыр творожный DenCheese","кг"],</p>
-<p class="p2">["Порча","11223","Сыр Тофу","кг"],</p>
-<p class="p2">["Порча","387162","Сыр Чеддер слайсы хохланд","кг"],</p>
-<p class="p2">["Порча","14212","Сыр Грана Падано","кг"],</p>
-<p class="p2">["Порча","18013","Яйцо куриное","шт"],</p>
-<p class="p2">["Порча","381245","Куриная окорочка копченая","кг"],</p>
-<p class="p2">["Порча","17717","Баранина мякоть не очищенная","кг"],</p>
-<p class="p2">["Порча","385929","Говядина ВС Экстра зачищенная","кг"],</p>
-<p class="p2">["Порча","19057","Говядина мякоть голень","кг"],</p>
-<p class="p2">["Порча","18346","Говядина мякоть незачищенная","кг"],</p>
-<p class="p2">["Порча","22896","Говяжий жир","кг"],</p>
-<p class="p2">["Порча","11473","Говяжий фарш","кг"],</p>
-<p class="p2">["Порча","11148","Говяжьи кости (суп набор)","кг"],</p>
-<p class="p2">["Порча","20831","Куриное бедро без кости и без кожи","кг"],</p>
-<p class="p2">["Порча","11140","Куриное филе","кг"],</p>
-<p class="p2">["Порча","18408","Куриные крылья","кг"],</p>
-<p class="p2">["Порча","19032","Куриные окорочка","кг"],</p>
-<p class="p2">["Порча","383942","Куриный каркас","кг"],</p>
-<p class="p2">["Порча","17115","Утка окорочка","кг"],</p>
-<p class="p2">["Порча","17113","Вино Красное для кухни","л"],</p>
-<p class="p2">["Порча","11828","Грибы вешенки","кг"],</p>
-<p class="p2">["Порча","11795","Грибы древесные","кг"],</p>
-<p class="p2">["Порча","18565","Грибы шампиньоны","кг"],</p>
-<p class="p2">["Порча","22835","Грибы шитаки сухие","кг"],</p>
-<p class="p2">["Порча","30027","Базилик красный свежий","кг"],</p>
-<p class="p2">["Порча","18787","Бобовые ростки","кг"],</p>
-<p class="p2">["Порча","19686","Имбирь корень","кг"],</p>
-<p class="p2">["Порча","17610","Кинза свежая","кг"],</p>
-<p class="p2">["Порча","29776","Лемонграсс","кг"],</p>
-<p class="p2">["Порча","16218","Лист Салата","кг"],</p>
-<p class="p2">["Порча","12007","Лук зеленый","кг"],</p>
-<p class="p2">["Порча","16891","Мята свежая","кг"],</p>
-<p class="p2">["Порча","13552","Салат Микс","кг"],</p>
-<p class="p2">["Порча","21002","Сельдерей стебель","кг"],</p>
-<p class="p2">["Порча","13574","Чесночные стрелки","кг"],</p>
-<p class="p2">["Порча","29683","Шпинат св.","кг"],</p>
-<p class="p2">["Порча","29652","Бобы эдамаме","кг"],</p>
-<p class="p2">["Порча","17141","Горошек зеленый с/м","кг"],</p>
-<p class="p2">["Порча","39150298","Картофель фри McCain CRISPERS 2*5","кг"],</p>
-<p class="p2">["Порча","13673","Картофель фри 8*12 с/м (лодочки)","кг"],</p>
-<p class="p2">["Порча","16657","Кукуруза початок с/м","кг"],</p>
-<p class="p2">["Порча","22873","Баклажаны","кг"],</p>
-<p class="p2">["Порча","18686","Дайкон редька белая","кг"],</p>
-<p class="p2">["Порча","10561","Кабачки св","кг"],</p>
-<p class="p2">["Порча","11145","Капуста белокачанная","кг"],</p>
-<p class="p2">["Порча","29627","Капуста корейская кимчи","кг"],</p>
-<p class="p2">["Порча","21050","Капуста пекинская","кг"],</p>
-<p class="p2">["Порча","13759","Картофель св","кг"],</p>
-<p class="p2">["Порча","18661","Лук красный","кг"],</p>
-<p class="p2">["Порча","13895","Лук репчатый","кг"],</p>
-<p class="p2">["Порча","14086","Лук шалот","кг"],</p>
-<p class="p2">["Порча","16534","Морковь св","кг"],</p>
-<p class="p2">["Порча","14831","Огурцы св","кг"],</p>
-<p class="p2">["Порча","13279","Перец болгарский светофор (зеленый)","кг"],</p>
-<p class="p2">["Порча","17630","Перец болгарский светофор (красный)","кг"],</p>
-<p class="p2">["Порча","18636","Перец полу горький (зеленый)","кг"],</p>
-<p class="p2">["Порча","18654","Перец Чили Зеленый свежий","кг"],</p>
-<p class="p2">["Порча","11704","Перец Чили Красный свежий","кг"],</p>
-<p class="p2">["Порча","18894","Помидоры черри","кг"],</p>
-<p class="p2">["Порча","17733","Фасоль стручковая св","кг"],</p>
-<p class="p2">["Порча","19419","Чеснок св","кг"],</p>
-<p class="p2">["Порча","23226","Чеснок св очищенный","кг"],</p>
-<p class="p2">["Порча","29428","Водоросли Вакаме","кг"],</p>
-<p class="p2">["Порча","13255","Водоросли Комбу","кг"],</p>
-<p class="p2">["Порча","22244","Водоросли Нори","кг"],</p>
-<p class="p2">["Порча","29553","Водоросли Нори соленые","кг"],</p>
-<p class="p2">["Порча","11938","Имбирь маринованный","кг"],</p>
-<p class="p2">["Порча","29445","Салат чукка","кг"],</p>
-<p class="p2">["Порча","31776","Кокосовая стружка","кг"],</p>
-<p class="p2">["Порча","39145257","Кунжут с кимчи","кг"],</p>
-<p class="p2">["Порча","12479","Семена кунжутные","кг"],</p>
-<p class="p2">["Порча","10459","Вонголе","кг"],</p>
-<p class="p2">["Порча","22888","Кальмары кольца с/м","кг"],</p>
-<p class="p2">["Порча","29463","Крабовые палочки","кг"],</p>
-<p class="p2">["Порча","29566","Креветки корол. с/м б/г 21/25","кг"],</p>
-<p class="p2">["Порча","386367","Мидии на полустворке","кг"],</p>
-<p class="p2">["Порча","20217","Мясо краба","кг"],</p>
-<p class="p2">["Порча","13270","Тунец с/м","кг"],</p>
-<p class="p2">["Порча","11915","Угорь жареный \"унаги\"","кг"],</p>
-<p class="p2">["Порча","19742","Рыба голова семги","кг"],</p>
-<p class="p2">["Порча","24686","Рыба семга тушка охл","кг"],</p>
-<p class="p2">["Порча","22806","Рыба сибас с/м","шт"],</p>
-<p class="p2">["Порча","22807","Рыба филе семга на шкуре с/м","кг"],</p>
-<p class="p2">["Порча","30189","Икра красная","кг"],</p>
-<p class="p2">["Порча","20049","Икра Тобико","кг"],</p>
-<p class="p2">["Порча","12542","Стружка тунца","кг"],</p>
-<p class="p2">["Порча","16602","Горчица дижон зернистая","кг"],</p>
-<p class="p2">["Порча","16522","Кетчуп томатный Heinz","кг"],</p>
-<p class="p2">["Порча","29597","Майонез","кг"],</p>
-<p class="p2">["Порча","29527","Майонез Японский","кг"],</p>
-<p class="p2">["Порча","31569","Соус QP юдзу","л"],</p>
-<p class="p2">["Порча","30185","Соус Бульгоги","кг"],</p>
-<p class="p2">["Порча","11236","Соус ворчестер","л"],</p>
-<p class="p2">["Порча","29513","Соус Кимчи","л"],</p>
-<p class="p2">["Порча","39153018175","Соус кисло-сладкий AROY-D","кг"],</p>
-<p class="p2">["Порча","25744","Соус кунжутный","л"],</p>
-<p class="p2">["Порча","30114","Соус Мирин","л"],</p>
-<p class="p2">["Порча","29645","Соус Рыбный","л"],</p>
-<p class="p2">["Порча","25798","Соус сладкий чили","кг"],</p>
-<p class="p2">["Порча","22887","Соус соевый Киккоман","л"],</p>
-<p class="p2">["Порча","30070","Соус соевый Китайский (1,72л)","л"],</p>
-<p class="p2">["Порча","391530202286","Соус Соевый сладкий","кг"],</p>
-<p class="p2">["Порча","29508","Соус сырный","л"],</p>
-<p class="p2">["Порча","30066","Соус терияки","л"],</p>
-<p class="p2">["Порча","29458","Соус Тонкацу","кг"],</p>
-<p class="p2">["Порча","29547","Соус устричный","л"],</p>
-<p class="p2">["Порча","29833","Соус Хой Син","л"],</p>
-<p class="p2">["Порча","31157","Соус шисо","кг"],</p>
-<p class="p2">["Порча","30200","Соус Шрирача","кг"],</p>
-<p class="p2">["Порча","18617","Уксус китайский ЮН","л"],</p>
-<p class="p2">["Порча","30161","Уксус красный винный","л"],</p>
-<p class="p2">["Порча","12483","Уксус мицукан","л"],</p>
-<p class="p2">["Порча","16135","Уксусная кислота 70%","л"],</p>
-<p class="p2">["Порча","29601","Кукуруза консервированная стафф бондюэль","кг"],</p>
-<p class="p2">["Порча","29404","Макароны стафф","кг"],</p>
-<p class="p2">["Порча","17043","Авокадо","кг"],</p>
-<p class="p2">["Порча","16186","Апельсин св","кг"],</p>
-<p class="p2">["Порча","13957","Лайм","кг"],</p>
-<p class="p2">["Порча","13992","Лимон св","кг"],</p>
-<p class="p2">["Порча","30125","Сухари панировочные Панко","кг"],</p>
-<p class="p2">["Порча","378328","Печенье BISCOFF карамельное LOTUS","шт"],</p>
-<p class="p2">["Порча","17393","Хлеб бородинский","кг"],</p>
-<p class="p2">["Порча","29504","Вишня с/м","кг"],</p>
-<p class="p2">["Порча","20390","Клубника с/м","кг"],</p>
-<p class="p2">["Порча","29823","Малина с/м","кг"],</p>
-<p class="p2">["Порча","32427","Приправа дашидо","кг"],</p>
-<p class="p2">["Порча","11579","Приправа для курицы","кг"],</p>
-<p class="p2">["Порча","29395","Приправа карри","кг"],</p>
-<p class="p2">["Порча","14529","Приправа смесь 15 перцев","кг"],</p>
-<p class="p2">["Порча","39146065","Приправа Фурикаки","кг"],</p>
-<p class="p2">["Порча","25135","Приправа хондаши","кг"],</p>
-<p class="p2">["Порча","11892","Соль крупная","кг"],</p>
-<p class="p2">["Порча","14016","Соль морская","кг"],</p>
-<p class="p2">["Порча","30194","Васаби порошок","кг"],</p>
-<p class="p2">["Порча","39153012188","Кансуй японская добавка к тесту","кг"],</p>
-<p class="p2">["Порча","22809","Кинза сухая","кг"],</p>
-<p class="p2">["Порча","16760","Кумин (зира)","кг"],</p>
-<p class="p2">["Порча","30047","Куркума","кг"],</p>
-<p class="p2">["Порча","29936","Лук жареный","кг"],</p>
-<p class="p2">["Порча","29459","Пектин","кг"],</p>
-<p class="p2">["Порча","12904","Перец душистый","кг"],</p>
-<p class="p2">["Порча","22906","Перец кр. стручковый острый сушеный","кг"],</p>
-<p class="p2">["Порча","20777","Перец сычуаньский","кг"],</p>
-<p class="p2">["Порча","16554","Перец черный горошек","кг"],</p>
-<p class="p2">["Порча","391530201328","Перчик китайский с арахисом","кг"],</p>
-<p class="p2">["Порча","11228","Специи тогараши","кг"],</p>
-<p class="p2">["Порча","18488","Усилитель вкуса (кристаллики)","кг"],</p>
-<p class="p2">["Порча","12581","Молоко до 3,2%","л"],</p>
-<p class="p2">["Порча","29883","Молоко сгущеное","кг"],</p>
-<p class="p2">["Порча","16795","Сливки взбитые в баллонах","кг"],</p>
-<p class="p2">["Порча","30149","Сливки не сладкие до 35%","л"],</p>
-<p class="p2">["Порча","29309","Сливки растительные","л"],</p>
-<p class="p2">["Порча","16190","Орех арахис очищенный","кг"],</p>
-<p class="p2">["Порча","30166","Кориандр сухой","кг"],</p>
-<p class="p2">["Порча","14241","Перец белый молотый","кг"],</p>
-<p class="p2">["Порча","14633","Перец черный молотый","кг"],</p>
-<p class="p2">["Порча","22890","Перец чили острый хлопья","кг"],</p>
-<p class="p2">["Порча","387163","Мед горный разнотравье","кг"],</p>
-<p class="p2">["Порча","30182","Сахар песок","кг"],</p>
-<p class="p2">["Порча","19665","Эконом (для чистки овощей)","шт"],</p>
-<p class="p2">["Порча","377735","Циновка (коврик для суши)","шт"],</p>
-<p class="p2">["Порча","10189","П/ф Фреш Имбирный (-75%) (ALL)","л"],</p>
-<p class="p2">["Порча","20050","ПФ Авокадо очищенное (-45%) (ALL)","кг"],</p>
-<p class="p2">["Порча","20865","Пф Базилик зеленый листья (-50%) (ALL)","кг"],</p>
-<p class="p2">["Порча","10343","ПФ Базилик зеленый литья -50% ALL","кг"],</p>
-<p class="p2">["Порча","10636","Пф Базилик Зеленый свежий (-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39147001","пф базилик красный свежий (-20%) (ALL)","кг"],</p>
-<p class="p2">["Порча","21047","Пф Базилик красный свежий листья (-50%) (ALL)","кг"],</p>
-<p class="p2">["Порча","18014","Пф Баклажаны (-10%) (ALL)","кг"],</p>
-<p class="p2">["Порча","33320","пф вонголе (-35%) ALL","кг"],</p>
-<p class="p2">["Порча","391530215066","ПФ вонголе (45%)","кг"],</p>
-<p class="p2">["Порча","12041","Пф Грибы вешенки (-15%) (ALL)","кг"],</p>
-<p class="p2">["Порча","18191","Пф Грибы шампиньоны (-10%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39153017397","ПФ Заправка на окрошку","кг"],</p>
-<p class="p2">["Порча","11878","Пф Имбирь корень (-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","20806","пф имбирь корень (-25%) ALL","кг"],</p>
-<p class="p2">["Порча","20423","Пф Кабачки св (-10%) (ALL)","кг"],</p>
-<p class="p2">["Порча","13402","Пф Капуста белокачанная (-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","3913363","Пф капуста кимчи (-15%)","кг"],</p>
-<p class="p2">["Порча","14291","Пф Капуста пекинская (-33%) (ALL)","кг"],</p>
-<p class="p2">["Порча","391530214531","ПФ Капуста с цыпленком(О)","порц"],</p>
-<p class="p2">["Порча","13433","Пф Картофель (-30%) (ALL)","кг"],</p>
-<p class="p2">["Порча","384285","пф кинза листья (-60%) (ALL)","кг"],</p>
-<p class="p2">["Порча","20940","Пф Кинза свежая (-30%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39145395","ПФ Крем павлова КФТ","кг"],</p>
-<p class="p2">["Порча","39151107","ПФ Крылья зач. (-21%)","кг"],</p>
-<p class="p2">["Порча","388119","ПФ куринные крылья Светлана -18,6%","кг"],</p>
-<p class="p2">["Порча","20711","Пф Куриное филе (-15%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39153021227320","ПФ куриное филе Атырау","кг"],</p>
-<p class="p2">["Порча","20214","Пф Куриные крылья (-15%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39153021229490","Пф Куриные крылья (7%) (СС)","кг"],</p>
-<p class="p2">["Порча","27733","Пф Лайм-СОК (-60%) (ALL)","л"],</p>
-<p class="p2">["Порча","12214","Пф Лук зеленый (-20%) (ALL)","кг"],</p>
-<p class="p2">["Порча","15037","ПФ лук красный (-20%) (ALL)","кг"],</p>
-<p class="p2">["Порча","18122","Пф Лук репчатый (-20%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39151600","ПФ мак AR","кг"],</p>
-<p class="p2">["Порча","3912512","Пф Маринад на овощи","кг"],</p>
-<p class="p2">["Порча","39153021231833","ПФ маринованные кабачки (Р)","кг"],</p>
-<p class="p2">["Порча","39149290","ПФ Морковный фрешь -85% JS","л"],</p>
-<p class="p2">["Порча","18397","Пф Морковь отварная (-26%) (ALL)","кг"],</p>
-<p class="p2">["Порча","12920","Пф Морковь св (-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","10643","ПФ морковь св -25% ALL","кг"],</p>
-<p class="p2">["Порча","391530211424","Пф Мята свежая (-55%) (ALL)","кг"],</p>
-<p class="p2">["Порча","11225","Пф Мята свежая (-7%) (ALL)","кг"],</p>
-<p class="p2">["Порча","20116","Пф Огурцы без кожуры (-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","39153013091","Пф Огурцы без семян (-46%) (ALL)","кг"],</p>
-<p class="p2">["Порча","15190","ПФ Огурцы св (-12%)","кг"],</p>
-<p class="p2">["Порча","20743","Пф Огурцы св (-12%) (ALL)","кг"],</p>
-<p class="p2">["Порча","11965","пф огурцы св без кожуры (-35%) ALL","кг"],</p>
-<p class="p2">["Порча","39153013826","ПФ Пельмени","шт"],</p>
-<p class="p2">["Порча","17196","Пф Перец болгарск.светофор(3 вида)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","13101","Пф Перец болгарск.светофор(ЖЕЛТЫЙ)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","14794","Пф Перец болгарск.светофор(ЗЕЛЕНЫЙ)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","13125","Пф Перец болгарск.светофор(КРАСНЫЙ)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Порча","20317","пф перец болгарский светоф. 3 вида (-25%) ALL","кг"],</p>
-<p class="p2">["Порча","21286","Пф Перец болгарский светофор (-20%) (ALL)","кг"],</p>
-<p class="p2">["Порча","29799","пф перец полугоркий (зеленый) (-25%) (В)","кг"],</p>
-<p class="p2">["Порча","11544","Пф Перец Чили Зеленый свежий (-16%) (ALL)","кг"],</p>
-<p class="p2">["Порча","3913892","Пф перец чили зленый (-50%)ALL","кг"],</p>
-<p class="p2">["Порча","19139","Пф Перец Чили Красный свежий (-16%) (ALL)","кг"],</p>
-<p class="p2">["Порча","19911","пф помидоры черри (-5%) (ALL)","кг"],</p>
-<p class="p2">["Порча","388285","ПФ Риет (Боч)","кг"],</p>
-<p class="p2">["Порча","21029","Пф Рыба филе семга на шкуре с/м (-7%) (ALL)","кг"],</p>
-<p class="p2">["Порча","17665","Пф Салат Микс (-5%) (ALL)","кг"],</p>
-<p class="p2">["Порча","18544","Пф Сельдерей стебель (-15%) (ALL)","кг"],</p>
-<p class="p2">["Порча","10757","Пф Сыр Грана Падано (-18%) (ALL)","кг"],</p>
-<p class="p2">["Порча","389464","ПФ сыр греческий Светлана","кг"],</p>
-<p class="p2">["Порча","39151186","пф томатный конкасе Саид","кг"],</p>
-<p class="p2">["Порча","39151185","пф тоннато соус Саид","кг"],</p>
-<p class="p2">["Порча","3912223","пф фасоль стручковый св (-2%) ALL","кг"],</p>
-<p class="p2">["Порча","3915296901","пф черри жареные","кг"],</p>
-<p class="p2">["Порча","19572","Пф Чеснок св (-22%) (ALL)","кг"],</p>
-<p class="p2">["Порча","18775","Пф Шпинат (-40%) (ALL)","кг"],</p>
-<p class="p2">["Порча","391530204911","ПФ шпинат св (5%) Атырау","кг"],</p>
-<p class="p2">["Порча","10092","ПФ Шпинат св -46% ALL","кг"],</p>
-<p class="p2">["Порча","391530211276","Булочка БАО 90 гр","кг"],</p>
-<p class="p2">["Порча","391530207922","П/ф Лепешка слоеная","кг"],</p>
-<p class="p2">["Порча","391530207923","П/ф Мусс авокадо","кг"],</p>
-<p class="p2">["Порча","391530210927","Пф Алоэ-майо","кг"],</p>
-<p class="p2">["Порча","381642","пф база на мисо суп (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530215149","Пф База на Рамен","кг"],</p>
-<p class="p2">["Порча","39153021230869","Пф База на тирамису","кг"],</p>
-<p class="p2">["Порча","391530201918","Пф База семифредо","кг"],</p>
-<p class="p2">["Порча","39153019615","Пф База том ям New","кг"],</p>
-<p class="p2">["Порча","391530212602","Пф Бао дзы 1шт","шт"],</p>
-<p class="p2">["Порча","389224","Пф Бедро куриное маринованное","кг"],</p>
-<p class="p2">["Порча","391530210970","Пф бедро маринованное на коже","кг"],</p>
-<p class="p2">["Порча","391530201913","Пф Бедро маринованное с кожей","кг"],</p>
-<p class="p2">["Порча","39153018154","Пф Бедро маринованное Саид","кг"],</p>
-<p class="p2">["Порча","389234","Пф Битые огурцы","кг"],</p>
-<p class="p2">["Порча","39148548","Пф Бобовые ростки (-17%)","кг"],</p>
-<p class="p2">["Порча","389226","Пф Булочка БАО","кг"],</p>
-<p class="p2">["Порча","23658","пф бульон водоросли (ЛЮ)2","кг"],</p>
-<p class="p2">["Порча","39153019694","Пф Бульон говяжий из голени","кг"],</p>
-<p class="p2">["Порча","391530201919","Пф Бульон Даши","кг"],</p>
-<p class="p2">["Порча","39153014838","Пф Бульон копченый","кг"],</p>
-<p class="p2">["Порча","391530210969","Пф Бульон на кимчи","кг"],</p>
-<p class="p2">["Порча","391530215148","Пф Бульон на Рамен","л"],</p>
-<p class="p2">["Порча","391530214245","Пф Бульон на Фобо","л"],</p>
-<p class="p2">["Порча","386236","пф бульон рыбный NEW(ЛЮ)","л"],</p>
-<p class="p2">["Порча","39153012198","Пф Бульон том ям LY","кг"],</p>
-<p class="p2">["Порча","39146433","Пф Бульон Фо-бо","кг"],</p>
-<p class="p2">["Порча","13159","пф васаби пюре (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530216237","Пф Васаби шисо дресинг","кг"],</p>
-<p class="p2">["Порча","39153018471","Пф Вешенки (-27%)","кг"],</p>
-<p class="p2">["Порча","39153017947","Пф Вонтоны с креветками (1шт)","шт"],</p>
-<p class="p2">["Порча","39153012429","Пф Вонтоны с креветкой 1шт LY","шт"],</p>
-<p class="p2">["Порча","39153021230870","Пф Ганаш шоколадный","кг"],</p>
-<p class="p2">["Порча","39153019693","Пф Говядина голень","кг"],</p>
-<p class="p2">["Порча","381643","Пф Говядина марин (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530215755","Пф Говядина марин.бульгоги","кг"],</p>
-<p class="p2">["Порча","391530216703","Пф Говядина маринованная на салат","кг"],</p>
-<p class="p2">["Порча","391530214248","Пф Говядина отварная NEW","кг"],</p>
-<p class="p2">["Порча","39153019695","Пф Голень отварная","кг"],</p>
-<p class="p2">["Порча","391530198413","Пф Голень томленая","кг"],</p>
-<p class="p2">["Порча","20134","ПФ Грибы древесные вымоченные (L)","кг"],</p>
-<p class="p2">["Порча","391530216239","Пф Дайкон кошеу","кг"],</p>
-<p class="p2">["Порча","391530195356","Пф Дамплинг с говядиной и тофу 1шт","шт"],</p>
-<p class="p2">["Порча","391530212599","Пф Дамплинги из говядина на пару 1шт","шт"],</p>
-<p class="p2">["Порча","391530215068","Пф Дамплинги креветки -джусай","шт"],</p>
-<p class="p2">["Порча","39153017086","Пф Дамплинги с говядиной LY 1шт","шт"],</p>
-<p class="p2">["Порча","391530202791","Пф Дамплинги с говядиной мини -1шт","шт"],</p>
-<p class="p2">["Порча","391530210925","Пф Дамплинги с креветками и шитаке","шт"],</p>
-<p class="p2">["Порча","391530195357","Пф Дамплинги с курицей и фунчезой 1шт","шт"],</p>
-<p class="p2">["Порча","391530209234","Пф Дрессинг васаби понзу","кг"],</p>
-<p class="p2">["Порча","391530216705","Пф Дрессинг тайский","кг"],</p>
-<p class="p2">["Порча","391530195352","Пф Желатин куриный","кг"],</p>
-<p class="p2">["Порча","391530216439","Пф Заправка на зеленый салат","кг"],</p>
-<p class="p2">["Порча","391530211673","Пф Заправка ореховая","кг"],</p>
-<p class="p2">["Порча","391530210339","Пф Заправка соевая","кг"],</p>
-<p class="p2">["Порча","24278","пф икра тобика (-7%)ЛЮ","кг"],</p>
-<p class="p2">["Порча","3912398","Пф Кальмары кольца","кг"],</p>
-<p class="p2">["Порча","391530216725","Пф Карри зеленый","кг"],</p>
-<p class="p2">["Порча","39153012080","пф ким чи выжатая (-30%) ЛЮ","кг"],</p>
-<p class="p2">["Порча","27815","пф ким чи выжатая (-33%) ЛЮ","кг"],</p>
-<p class="p2">["Порча","39153010063","Пф Кимчи new","кг"],</p>
-<p class="p2">["Порча","10882","ПФ Кляр темпурный (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530212385","Пф Котлета куриная","кг"],</p>
-<p class="p2">["Порча","39153013549","Пф Котлета на бургер","кг"],</p>
-<p class="p2">["Порча","20296","Пф Краб снежный (-20%) ЛЮ","кг"],</p>
-<p class="p2">["Порча","39153015268","Пф Крабовый микс","кг"],</p>
-<p class="p2">["Порча","391530197559","Пф Креветка Тар-тар","кг"],</p>
-<p class="p2">["Порча","25241","пф креветки 21*25 отварные на суши (ЛЮ)2","кг"],</p>
-<p class="p2">["Порча","391530203733","ПФ Креветки 21*25 очищеные (-21%) (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530203737","ПФ Креветки 21*25 очищеные (-23%) (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530202076","Пф Крем алоэ","кг"],</p>
-<p class="p2">["Порча","39153017945","Пф Крем васаби","кг"],</p>
-<p class="p2">["Порча","391530216436","Пф Крем из маскарпоне","кг"],</p>
-<p class="p2">["Порча","39153021227453","Пф Крем клубничный","кг"],</p>
-<p class="p2">["Порча","391530202075","Пф Крем матча","кг"],</p>
-<p class="p2">["Порча","391530214472","Пф Крем на пончики","кг"],</p>
-<p class="p2">["Порча","391530200266","Пф Крем с финиками","кг"],</p>
-<p class="p2">["Порча","39153021230871","Пф Крем тирамису","кг"],</p>
-<p class="p2">["Порча","391530210971","Пф Креметте с трюфелем","кг"],</p>
-<p class="p2">["Порча","39153014823","Пф Крылья куриные маринованные","кг"],</p>
-<p class="p2">["Порча","3915300541","Пф Куриное бедро (-18%)","кг"],</p>
-<p class="p2">["Порча","39148736","Пф Куриное бедро без кожи (-15%)","кг"],</p>
-<p class="p2">["Порча","39153021229569","Пф Куриное филе маринованное","кг"],</p>
-<p class="p2">["Порча","391530198892","Пф Куриные крылья маринованные","кг"],</p>
-<p class="p2">["Порча","391530212384","Пф Куриные стрипсы","кг"],</p>
-<p class="p2">["Порча","39153019613","Пф Курица маринованная Саид","кг"],</p>
-<p class="p2">["Порча","39153014845","Пф Лазджан","кг"],</p>
-<p class="p2">["Порча","391530203627","Пф Лазджан майо","кг"],</p>
-<p class="p2">["Порча","391530199381","Пф Лапша на утку","кг"],</p>
-<p class="p2">["Порча","380055","Пф Лапша рисовая отварная (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530213099","Пф Лук карамель","кг"],</p>
-<p class="p2">["Порча","39153017983","Пф Лук карри","кг"],</p>
-<p class="p2">["Порча","390994","Пф Лук красный (зачистка LY)","кг"],</p>
-<p class="p2">["Порча","39153019687","Пф Лук маринованный красный new","кг"],</p>
-<p class="p2">["Порча","39153021229564","Пф Луковая лепешка","шт"],</p>
-<p class="p2">["Порча","391530209236","Пф Майнез трюфельный","кг"],</p>
-<p class="p2">["Порча","389236","Пф Майонез Кочуджан","кг"],</p>
-<p class="p2">["Порча","391530202074","Пф Малиновое кюли","кг"],</p>
-<p class="p2">["Порча","391530216437","Пф Манго курт","кг"],</p>
-<p class="p2">["Порча","39153017976","Пф Маринад для огурцов","кг"],</p>
-<p class="p2">["Порча","39153015266","Пф Маринад для риса Саид","кг"],</p>
-<p class="p2">["Порча","39153019688","Пф Маринованные огурцы новые","кг"],</p>
-<p class="p2">["Порча","390993","Пф Маринованные яйца аджимата","шт"],</p>
-<p class="p2">["Порча","391530200391","Пф Масло мисо","кг"],</p>
-<p class="p2">["Порча","39153012372","Пф Масло пряное","кг"],</p>
-<p class="p2">["Порча","391530200943","Пф Масло сычуаньское","кг"],</p>
-<p class="p2">["Порча","39153011726","Пф Масло чесночное LY","кг"],</p>
-<p class="p2">["Порча","39153015379","Пф Масса желатиновая","кг"],</p>
-<p class="p2">["Порча","39153021230169","Пф Мидии на полустворке","кг"],</p>
-<p class="p2">["Порча","391530216729","Пф Микс гарнир","кг"],</p>
-<p class="p2">["Порча","39153021228872","Пф Мука панировочная","кг"],</p>
-<p class="p2">["Порча","39153021230867","Пф Начинка из тунца","кг"],</p>
-<p class="p2">["Порча","391530212600","Пф Начинка на бао дзы","кг"],</p>
-<p class="p2">["Порча","39153021229351","Пф Начинка на гедзе","кг"],</p>
-<p class="p2">["Порча","391530216727","Пф Начинка на сянбин","кг"],</p>
-<p class="p2">["Порча","12927","пф овощи соломкой (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","389233","Пф Огурец без семян","кг"],</p>
-<p class="p2">["Порча","391530209235","Пф Огурцы маринованные шисо-васаби","кг"],</p>
-<p class="p2">["Порча","23061","пф огурцы на суши (-50%) (ЛЮ)2","кг"],</p>
-<p class="p2">["Порча","391530214188","Пф Омлет тамаго","кг"],</p>
-<p class="p2">["Порча","26160","--пф основа на мисо суп (ЛЮ)2","кг"],</p>
-<p class="p2">["Порча","39153014827","Пф Панировка для крыльев","кг"],</p>
-<p class="p2">["Порча","39153021229611","Пф Пельмени китайские","шт"],</p>
-<p class="p2">["Порча","391530212143","Пф Помадка","кг"],</p>
-<p class="p2">["Порча","391044","Пф Посыпка на картофель фри","кг"],</p>
-<p class="p2">["Порча","15315","ПФ Приправа панко китайский (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","39153021230868","Пф Пропитка на тирамису","кг"],</p>
-<p class="p2">["Порча","39153015357","Пф Рис для суши с маринадом Саид","кг"],</p>
-<p class="p2">["Порча","39153015265","Пф Рис для суши Саид","кг"],</p>
-<p class="p2">["Порча","390985","Пф Рис жасмин","кг"],</p>
-<p class="p2">["Порча","391530216704","Пф Салат микс LY","кг"],</p>
-<p class="p2">["Порча","386446","пф семга филе без кожи (-11%) ЛЮ","кг"],</p>
-<p class="p2">["Порча","39153012786","пф семга филе без кожи (-12%) ЛЮ","кг"],</p>
-<p class="p2">["Порча","391530202581","Пф Семга маринованная","кг"],</p>
-<p class="p2">["Порча","380943","пф семга просоленная (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","18794","ПФ Смесь для риса суши (ЛЮ)","л"],</p>
-<p class="p2">["Порча","39153021229610","Пф Смесь на гедзе","кг"],</p>
-<p class="p2">["Порча","391530199762","Пф Соус биск","кг"],</p>
-<p class="p2">["Порча","391530216728","Пф Соус из тамаринда","кг"],</p>
-<p class="p2">["Порча","391530213097","Пф Соус йогуртовый","кг"],</p>
-<p class="p2">["Порча","11336","пф соус к стекляной лапше (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","12883","пф соус кальби (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","39153018740","Пф Соус карри","кг"],</p>
-<p class="p2">["Порча","39153009584","Пф Соус Кун Лу","кг"],</p>
-<p class="p2">["Порча","391530195611","Пф Соус лазджан-димсам","кг"],</p>
-<p class="p2">["Порча","39153015269","Пф Соус Масага","кг"],</p>
-<p class="p2">["Порча","391530210972","Пф Соус Мисо майонез","кг"],</p>
-<p class="p2">["Порча","391530197001","Пф Соус на баклажаны","кг"],</p>
-<p class="p2">["Порча","12168","ПФ Соус на дамплинги из говядина LY","кг"],</p>
-<p class="p2">["Порча","385209","пф соус на димпсамы (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","381645","пф соус на древесные грибы (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530208977","Пф Соус на креветки","кг"],</p>
-<p class="p2">["Порча","391530205982","Пф Соус на крылья","кг"],</p>
-<p class="p2">["Порча","381644","ПФ Соус на лапшу 3 (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530198897","Пф Соус на Пад Тай","кг"],</p>
-<p class="p2">["Порча","11218","пф соус на хрус баклажаны (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530201915","Пф Соус остро-сладкий","кг"],</p>
-<p class="p2">["Порча","391530202647","Пф Соус Понзу LY","кг"],</p>
-<p class="p2">["Порча","13651","ПФ Соус Саке (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","39153021228460","Пф Соус Самбал","кг"],</p>
-<p class="p2">["Порча","24356","пф соус соевый для гостей (ЛЮ)2","кг"],</p>
-<p class="p2">["Порча","39153015270","Пф Соус Спайси Саид","кг"],</p>
-<p class="p2">["Порча","23277","пф соус унаги (ЛЮ)2","кг"],</p>
-<p class="p2">["Порча","391530201351","Пф Соус Чили","кг"],</p>
-<p class="p2">["Порча","391530215756","Пф Страчателла","кг"],</p>
-<p class="p2">["Порча","3912463","Пф Сыр Ден чиз","кг"],</p>
-<p class="p2">["Порча","18439","ПФ Тесто для лагмана отварное (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","39153015384","Пф Тесто моти New","кг"],</p>
-<p class="p2">["Порча","39153017173","Пф Тесто на бао","кг"],</p>
-<p class="p2">["Порча","391530212601","Пф Тесто на бао дзы","кг"],</p>
-<p class="p2">["Порча","39153014843","Пф Тесто на вонтоны","кг"],</p>
-<p class="p2">["Порча","385207","пф тесто на димсамы (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","39153014840","Пф Тесто на лапшу","кг"],</p>
-<p class="p2">["Порча","12513","ПФ Тесто на лапшу и дамплинг (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","39153021229567","Пф Тесто на пельмени","кг"],</p>
-<p class="p2">["Порча","391530214471","Пф Тесто на пончики","кг"],</p>
-<p class="p2">["Порча","391530216726","Пф Тесто на сямбин","кг"],</p>
-<p class="p2">["Порча","39153021230872","Пф Тирамису","кг"],</p>
-<p class="p2">["Порча","39153018060","Пф Тунец (-10%)","кг"],</p>
-<p class="p2">["Порча","22693","пф угорь (-23%) ЛЮ","кг"],</p>
-<p class="p2">["Порча","391530199287","Пф Угорь (-35%)","кг"],</p>
-<p class="p2">["Порча","391530201492","Пф Угорь (-40%)","кг"],</p>
-<p class="p2">["Порча","391530213100","Пф Фарш говядина-джусай","кг"],</p>
-<p class="p2">["Порча","39146417","Пф Фарш говяжий (5%)","кг"],</p>
-<p class="p2">["Порча","391530195353","Пф Фарш говяжий тофу","кг"],</p>
-<p class="p2">["Порча","391530202378","Пф Фарш из утки","кг"],</p>
-<p class="p2">["Порча","3914393","Пф Фарш креветка LY","кг"],</p>
-<p class="p2">["Порча","39153017942","Пф Фарш креветочный LY new","кг"],</p>
-<p class="p2">["Порча","391530195354","Пф Фарш куриный с фунчезой","кг"],</p>
-<p class="p2">["Порча","39153021229563","Пф Фарш луковый на лепешку","кг"],</p>
-<p class="p2">["Порча","39153014837","Пф Фарш на вонтоны","кг"],</p>
-<p class="p2">["Порча","39153017085","Пф фарш на дамплинги из говядины","кг"],</p>
-<p class="p2">["Порча","39153021229566","Пф Фарш на пельмени","кг"],</p>
-<p class="p2">["Порча","39153021228489","Пф Фарш на сянбин говядина","кг"],</p>
-<p class="p2">["Порча","391530208976","Пф Фарш с креветками и имбирем","кг"],</p>
-<p class="p2">["Порча","12205","пф фунчеза стеклянная отварная (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","391530207921","Пф Чизкейк","порц"],</p>
-<p class="p2">["Порча","19797","ПФ Чипсы картофельные (ЛЮ)","кг"],</p>
-<p class="p2">["Порча","3913825","Пф Чукка","кг"],</p>
-<p class="p2">["Порча","391530200076","Пф Шиитаки маринованные","кг"],</p>
-<p class="p2">["Порча","391530213098","Пф Шпинат маринованный","кг"],</p>
-<p class="p2">["Порча","391530203626","Пф Щечки","кг"],</p>
-<p class="p2">["Порча","391530210924","Фарш креветки шитаке","кг"],</p>
-<p class="p2">["Порча","391530213101","Пф Вонтоны говядина-джусай 1 шт","кг"],</p>
-<p class="p2">["Порча","39153021229352","Пф Гедзе с курицей 1 шт","шт"],</p>
-<p class="p2">["Бракераж","10189","П/ф Фреш Имбирный (-75%) (ALL)","л"],</p>
-<p class="p2">["Бракераж","20050","ПФ Авокадо очищенное (-45%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","20865","Пф Базилик зеленый листья (-50%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","10343","ПФ Базилик зеленый литья -50% ALL","кг"],</p>
-<p class="p2">["Бракераж","10636","Пф Базилик Зеленый свежий (-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39147001","пф базилик красный свежий (-20%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","21047","Пф Базилик красный свежий листья (-50%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","18014","Пф Баклажаны (-10%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","33320","пф вонголе (-35%) ALL","кг"],</p>
-<p class="p2">["Бракераж","391530215066","ПФ вонголе (45%)","кг"],</p>
-<p class="p2">["Бракераж","12041","Пф Грибы вешенки (-15%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","18191","Пф Грибы шампиньоны (-10%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39153017397","ПФ Заправка на окрошку","кг"],</p>
-<p class="p2">["Бракераж","11878","Пф Имбирь корень (-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","20806","пф имбирь корень (-25%) ALL","кг"],</p>
-<p class="p2">["Бракераж","20423","Пф Кабачки св (-10%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","13402","Пф Капуста белокачанная (-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","3913363","Пф капуста кимчи (-15%)","кг"],</p>
-<p class="p2">["Бракераж","14291","Пф Капуста пекинская (-33%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","391530214531","ПФ Капуста с цыпленком(О)","порц"],</p>
-<p class="p2">["Бракераж","13433","Пф Картофель (-30%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","384285","пф кинза листья (-60%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","20940","Пф Кинза свежая (-30%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39145395","ПФ Крем павлова КФТ","кг"],</p>
-<p class="p2">["Бракераж","39151107","ПФ Крылья зач. (-21%)","кг"],</p>
-<p class="p2">["Бракераж","388119","ПФ куринные крылья Светлана -18,6%","кг"],</p>
-<p class="p2">["Бракераж","20711","Пф Куриное филе (-15%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39153021227320","ПФ куриное филе Атырау","кг"],</p>
-<p class="p2">["Бракераж","20214","Пф Куриные крылья (-15%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39153021229490","Пф Куриные крылья (7%) (СС)","кг"],</p>
-<p class="p2">["Бракераж","27733","Пф Лайм-СОК (-60%) (ALL)","л"],</p>
-<p class="p2">["Бракераж","12214","Пф Лук зеленый (-20%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","15037","ПФ лук красный (-20%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","18122","Пф Лук репчатый (-20%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39151600","ПФ мак AR","кг"],</p>
-<p class="p2">["Бракераж","3912512","Пф Маринад на овощи","кг"],</p>
-<p class="p2">["Бракераж","39153021231833","ПФ маринованные кабачки (Р)","кг"],</p>
-<p class="p2">["Бракераж","39149290","ПФ Морковный фрешь -85% JS","л"],</p>
-<p class="p2">["Бракераж","18397","Пф Морковь отварная (-26%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","12920","Пф Морковь св (-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","10643","ПФ морковь св -25% ALL","кг"],</p>
-<p class="p2">["Бракераж","391530211424","Пф Мята свежая (-55%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","11225","Пф Мята свежая (-7%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","20116","Пф Огурцы без кожуры (-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","39153013091","Пф Огурцы без семян (-46%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","15190","ПФ Огурцы св (-12%)","кг"],</p>
-<p class="p2">["Бракераж","20743","Пф Огурцы св (-12%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","11965","пф огурцы св без кожуры (-35%) ALL","кг"],</p>
-<p class="p2">["Бракераж","39153013826","ПФ Пельмени","шт"],</p>
-<p class="p2">["Бракераж","17196","Пф Перец болгарск.светофор(3 вида)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","13101","Пф Перец болгарск.светофор(ЖЕЛТЫЙ)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","14794","Пф Перец болгарск.светофор(ЗЕЛЕНЫЙ)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","13125","Пф Перец болгарск.светофор(КРАСНЫЙ)(-25%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","20317","пф перец болгарский светоф. 3 вида (-25%) ALL","кг"],</p>
-<p class="p2">["Бракераж","21286","Пф Перец болгарский светофор (-20%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","29799","пф перец полугоркий (зеленый) (-25%) (В)","кг"],</p>
-<p class="p2">["Бракераж","11544","Пф Перец Чили Зеленый свежий (-16%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","3913892","Пф перец чили зленый (-50%)ALL","кг"],</p>
-<p class="p2">["Бракераж","19139","Пф Перец Чили Красный свежий (-16%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","19911","пф помидоры черри (-5%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","388285","ПФ Риет (Боч)","кг"],</p>
-<p class="p2">["Бракераж","21029","Пф Рыба филе семга на шкуре с/м (-7%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","17665","Пф Салат Микс (-5%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","18544","Пф Сельдерей стебель (-15%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","10757","Пф Сыр Грана Падано (-18%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","389464","ПФ сыр греческий Светлана","кг"],</p>
-<p class="p2">["Бракераж","39151186","пф томатный конкасе Саид","кг"],</p>
-<p class="p2">["Бракераж","39151185","пф тоннато соус Саид","кг"],</p>
-<p class="p2">["Бракераж","3912223","пф фасоль стручковый св (-2%) ALL","кг"],</p>
-<p class="p2">["Бракераж","3915296901","пф черри жареные","кг"],</p>
-<p class="p2">["Бракераж","19572","Пф Чеснок св (-22%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","18775","Пф Шпинат (-40%) (ALL)","кг"],</p>
-<p class="p2">["Бракераж","391530204911","ПФ шпинат св (5%) Атырау","кг"],</p>
-<p class="p2">["Бракераж","10092","ПФ Шпинат св -46% ALL","кг"],</p>
-<p class="p2">["Бракераж","391530211276","Булочка БАО 90 гр","кг"],</p>
-<p class="p2">["Бракераж","391530207922","П/ф Лепешка слоеная","кг"],</p>
-<p class="p2">["Бракераж","391530207923","П/ф Мусс авокадо","кг"],</p>
-<p class="p2">["Бракераж","391530210927","Пф Алоэ-майо","кг"],</p>
-<p class="p2">["Бракераж","381642","пф база на мисо суп (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530215149","Пф База на Рамен","кг"],</p>
-<p class="p2">["Бракераж","39153021230869","Пф База на тирамису","кг"],</p>
-<p class="p2">["Бракераж","391530201918","Пф База семифредо","кг"],</p>
-<p class="p2">["Бракераж","39153019615","Пф База том ям New","кг"],</p>
-<p class="p2">["Бракераж","391530212602","Пф Бао дзы 1шт","шт"],</p>
-<p class="p2">["Бракераж","389224","Пф Бедро куриное маринованное","кг"],</p>
-<p class="p2">["Бракераж","391530210970","Пф бедро маринованное на коже","кг"],</p>
-<p class="p2">["Бракераж","391530201913","Пф Бедро маринованное с кожей","кг"],</p>
-<p class="p2">["Бракераж","39153018154","Пф Бедро маринованное Саид","кг"],</p>
-<p class="p2">["Бракераж","389234","Пф Битые огурцы","кг"],</p>
-<p class="p2">["Бракераж","39148548","Пф Бобовые ростки (-17%)","кг"],</p>
-<p class="p2">["Бракераж","389226","Пф Булочка БАО","кг"],</p>
-<p class="p2">["Бракераж","23658","пф бульон водоросли (ЛЮ)2","кг"],</p>
-<p class="p2">["Бракераж","39153019694","Пф Бульон говяжий из голени","кг"],</p>
-<p class="p2">["Бракераж","391530201919","Пф Бульон Даши","кг"],</p>
-<p class="p2">["Бракераж","39153014838","Пф Бульон копченый","кг"],</p>
-<p class="p2">["Бракераж","391530210969","Пф Бульон на кимчи","кг"],</p>
-<p class="p2">["Бракераж","391530215148","Пф Бульон на Рамен","л"],</p>
-<p class="p2">["Бракераж","391530214245","Пф Бульон на Фобо","л"],</p>
-<p class="p2">["Бракераж","386236","пф бульон рыбный NEW(ЛЮ)","л"],</p>
-<p class="p2">["Бракераж","39153012198","Пф Бульон том ям LY","кг"],</p>
-<p class="p2">["Бракераж","39146433","Пф Бульон Фо-бо","кг"],</p>
-<p class="p2">["Бракераж","13159","пф васаби пюре (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530216237","Пф Васаби шисо дресинг","кг"],</p>
-<p class="p2">["Бракераж","39153018471","Пф Вешенки (-27%)","кг"],</p>
-<p class="p2">["Бракераж","39153017947","Пф Вонтоны с креветками (1шт)","шт"],</p>
-<p class="p2">["Бракераж","39153012429","Пф Вонтоны с креветкой 1шт LY","шт"],</p>
-<p class="p2">["Бракераж","39153021230870","Пф Ганаш шоколадный","кг"],</p>
-<p class="p2">["Бракераж","39153019693","Пф Говядина голень","кг"],</p>
-<p class="p2">["Бракераж","381643","Пф Говядина марин (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530215755","Пф Говядина марин.бульгоги","кг"],</p>
-<p class="p2">["Бракераж","391530216703","Пф Говядина маринованная на салат","кг"],</p>
-<p class="p2">["Бракераж","391530214248","Пф Говядина отварная NEW","кг"],</p>
-<p class="p2">["Бракераж","39153019695","Пф Голень отварная","кг"],</p>
-<p class="p2">["Бракераж","391530198413","Пф Голень томленая","кг"],</p>
-<p class="p2">["Бракераж","20134","ПФ Грибы древесные вымоченные (L)","кг"],</p>
-<p class="p2">["Бракераж","391530216239","Пф Дайкон кошеу","кг"],</p>
-<p class="p2">["Бракераж","391530195356","Пф Дамплинг с говядиной и тофу 1шт","шт"],</p>
-<p class="p2">["Бракераж","391530212599","Пф Дамплинги из говядина на пару 1шт","шт"],</p>
-<p class="p2">["Бракераж","391530215068","Пф Дамплинги креветки -джусай","шт"],</p>
-<p class="p2">["Бракераж","39153017086","Пф Дамплинги с говядиной LY 1шт","шт"],</p>
-<p class="p2">["Бракераж","391530202791","Пф Дамплинги с говядиной мини -1шт","шт"],</p>
-<p class="p2">["Бракераж","391530210925","Пф Дамплинги с креветками и шитаке","шт"],</p>
-<p class="p2">["Бракераж","391530195357","Пф Дамплинги с курицей и фунчезой 1шт","шт"],</p>
-<p class="p2">["Бракераж","391530209234","Пф Дрессинг васаби понзу","кг"],</p>
-<p class="p2">["Бракераж","391530216705","Пф Дрессинг тайский","кг"],</p>
-<p class="p2">["Бракераж","391530195352","Пф Желатин куриный","кг"],</p>
-<p class="p2">["Бракераж","391530216439","Пф Заправка на зеленый салат","кг"],</p>
-<p class="p2">["Бракераж","391530211673","Пф Заправка ореховая","кг"],</p>
-<p class="p2">["Бракераж","391530210339","Пф Заправка соевая","кг"],</p>
-<p class="p2">["Бракераж","24278","пф икра тобика (-7%)ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","3912398","Пф Кальмары кольца","кг"],</p>
-<p class="p2">["Бракераж","391530216725","Пф Карри зеленый","кг"],</p>
-<p class="p2">["Бракераж","39153012080","пф ким чи выжатая (-30%) ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","27815","пф ким чи выжатая (-33%) ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","39153010063","Пф Кимчи new","кг"],</p>
-<p class="p2">["Бракераж","10882","ПФ Кляр темпурный (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530212385","Пф Котлета куриная","кг"],</p>
-<p class="p2">["Бракераж","39153013549","Пф Котлета на бургер","кг"],</p>
-<p class="p2">["Бракераж","20296","Пф Краб снежный (-20%) ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","39153015268","Пф Крабовый микс","кг"],</p>
-<p class="p2">["Бракераж","391530197559","Пф Креветка Тар-тар","кг"],</p>
-<p class="p2">["Бракераж","25241","пф креветки 21*25 отварные на суши (ЛЮ)2","кг"],</p>
-<p class="p2">["Бракераж","391530203733","ПФ Креветки 21*25 очищеные (-21%) (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530203737","ПФ Креветки 21*25 очищеные (-23%) (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530202076","Пф Крем алоэ","кг"],</p>
-<p class="p2">["Бракераж","39153017945","Пф Крем васаби","кг"],</p>
-<p class="p2">["Бракераж","391530216436","Пф Крем из маскарпоне","кг"],</p>
-<p class="p2">["Бракераж","39153021227453","Пф Крем клубничный","кг"],</p>
-<p class="p2">["Бракераж","391530202075","Пф Крем матча","кг"],</p>
-<p class="p2">["Бракераж","391530214472","Пф Крем на пончики","кг"],</p>
-<p class="p2">["Бракераж","391530200266","Пф Крем с финиками","кг"],</p>
-<p class="p2">["Бракераж","39153021230871","Пф Крем тирамису","кг"],</p>
-<p class="p2">["Бракераж","391530210971","Пф Креметте с трюфелем","кг"],</p>
-<p class="p2">["Бракераж","39153014823","Пф Крылья куриные маринованные","кг"],</p>
-<p class="p2">["Бракераж","3915300541","Пф Куриное бедро (-18%)","кг"],</p>
-<p class="p2">["Бракераж","39148736","Пф Куриное бедро без кожи (-15%)","кг"],</p>
-<p class="p2">["Бракераж","39153021229569","Пф Куриное филе маринованное","кг"],</p>
-<p class="p2">["Бракераж","391530198892","Пф Куриные крылья маринованные","кг"],</p>
-<p class="p2">["Бракераж","391530212384","Пф Куриные стрипсы","кг"],</p>
-<p class="p2">["Бракераж","39153019613","Пф Курица маринованная Саид","кг"],</p>
-<p class="p2">["Бракераж","39153014845","Пф Лазджан","кг"],</p>
-<p class="p2">["Бракераж","391530203627","Пф Лазджан майо","кг"],</p>
-<p class="p2">["Бракераж","391530199381","Пф Лапша на утку","кг"],</p>
-<p class="p2">["Бракераж","380055","Пф Лапша рисовая отварная (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530213099","Пф Лук карамель","кг"],</p>
-<p class="p2">["Бракераж","39153017983","Пф Лук карри","кг"],</p>
-<p class="p2">["Бракераж","390994","Пф Лук красный (зачистка LY)","кг"],</p>
-<p class="p2">["Бракераж","39153019687","Пф Лук маринованный красный new","кг"],</p>
-<p class="p2">["Бракераж","39153021229564","Пф Луковая лепешка","шт"],</p>
-<p class="p2">["Бракераж","391530209236","Пф Майнез трюфельный","кг"],</p>
-<p class="p2">["Бракераж","389236","Пф Майонез Кочуджан","кг"],</p>
-<p class="p2">["Бракераж","391530202074","Пф Малиновое кюли","кг"],</p>
-<p class="p2">["Бракераж","391530216437","Пф Манго курт","кг"],</p>
-<p class="p2">["Бракераж","39153017976","Пф Маринад для огурцов","кг"],</p>
-<p class="p2">["Бракераж","39153015266","Пф Маринад для риса Саид","кг"],</p>
-<p class="p2">["Бракераж","39153019688","Пф Маринованные огурцы новые","кг"],</p>
-<p class="p2">["Бракераж","390993","Пф Маринованные яйца аджимата","шт"],</p>
-<p class="p2">["Бракераж","391530200391","Пф Масло мисо","кг"],</p>
-<p class="p2">["Бракераж","39153012372","Пф Масло пряное","кг"],</p>
-<p class="p2">["Бракераж","391530200943","Пф Масло сычуаньское","кг"],</p>
-<p class="p2">["Бракераж","39153011726","Пф Масло чесночное LY","кг"],</p>
-<p class="p2">["Бракераж","39153015379","Пф Масса желатиновая","кг"],</p>
-<p class="p2">["Бракераж","39153021230169","Пф Мидии на полустворке","кг"],</p>
-<p class="p2">["Бракераж","391530216729","Пф Микс гарнир","кг"],</p>
-<p class="p2">["Бракераж","39153021228872","Пф Мука панировочная","кг"],</p>
-<p class="p2">["Бракераж","39153021230867","Пф Начинка из тунца","кг"],</p>
-<p class="p2">["Бракераж","391530212600","Пф Начинка на бао дзы","кг"],</p>
-<p class="p2">["Бракераж","39153021229351","Пф Начинка на гедзе","кг"],</p>
-<p class="p2">["Бракераж","391530216727","Пф Начинка на сянбин","кг"],</p>
-<p class="p2">["Бракераж","12927","пф овощи соломкой (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","389233","Пф Огурец без семян","кг"],</p>
-<p class="p2">["Бракераж","391530209235","Пф Огурцы маринованные шисо-васаби","кг"],</p>
-<p class="p2">["Бракераж","23061","пф огурцы на суши (-50%) (ЛЮ)2","кг"],</p>
-<p class="p2">["Бракераж","391530214188","Пф Омлет тамаго","кг"],</p>
-<p class="p2">["Бракераж","26160","--пф основа на мисо суп (ЛЮ)2","кг"],</p>
-<p class="p2">["Бракераж","39153014827","Пф Панировка для крыльев","кг"],</p>
-<p class="p2">["Бракераж","39153021229611","Пф Пельмени китайские","шт"],</p>
-<p class="p2">["Бракераж","391530212143","Пф Помадка","кг"],</p>
-<p class="p2">["Бракераж","391044","Пф Посыпка на картофель фри","кг"],</p>
-<p class="p2">["Бракераж","15315","ПФ Приправа панко китайский (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","39153021230868","Пф Пропитка на тирамису","кг"],</p>
-<p class="p2">["Бракераж","39153015357","Пф Рис для суши с маринадом Саид","кг"],</p>
-<p class="p2">["Бракераж","39153015265","Пф Рис для суши Саид","кг"],</p>
-<p class="p2">["Бракераж","390985","Пф Рис жасмин","кг"],</p>
-<p class="p2">["Бракераж","391530216704","Пф Салат микс LY","кг"],</p>
-<p class="p2">["Бракераж","386446","пф семга филе без кожи (-11%) ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","39153012786","пф семга филе без кожи (-12%) ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","391530202581","Пф Семга маринованная","кг"],</p>
-<p class="p2">["Бракераж","380943","пф семга просоленная (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","18794","ПФ Смесь для риса суши (ЛЮ)","л"],</p>
-<p class="p2">["Бракераж","39153021229610","Пф Смесь на гедзе","кг"],</p>
-<p class="p2">["Бракераж","391530199762","Пф Соус биск","кг"],</p>
-<p class="p2">["Бракераж","391530216728","Пф Соус из тамаринда","кг"],</p>
-<p class="p2">["Бракераж","391530213097","Пф Соус йогуртовый","кг"],</p>
-<p class="p2">["Бракераж","11336","пф соус к стекляной лапше (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","12883","пф соус кальби (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","39153018740","Пф Соус карри","кг"],</p>
-<p class="p2">["Бракераж","39153009584","Пф Соус Кун Лу","кг"],</p>
-<p class="p2">["Бракераж","391530195611","Пф Соус лазджан-димсам","кг"],</p>
-<p class="p2">["Бракераж","39153015269","Пф Соус Масага","кг"],</p>
-<p class="p2">["Бракераж","391530210972","Пф Соус Мисо майонез","кг"],</p>
-<p class="p2">["Бракераж","391530197001","Пф Соус на баклажаны","кг"],</p>
-<p class="p2">["Бракераж","12168","ПФ Соус на дамплинги из говядина LY","кг"],</p>
-<p class="p2">["Бракераж","385209","пф соус на димпсамы (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","381645","пф соус на древесные грибы (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530208977","Пф Соус на креветки","кг"],</p>
-<p class="p2">["Бракераж","391530205982","Пф Соус на крылья","кг"],</p>
-<p class="p2">["Бракераж","381644","ПФ Соус на лапшу 3 (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530198897","Пф Соус на Пад Тай","кг"],</p>
-<p class="p2">["Бракераж","11218","пф соус на хрус баклажаны (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530201915","Пф Соус остро-сладкий","кг"],</p>
-<p class="p2">["Бракераж","391530202647","Пф Соус Понзу LY","кг"],</p>
-<p class="p2">["Бракераж","13651","ПФ Соус Саке (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","39153021228460","Пф Соус Самбал","кг"],</p>
-<p class="p2">["Бракераж","24356","пф соус соевый для гостей (ЛЮ)2","кг"],</p>
-<p class="p2">["Бракераж","39153015270","Пф Соус Спайси Саид","кг"],</p>
-<p class="p2">["Бракераж","23277","пф соус унаги (ЛЮ)2","кг"],</p>
-<p class="p2">["Бракераж","391530201351","Пф Соус Чили","кг"],</p>
-<p class="p2">["Бракераж","391530215756","Пф Страчателла","кг"],</p>
-<p class="p2">["Бракераж","3912463","Пф Сыр Ден чиз","кг"],</p>
-<p class="p2">["Бракераж","18439","ПФ Тесто для лагмана отварное (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","39153015384","Пф Тесто моти New","кг"],</p>
-<p class="p2">["Бракераж","39153017173","Пф Тесто на бао","кг"],</p>
-<p class="p2">["Бракераж","391530212601","Пф Тесто на бао дзы","кг"],</p>
-<p class="p2">["Бракераж","39153014843","Пф Тесто на вонтоны","кг"],</p>
-<p class="p2">["Бракераж","385207","пф тесто на димсамы (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","39153014840","Пф Тесто на лапшу","кг"],</p>
-<p class="p2">["Бракераж","12513","ПФ Тесто на лапшу и дамплинг (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","39153021229567","Пф Тесто на пельмени","кг"],</p>
-<p class="p2">["Бракераж","391530214471","Пф Тесто на пончики","кг"],</p>
-<p class="p2">["Бракераж","391530216726","Пф Тесто на сямбин","кг"],</p>
-<p class="p2">["Бракераж","39153021230872","Пф Тирамису","кг"],</p>
-<p class="p2">["Бракераж","39153018060","Пф Тунец (-10%)","кг"],</p>
-<p class="p2">["Бракераж","22693","пф угорь (-23%) ЛЮ","кг"],</p>
-<p class="p2">["Бракераж","391530199287","Пф Угорь (-35%)","кг"],</p>
-<p class="p2">["Бракераж","391530201492","Пф Угорь (-40%)","кг"],</p>
-<p class="p2">["Бракераж","391530213100","Пф Фарш говядина-джусай","кг"],</p>
-<p class="p2">["Бракераж","39146417","Пф Фарш говяжий (5%)","кг"],</p>
-<p class="p2">["Бракераж","391530195353","Пф Фарш говяжий тофу","кг"],</p>
-<p class="p2">["Бракераж","391530202378","Пф Фарш из утки","кг"],</p>
-<p class="p2">["Бракераж","3914393","Пф Фарш креветка LY","кг"],</p>
-<p class="p2">["Бракераж","39153017942","Пф Фарш креветочный LY new","кг"],</p>
-<p class="p2">["Бракераж","391530195354","Пф Фарш куриный с фунчезой","кг"],</p>
-<p class="p2">["Бракераж","39153021229563","Пф Фарш луковый на лепешку","кг"],</p>
-<p class="p2">["Бракераж","39153014837","Пф Фарш на вонтоны","кг"],</p>
-<p class="p2">["Бракераж","39153017085","Пф фарш на дамплинги из говядины","кг"],</p>
-<p class="p2">["Бракераж","39153021229566","Пф Фарш на пельмени","кг"],</p>
-<p class="p2">["Бракераж","39153021228489","Пф Фарш на сянбин говядина","кг"],</p>
-<p class="p2">["Бракераж","391530208976","Пф Фарш с креветками и имбирем","кг"],</p>
-<p class="p2">["Бракераж","12205","пф фунчеза стеклянная отварная (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","391530207921","Пф Чизкейк","порц"],</p>
-<p class="p2">["Бракераж","19797","ПФ Чипсы картофельные (ЛЮ)","кг"],</p>
-<p class="p2">["Бракераж","3913825","Пф Чукка","кг"],</p>
-<p class="p2">["Бракераж","391530200076","Пф Шиитаки маринованные","кг"],</p>
-<p class="p2">["Бракераж","391530213098","Пф Шпинат маринованный","кг"],</p>
-<p class="p2">["Бракераж","391530203626","Пф Щечки","кг"],</p>
-<p class="p2">["Бракераж","391530210924","Фарш креветки шитаке","кг"],</p>
-<p class="p2">["Бракераж","391530213101","Пф Вонтоны говядина-джусай 1 шт","кг"],</p>
-<p class="p2">["Бракераж","39153021229352","Пф Гедзе с курицей 1 шт","шт"],</p>
-<p class="p2">["Стафф","29507","Анис звездочками","кг"],</p>
-<p class="p2">["Стафф","13601","Кардамон","кг"],</p>
-<p class="p2">["Стафф","17552","Корица палочка","кг"],</p>
-<p class="p2">["Стафф","13258","Листья лайма","кг"],</p>
-<p class="p2">["Стафф","13710","Сахар тростниковый","кг"],</p>
-<p class="p2">["Стафф","16367","Вино Тбилиси Долины Грузии белое сухое","л"],</p>
-<p class="p2">["Стафф","391530195469","Вино Rebelle, Blanc (0,75л)","л"],</p>
-<p class="p2">["Стафф","17925","Вино CHOYA Sake (0,75л)","л"],</p>
-<p class="p2">["Стафф","380784","Сироп Бузина Sk bar","л"],</p>
-<p class="p2">["Стафф","25144","Сок юдзу","л"],</p>
-<p class="p2">["Стафф","29733","Чай зеленый матча","кг"],</p>
-<p class="p2">["Стафф","16525","Чай матча голубой","кг"],</p>
-<p class="p2">["Стафф","22861","Бадьян хаджо","кг"],</p>
-<p class="p2">["Стафф","12084","Горох","кг"],</p>
-<p class="p2">["Стафф","19948","Гречка","кг"],</p>
-<p class="p2">["Стафф","29466","Крупа манная","кг"],</p>
-<p class="p2">["Стафф","30145","Овсяные хлопья","кг"],</p>
-<p class="p2">["Стафф","30007","Рис для суши","кг"],</p>
-<p class="p2">["Стафф","30279","Рис жасмин","кг"],</p>
-<p class="p2">["Стафф","28344","Бумага рисовая 22см","кг"],</p>
-<p class="p2">["Стафф","29804","Лапша рисовая","кг"],</p>
-<p class="p2">["Стафф","22832","Лапша фунчоза","кг"],</p>
-<p class="p2">["Стафф","30135","Лапша фунчоза стеклянная","кг"],</p>
-<p class="p2">["Стафф","39147578","Паста Тамариндовая","кг"],</p>
-<p class="p2">["Стафф","29726","Мука в/с","кг"],</p>
-<p class="p2">["Стафф","30150","Мука рисовая","кг"],</p>
-<p class="p2">["Стафф","16342","Мука темпура","кг"],</p>
-<p class="p2">["Стафф","13406","Джем алоэ","кг"],</p>
-<p class="p2">["Стафф","29609","Глюкоза","кг"],</p>
-<p class="p2">["Стафф","29429","Дрожжи сухие","кг"],</p>
-<p class="p2">["Стафф","13334","Разрыхлитель для теста","кг"],</p>
-<p class="p2">["Стафф","30122","Сода пищевая","кг"],</p>
-<p class="p2">["Стафф","29542","Краситель пищевой","кг"],</p>
-<p class="p2">["Стафф","20786","Агар-агар","кг"],</p>
-<p class="p2">["Стафф","29983","Желатин","кг"],</p>
-<p class="p2">["Стафф","29452","Крахмал кукурузный","кг"],</p>
-<p class="p2">["Стафф","20745","Крахмал топиоковый","кг"],</p>
-<p class="p2">["Стафф","16337","Шоколад белый плитка","кг"],</p>
-<p class="p2">["Стафф","39145687","Дайкон маринованный","кг"],</p>
-<p class="p2">["Стафф","29313","Кабачковая икра","кг"],</p>
-<p class="p2">["Стафф","18063","Паста карри","кг"],</p>
-<p class="p2">["Стафф","16423","Паста Криспи Чили","кг"],</p>
-<p class="p2">["Стафф","30048","Паста мисо","кг"],</p>
-<p class="p2">["Стафф","30103","Паста перечная Кучуджан","кг"],</p>
-<p class="p2">["Стафф","29691","Паста Табаджан","кг"],</p>
-<p class="p2">["Стафф","29706","Паста тахини","кг"],</p>
-<p class="p2">["Стафф","18631","Паста том ям","кг"],</p>
-<p class="p2">["Стафф","22800","Паста трюфельная","кг"],</p>
-<p class="p2">["Стафф","29862","Перец халапеньо консервированный","кг"],</p>
-<p class="p2">["Стафф","29414","Томатная паста","кг"],</p>
-<p class="p2">["Стафф","29520","Тунец консервированный","кг"],</p>
-<p class="p2">["Стафф","22833","Пюре манго (Mango puree)","кг"],</p>
-<p class="p2">["Стафф","29693","Пюре маракуйя","кг"],</p>
-<p class="p2">["Стафф","30190","Жир фритюрный","л"],</p>
-<p class="p2">["Стафф","17827","Масло кунжутное","л"],</p>
-<p class="p2">["Стафф","29694","Масло подсолнечное рафинированное","л"],</p>
-<p class="p2">["Стафф","13244","Масло трюфельное","кг"],</p>
-<p class="p2">["Стафф","29867","Йогурт","кг"],</p>
-<p class="p2">["Стафф","18044","Курт копченый","кг"],</p>
-<p class="p2">["Стафф","17090","Масло президент","кг"],</p>
-<p class="p2">["Стафф","29483","Масло сливочное","кг"],</p>
-<p class="p2">["Стафф","30015","Молоко кокосовое","л"],</p>
-<p class="p2">["Стафф","21426","Молоко соевое","л"],</p>
-<p class="p2">["Стафф","29963","Сыр Маскарпоне","кг"],</p>
-<p class="p2">["Стафф","12356","Сыр Сулугуни","кг"],</p>
-<p class="p2">["Стафф","30242","Сыр творожный DenCheese","кг"],</p>
-<p class="p2">["Стафф","11223","Сыр Тофу","кг"],</p>
-<p class="p2">["Стафф","387162","Сыр Чеддер слайсы хохланд","кг"],</p>
-<p class="p2">["Стафф","14212","Сыр Грана Падано","кг"],</p>
-<p class="p2">["Стафф","18013","Яйцо куриное","шт"],</p>
-<p class="p2">["Стафф","381245","Куриная окорочка копченая","кг"],</p>
-<p class="p2">["Стафф","17717","Баранина мякоть не очищенная","кг"],</p>
-<p class="p2">["Стафф","385929","Говядина ВС Экстра зачищенная","кг"],</p>
-<p class="p2">["Стафф","19057","Говядина мякоть голень","кг"],</p>
-<p class="p2">["Стафф","18346","Говядина мякоть незачищенная","кг"],</p>
-<p class="p2">["Стафф","22896","Говяжий жир","кг"],</p>
-<p class="p2">["Стафф","11473","Говяжий фарш","кг"],</p>
-<p class="p2">["Стафф","11148","Говяжьи кости (суп набор)","кг"],</p>
-<p class="p2">["Стафф","20831","Куриное бедро без кости и без кожи","кг"],</p>
-<p class="p2">["Стафф","11140","Куриное филе","кг"],</p>
-<p class="p2">["Стафф","18408","Куриные крылья","кг"],</p>
-<p class="p2">["Стафф","19032","Куриные окорочка","кг"],</p>
-<p class="p2">["Стафф","383942","Куриный каркас","кг"],</p>
-<p class="p2">["Стафф","17115","Утка окорочка","кг"],</p>
-<p class="p2">["Стафф","17113","Вино Красное для кухни","л"],</p>
-<p class="p2">["Стафф","11828","Грибы вешенки","кг"],</p>
-<p class="p2">["Стафф","11795","Грибы древесные","кг"],</p>
-<p class="p2">["Стафф","18565","Грибы шампиньоны","кг"],</p>
-<p class="p2">["Стафф","22835","Грибы шитаки сухие","кг"],</p>
-<p class="p2">["Стафф","30027","Базилик красный свежий","кг"],</p>
-<p class="p2">["Стафф","18787","Бобовые ростки","кг"],</p>
-<p class="p2">["Стафф","19686","Имбирь корень","кг"],</p>
-<p class="p2">["Стафф","17610","Кинза свежая","кг"],</p>
-<p class="p2">["Стафф","29776","Лемонграсс","кг"],</p>
-<p class="p2">["Стафф","16218","Лист Салата","кг"],</p>
-<p class="p2">["Стафф","12007","Лук зеленый","кг"],</p>
-<p class="p2">["Стафф","16891","Мята свежая","кг"],</p>
-<p class="p2">["Стафф","13552","Салат Микс","кг"],</p>
-<p class="p2">["Стафф","21002","Сельдерей стебель","кг"],</p>
-<p class="p2">["Стафф","13574","Чесночные стрелки","кг"],</p>
-<p class="p2">["Стафф","29683","Шпинат св.","кг"],</p>
-<p class="p2">["Стафф","29652","Бобы эдамаме","кг"],</p>
-<p class="p2">["Стафф","17141","Горошек зеленый с/м","кг"],</p>
-<p class="p2">["Стафф","39150298","Картофель фри McCain CRISPERS 2*5","кг"],</p>
-<p class="p2">["Стафф","13673","Картофель фри 8*12 с/м (лодочки)","кг"],</p>
-<p class="p2">["Стафф","16657","Кукуруза початок с/м","кг"],</p>
-<p class="p2">["Стафф","22873","Баклажаны","кг"],</p>
-<p class="p2">["Стафф","18686","Дайкон редька белая","кг"],</p>
-<p class="p2">["Стафф","10561","Кабачки св","кг"],</p>
-<p class="p2">["Стафф","11145","Капуста белокачанная","кг"],</p>
-<p class="p2">["Стафф","29627","Капуста корейская кимчи","кг"],</p>
-<p class="p2">["Стафф","21050","Капуста пекинская","кг"],</p>
-<p class="p2">["Стафф","13759","Картофель св","кг"],</p>
-<p class="p2">["Стафф","18661","Лук красный","кг"],</p>
-<p class="p2">["Стафф","13895","Лук репчатый","кг"],</p>
-<p class="p2">["Стафф","14086","Лук шалот","кг"],</p>
-<p class="p2">["Стафф","16534","Морковь св","кг"],</p>
-<p class="p2">["Стафф","14831","Огурцы св","кг"],</p>
-<p class="p2">["Стафф","13279","Перец болгарский светофор (зеленый)","кг"],</p>
-<p class="p2">["Стафф","17630","Перец болгарский светофор (красный)","кг"],</p>
-<p class="p2">["Стафф","18636","Перец полу горький (зеленый)","кг"],</p>
-<p class="p2">["Стафф","18654","Перец Чили Зеленый свежий","кг"],</p>
-<p class="p2">["Стафф","11704","Перец Чили Красный свежий","кг"],</p>
-<p class="p2">["Стафф","18894","Помидоры черри","кг"],</p>
-<p class="p2">["Стафф","17733","Фасоль стручковая св","кг"],</p>
-<p class="p2">["Стафф","19419","Чеснок св","кг"],</p>
-<p class="p2">["Стафф","23226","Чеснок св очищенный","кг"],</p>
-<p class="p2">["Стафф","29428","Водоросли Вакаме","кг"],</p>
-<p class="p2">["Стафф","13255","Водоросли Комбу","кг"],</p>
-<p class="p2">["Стафф","22244","Водоросли Нори","кг"],</p>
-<p class="p2">["Стафф","29553","Водоросли Нори соленые","кг"],</p>
-<p class="p2">["Стафф","11938","Имбирь маринованный","кг"],</p>
-<p class="p2">["Стафф","29445","Салат чукка","кг"],</p>
-<p class="p2">["Стафф","31776","Кокосовая стружка","кг"],</p>
-<p class="p2">["Стафф","39145257","Кунжут с кимчи","кг"],</p>
-<p class="p2">["Стафф","12479","Семена кунжутные","кг"],</p>
-<p class="p2">["Стафф","10459","Вонголе","кг"],</p>
-<p class="p2">["Стафф","22888","Кальмары кольца с/м","кг"],</p>
-<p class="p2">["Стафф","29463","Крабовые палочки","кг"],</p>
-<p class="p2">["Стафф","29566","Креветки корол. с/м б/г 21/25","кг"],</p>
-<p class="p2">["Стафф","386367","Мидии на полустворке","кг"],</p>
-<p class="p2">["Стафф","20217","Мясо краба","кг"],</p>
-<p class="p2">["Стафф","13270","Тунец с/м","кг"],</p>
-<p class="p2">["Стафф","11915","Угорь жареный \"унаги\"","кг"],</p>
-<p class="p2">["Стафф","19742","Рыба голова семги","кг"],</p>
-<p class="p2">["Стафф","24686","Рыба семга тушка охл","кг"],</p>
-<p class="p2">["Стафф","22806","Рыба сибас с/м","шт"],</p>
-<p class="p2">["Стафф","22807","Рыба филе семга на шкуре с/м","кг"],</p>
-<p class="p2">["Стафф","30189","Икра красная","кг"],</p>
-<p class="p2">["Стафф","20049","Икра Тобико","кг"],</p>
-<p class="p2">["Стафф","12542","Стружка тунца","кг"],</p>
-<p class="p2">["Стафф","16602","Горчица дижон зернистая","кг"],</p>
-<p class="p2">["Стафф","16522","Кетчуп томатный Heinz","кг"],</p>
-<p class="p2">["Стафф","29597","Майонез","кг"],</p>
-<p class="p2">["Стафф","29527","Майонез Японский","кг"],</p>
-<p class="p2">["Стафф","31569","Соус QP юдзу","л"],</p>
-<p class="p2">["Стафф","30185","Соус Бульгоги","кг"],</p>
-<p class="p2">["Стафф","11236","Соус ворчестер","л"],</p>
-<p class="p2">["Стафф","29513","Соус Кимчи","л"],</p>
-<p class="p2">["Стафф","39153018175","Соус кисло-сладкий AROY-D","кг"],</p>
-<p class="p2">["Стафф","25744","Соус кунжутный","л"],</p>
-<p class="p2">["Стафф","30114","Соус Мирин","л"],</p>
-<p class="p2">["Стафф","29645","Соус Рыбный","л"],</p>
-<p class="p2">["Стафф","25798","Соус сладкий чили","кг"],</p>
-<p class="p2">["Стафф","22887","Соус соевый Киккоман","л"],</p>
-<p class="p2">["Стафф","30070","Соус соевый Китайский (1,72л)","л"],</p>
-<p class="p2">["Стафф","391530202286","Соус Соевый сладкий","кг"],</p>
-<p class="p2">["Стафф","29508","Соус сырный","л"],</p>
-<p class="p2">["Стафф","30066","Соус терияки","л"],</p>
-<p class="p2">["Стафф","29458","Соус Тонкацу","кг"],</p>
-<p class="p2">["Стафф","29547","Соус устричный","л"],</p>
-<p class="p2">["Стафф","29833","Соус Хой Син","л"],</p>
-<p class="p2">["Стафф","31157","Соус шисо","кг"],</p>
-<p class="p2">["Стафф","30200","Соус Шрирача","кг"],</p>
-<p class="p2">["Стафф","18617","Уксус китайский ЮН","л"],</p>
-<p class="p2">["Стафф","30161","Уксус красный винный","л"],</p>
-<p class="p2">["Стафф","12483","Уксус мицукан","л"],</p>
-<p class="p2">["Стафф","16135","Уксусная кислота 70%","л"],</p>
-<p class="p2">["Стафф","29601","Кукуруза консервированная стафф бондюэль","кг"],</p>
-<p class="p2">["Стафф","29404","Макароны стафф","кг"],</p>
-<p class="p2">["Стафф","17043","Авокадо","кг"],</p>
-<p class="p2">["Стафф","16186","Апельсин св","кг"],</p>
-<p class="p2">["Стафф","13957","Лайм","кг"],</p>
-<p class="p2">["Стафф","13992","Лимон св","кг"],</p>
-<p class="p2">["Стафф","30125","Сухари панировочные Панко","кг"],</p>
-<p class="p2">["Стафф","378328","Печенье BISCOFF карамельное LOTUS","шт"],</p>
-<p class="p2">["Стафф","17393","Хлеб бородинский","кг"],</p>
-<p class="p2">["Стафф","29504","Вишня с/м","кг"],</p>
-<p class="p2">["Стафф","20390","Клубника с/м","кг"],</p>
-<p class="p2">["Стафф","29823","Малина с/м","кг"],</p>
-<p class="p2">["Стафф","32427","Приправа дашидо","кг"],</p>
-<p class="p2">["Стафф","11579","Приправа для курицы","кг"],</p>
-<p class="p2">["Стафф","29395","Приправа карри","кг"],</p>
-<p class="p2">["Стафф","14529","Приправа смесь 15 перцев","кг"],</p>
-<p class="p2">["Стафф","39146065","Приправа Фурикаки","кг"],</p>
-<p class="p2">["Стафф","25135","Приправа хондаши","кг"],</p>
-<p class="p2">["Стафф","11892","Соль крупная","кг"],</p>
-<p class="p2">["Стафф","14016","Соль морская","кг"],</p>
-<p class="p2">["Стафф","30194","Васаби порошок","кг"],</p>
-<p class="p2">["Стафф","39153012188","Кансуй японская добавка к тесту","кг"],</p>
-<p class="p2">["Стафф","22809","Кинза сухая","кг"],</p>
-<p class="p2">["Стафф","16760","Кумин (зира)","кг"],</p>
-<p class="p2">["Стафф","30047","Куркума","кг"],</p>
-<p class="p2">["Стафф","29936","Лук жареный","кг"],</p>
-<p class="p2">["Стафф","29459","Пектин","кг"],</p>
-<p class="p2">["Стафф","12904","Перец душистый","кг"],</p>
-<p class="p2">["Стафф","22906","Перец кр. стручковый острый сушеный","кг"],</p>
-<p class="p2">["Стафф","20777","Перец сычуаньский","кг"],</p>
-<p class="p2">["Стафф","16554","Перец черный горошек","кг"],</p>
-<p class="p2">["Стафф","391530201328","Перчик китайский с арахисом","кг"],</p>
-<p class="p2">["Стафф","11228","Специи тогараши","кг"],</p>
-<p class="p2">["Стафф","18488","Усилитель вкуса (кристаллики)","кг"],</p>
-<p class="p2">["Стафф","12581","Молоко до 3,2%","л"],</p>
-<p class="p2">["Стафф","29883","Молоко сгущеное","кг"],</p>
-<p class="p2">["Стафф","16795","Сливки взбитые в баллонах","кг"],</p>
-<p class="p2">["Стафф","30149","Сливки не сладкие до 35%","л"],</p>
-<p class="p2">["Стафф","29309","Сливки растительные","л"],</p>
-<p class="p2">["Стафф","16190","Орех арахис очищенный","кг"],</p>
-<p class="p2">["Стафф","30166","Кориандр сухой","кг"],</p>
-<p class="p2">["Стафф","14241","Перец белый молотый","кг"],</p>
-<p class="p2">["Стафф","14633","Перец черный молотый","кг"],</p>
-<p class="p2">["Стафф","22890","Перец чили острый хлопья","кг"],</p>
-<p class="p2">["Стафф","387163","Мед горный разнотравье","кг"],</p>
-<p class="p2">["Стафф","30182","Сахар песок","кг"],</p>
-<p class="p2">["Стафф","19665","Эконом (для чистки овощей)","шт"],</p>
-<p class="p2">["Стафф","377735","Циновка (коврик для суши)","шт"],</p>
-<p class="p2">["Стафф","39152387","Сироп Глюкозный","л"],</p>
-<p class="p2">["Невозвратные отходы","30190","Жир фритюрный","л"],</p>
-<p class="p2">["Невозвратные отходы","11938","Имбирь маринованный","кг"],</p>
-<p class="p2">["Невозвратные отходы","30194","Васаби порошок","кг"],</p>
-<p class="p2">["Невозвратные отходы","24356","Соус соевый для гостей","кг"]</p>
-<p class="p2">];</p>
+
+<div id="loginScreen" style="display:none;">
+  <h1>Списания</h1>
+  <div class="roletabs">
+    <button class="roletab active" id="roleTovarovedBtn">Товаровед</button>
+    <button class="roletab" id="roleChefBtn">Шеф ресторана</button>
+  </div>
+  <div id="chefRestField" class="field" style="display:none;">
+    <label>Ресторан</label>
+    <select id="chefRestSelect"></select>
+  </div>
+  <div id="chefPositionField" class="field" style="display:none;">
+    <label>Кто списывает?</label>
+    <select id="chefPositionSelect">
+      <option value="Шеф">Шеф</option>
+      <option value="Су-шеф">Су-шеф</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Код доступа</label>
+    <input type="text" id="codeInput" placeholder="Введите код" inputmode="numeric">
+  </div>
+  <button class="primary-btn" id="loginBtn">Войти</button>
+  <div class="msg" id="loginMsg"></div>
+</div>
+
+<div id="appScreen" style="display:none;">
+  <div class="wrap">
+    <header>
+      <div class="headtop">
+        <div>
+          <h1>Списания</h1>
+          <div class="role" id="roleLabel"></div>
+        </div>
+        <button class="linkbtn" id="logoutBtn">Сменить</button>
+      </div>
+      <div class="lockrow" id="codesLink" style="display:none;">🔒 Управление кодами доступа</div>
+    </header>
+
+    <div class="pillrow" id="restPills"></div>
+    <div class="pillrow" id="catPills"></div>
+    <div class="summary">
+      <div class="label" id="summaryLabel"></div>
+      <div id="todayList"></div>
+    </div>
+
+    <div style="display:flex; gap:16px; align-items:center;">
+      <button class="linkbtn" id="historyBtn" style="padding:0 0 14px; display:block;">📅 История списаний</button>
+      <button class="linkbtn" id="trashBtn" style="padding:0 0 14px; display:none;">🗑 Корзина</button>
+    </div>
+
+    <input type="text" id="search" class="search" placeholder="Найти товар...">
+
+    <div id="catalogArea"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="confirmRoot"></div>
+
+<script>
+(function(){
+  var RESTAURANTS = [
+    {id:'dostyk', name:'Luckee Yu Достык'},
+    {id:'dostyk-plaza', name:'Luckee Yu Достык Плаза'},
+    {id:'mega-almaty', name:'Luckee Yu Мега Алматы'},
+    {id:'mega-astana', name:'Luckee Yu Мега Астана'}
+  ];
+  var CATEGORIES = ['Отработка','Порча','Бракераж','Стафф','Невозвратные отходы'];
+  var DEFAULT_CODES = {tovaroved:'0000', 'dostyk':'1111', 'dostyk-plaza':'2222', 'mega-almaty':'3333', 'mega-astana':'4444'};
+  var SESSION_KEY = 'spisaniya_session_v2';
+
+  // ===== Подключение к Google Таблице через Apps Script =====
+  // ВСТАВЬТЕ сюда адрес веб-приложения Apps Script (заканчивается на /exec):
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxpceWNZKWDZq0udJvRr9xYJJTINbKTsl2ch7guDwtxQNG9gjgx8Bt0ib9XHQGA7L8/exec';
+  var POLL_MS = 30000;          // как часто (сек) сайт спрашивает сервер об изменениях, пока страница открыта
+  var FULL_REFRESH_MS = 300000; // раз в 5 минут — полная перезагрузка (на случай правок таблицы руками)
+
+  function apiConfigured(){ return API_URL.indexOf('/exec') > 0; }
+
+  async function apiRaw(action, body){
+    if(!apiConfigured()) throw new Error('API_URL_NOT_SET');
+    var res = await fetch(API_URL, {method:'POST', body: JSON.stringify(Object.assign({action:action}, body||{}))});
+    return res.json();
+  }
+
+  function toast(text){
+    var t = document.getElementById('toast');
+    if(!t){
+      t = document.createElement('div'); t.id = 'toast';
+      t.style.cssText = 'position:fixed;left:12px;right:12px;bottom:16px;max-width:600px;margin:0 auto;background:#16201b;color:#fff;padding:12px 14px;border-radius:12px;font-size:14px;z-index:99;text-align:center;';
+      document.body.appendChild(t);
+    }
+    t.textContent = text; t.style.display = 'block';
+    clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = 'none'; }, 4500);
+  }
+
+  function handleAuthLost(){
+    if(!session) return;
+    clearSession(); session = null;
+    if(unsubCatalog) unsubCatalog();
+    if(unsubEntries) unsubEntries();
+    showLogin();
+    document.getElementById('loginMsg').textContent = 'Код изменён или отключён. Войдите снова.';
+  }
+
+  async function api(action, body){
+    var payload = Object.assign({auth: session ? {role:session.role, restaurant:session.restaurant||null, code:session.code} : null}, body||{});
+    var data;
+    try{ data = await apiRaw(action, payload); }
+    catch(e){ toast(e.message==='API_URL_NOT_SET' ? 'Не указан адрес сервера (API_URL в index.html).' : 'Нет связи с сервером. Проверьте интернет.'); throw e; }
+    if(data && data.ok === false){
+      if(data.error === 'auth'){ handleAuthLost(); }
+      else { toast('Ошибка: ' + (data.message || data.error)); }
+      throw new Error(data.error || 'api');
+    }
+    return data;
+  }
+
+  // Слой, который выглядит как прежняя база (doc/get/set/onSnapshot), но работает через сервер.
+  // Изменения отправляются точечно (добавить/изменить/удалить конкретные записи), поэтому
+  // два человека, работающие одновременно, не затирают друг друга.
+  function makeDb(){
+    var st = {entries:{}, entriesVer:{}, catalog:null, catalogVer:null};
+    var L = {entries:{}, catalog:[]};
+    var timer = null, lastFull = 0;
+    var clone = function(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); };
+
+    function groupCatalog(list){
+      var g = {};
+      (list||[]).forEach(function(p){
+        var it = {id:p.id, name:p.name, unit:p.unit};
+        if(p.article) it.article = p.article;
+        (g[p.category] = g[p.category] || []).push(it);
+      });
+      return g;
+    }
+    function entriesSnap(rid){ var v = st.entries[rid]; return {exists: v!==undefined, data:function(){ return {items: clone(v||[])}; }}; }
+    function catalogSnap(){ var v = st.catalog; return {exists: v!==null, data:function(){ return groupCatalog(v); }}; }
+    function notifyEntries(rid){ (L.entries[rid]||[]).slice().forEach(function(cb){ setTimeout(function(){ cb(entriesSnap(rid)); }, 0); }); }
+    function notifyCatalog(){ L.catalog.slice().forEach(function(cb){ setTimeout(function(){ cb(catalogSnap()); }, 0); }); }
+
+    function applyState(rid, r){
+      var chE = false, chC = false;
+      if(r.entries){ if(JSON.stringify(r.entries) !== JSON.stringify(st.entries[rid])) chE = true; st.entries[rid] = r.entries; }
+      if(r.entriesVersion !== undefined) st.entriesVer[rid] = r.entriesVersion;
+      if(r.catalog){ if(JSON.stringify(r.catalog) !== JSON.stringify(st.catalog)) chC = true; st.catalog = r.catalog; }
+      if(r.catalogVersion !== undefined) st.catalogVer = r.catalogVersion;
+      if(chE) notifyEntries(rid);
+      if(chC) notifyCatalog();
+    }
+    async function refresh(rid, full){
+      var r = await api('getState', {
+        restaurant: rid,
+        entriesVersion: (full || st.entriesVer[rid] === undefined) ? null : st.entriesVer[rid],
+        catalogVersion: (full || st.catalogVer === null) ? null : st.catalogVer
+      });
+      applyState(rid, r);
+    }
+    async function tick(force){
+      if(document.hidden || !session) return;
+      var full = force || (Date.now() - lastFull) > FULL_REFRESH_MS;
+      if(full) lastFull = Date.now();
+      var rids = Object.keys(L.entries).filter(function(k){ return L.entries[k].length; });
+      for(var i=0;i<rids.length;i++){ try{ await refresh(rids[i], full); }catch(e){} }
+    }
+    function startPolling(){
+      if(timer) return;
+      timer = setInterval(function(){ tick(false); }, POLL_MS);
+      document.addEventListener('visibilitychange', function(){ if(!document.hidden) tick(true); });
+    }
+
+    async function setEntries(rid, v){
+      var prev = st.entries[rid] || [], next = (v && v.items) || [], pm = {}, nm = {};
+      prev.forEach(function(e){ pm[e.id] = e; }); next.forEach(function(e){ nm[e.id] = e; });
+      var add = [], update = [], del = [];
+      next.forEach(function(e){
+        var p = pm[e.id];
+        if(!p){ add.push({id:e.id, date:e.date, category:e.category, name:e.name, unit:e.unit, qty:e.qty, author:e.author}); return; }
+        var f = {};
+        if(!!e.archived !== !!p.archived) f.archived = !!e.archived;
+        if(!!e.trashed !== !!p.trashed) f.trashed = !!e.trashed;
+        if(Object.keys(f).length) update.push({id:e.id, fields:f});
+      });
+      prev.forEach(function(p){ if(!nm[p.id]) del.push(p.id); });
+      if(!add.length && !update.length && !del.length) return;
+      applyState(rid, await api('entryOps', {restaurant:rid, add:add, update:update, del:del}));
+    }
+
+    async function setCatalog(v){
+      var prev = st.catalog || [], pm = {}, seen = {}, add = [], update = [], del = [];
+      prev.forEach(function(p){ pm[p.id] = p; });
+      Object.keys(v || {}).forEach(function(cat){
+        (v[cat] || []).forEach(function(p){
+          seen[p.id] = true;
+          var q = pm[p.id];
+          if(!q) add.push({id:p.id, category:cat, name:p.name, unit:p.unit, article:p.article || ''});
+          else if(q.name !== p.name || q.unit !== p.unit || (q.article || '') !== (p.article || ''))
+            update.push({id:p.id, fields:{name:p.name, unit:p.unit, article:p.article || ''}});
+        });
+      });
+      prev.forEach(function(p){ if(!seen[p.id]) del.push(p.id); });
+      if(!add.length && !update.length && !del.length) return;
+      applyState(activeRestaurant, await api('catalogOps', {add:add, update:update, del:del}));
+    }
+
+    return {
+      doc: function(path){
+        var kind = path.split('/')[0], id = path.split('/')[1];
+        return {
+          get: async function(){
+            if(kind === 'config'){ var r = await api('getCodes'); return {exists:true, data:function(){ return r.codes; }}; }
+            if(kind === 'entries'){ if(st.entries[id] === undefined) await refresh(id, true); return entriesSnap(id); }
+            if(st.catalog === null) await refresh(activeRestaurant, true);
+            return catalogSnap();
+          },
+          set: async function(v){
+            if(kind === 'config'){ await api('setCodes', {codes: v}); return; }
+            if(kind === 'entries') return setEntries(id, v);
+            return setCatalog(v);
+          },
+          onSnapshot: function(cb, errCb){
+            if(kind === 'entries'){
+              (L.entries[id] = L.entries[id] || []).push(cb);
+              if(st.entries[id] !== undefined) setTimeout(function(){ cb(entriesSnap(id)); }, 0);
+              refresh(id, false).catch(function(e){ if(errCb) errCb(e); });
+              startPolling();
+              return function(){ L.entries[id] = (L.entries[id] || []).filter(function(x){ return x !== cb; }); };
+            }
+            if(kind === 'catalog'){
+              L.catalog.push(cb);
+              if(st.catalog !== null) setTimeout(function(){ cb(catalogSnap()); }, 0);
+              return function(){ L.catalog = L.catalog.filter(function(x){ return x !== cb; }); };
+            }
+            return function(){};
+          }
+        };
+      }
+    };
+  }
+
+
+  var db = null;
+  var downloadsCap = null;
+  var session = loadSession();
+  var codes = null;
+  var catalogData = {}; // {category: [{id,name,unit}]}
+  var entriesData = []; // flat list for current restaurant
+  var unsubCatalog = null, unsubEntries = null, unsubCodes = null;
+  var activeCategory = 'Отработка';
+  var activeRestaurant = null;
+  var searchTerm = '';
+  var openQtyFor = null;
+
+  function loadSession(){
+    try{ var r = localStorage.getItem(SESSION_KEY); if(r) return JSON.parse(r); }catch(e){}
+    return null;
+  }
+  function saveSession(s){
+    try{ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }catch(e){}
+  }
+  function clearSession(){
+    try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
+  }
+  function restName(id){
+    for(var i=0;i<RESTAURANTS.length;i++){ if(RESTAURANTS[i].id===id) return RESTAURANTS[i].name; }
+    return id;
+  }
+  function esc(s){ var d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; }
+  function uid(){ return 'id'+Date.now()+Math.random().toString(36).slice(2,7); }
+  function todayStr(){ var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+  async function init(){
+    db = makeDb();
+    downloadsCap = {save: async function(o){
+      var blob = new Blob([o.data], {type:'text/csv;charset=utf-8'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = o.filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1500);
+    }};
+    if(session){ enterApp(); } else { showLogin(); }
+    if(!apiConfigured()) document.getElementById('loginMsg').textContent = 'Не указан адрес сервера (API_URL в index.html).';
+  }
+
+  function renderLoginIfNeeded(){
+    if(!session) buildLoginRestaurantOptions();
+  }
+
+  function buildLoginRestaurantOptions(){
+    var sel = document.getElementById('chefRestSelect');
+    sel.innerHTML = '';
+    RESTAURANTS.forEach(function(r){
+      var o = document.createElement('option');
+      o.value = r.id; o.textContent = r.name;
+      sel.appendChild(o);
+    });
+  }
+
+  function showLogin(){
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('appScreen').style.display = 'none';
+    buildLoginRestaurantOptions();
+  }
+
+  var loginRole = 'tovaroved';
+  document.getElementById('roleTovarovedBtn').onclick = function(){
+    loginRole = 'tovaroved';
+    document.getElementById('roleTovarovedBtn').classList.add('active');
+    document.getElementById('roleChefBtn').classList.remove('active');
+    document.getElementById('chefRestField').style.display = 'none';
+    document.getElementById('chefPositionField').style.display = 'none';
+  };
+  document.getElementById('roleChefBtn').onclick = function(){
+    loginRole = 'chef';
+    document.getElementById('roleChefBtn').classList.add('active');
+    document.getElementById('roleTovarovedBtn').classList.remove('active');
+    document.getElementById('chefRestField').style.display = 'block';
+    document.getElementById('chefPositionField').style.display = 'block';
+  };
+
+  document.getElementById('loginBtn').onclick = async function(){
+    var msg = document.getElementById('loginMsg');
+    msg.textContent = '';
+    var code = document.getElementById('codeInput').value.trim();
+    if(!code){ msg.textContent = 'Введите код доступа.'; return; }
+
+    var rid = loginRole === 'chef' ? document.getElementById('chefRestSelect').value : null;
+    var btn = document.getElementById('loginBtn');
+    btn.disabled = true; msg.textContent = 'Проверяем…';
+    try{
+      var r = await apiRaw('login', {role: loginRole, restaurant: rid, code: code});
+      if(r.ok){
+        session = loginRole === 'tovaroved'
+          ? {role:'tovaroved', code:code}
+          : {role:'chef', restaurant:rid, position: document.getElementById('chefPositionSelect').value, code:code};
+        saveSession(session); msg.textContent = '';
+        enterApp();
+      } else if(r.error === 'throttled'){
+        msg.textContent = 'Слишком много неверных попыток. Подождите минуту.';
+      } else if(r.error === 'server'){
+        msg.textContent = 'Ошибка сервера: ' + (r.message || 'неизвестная') + ' (это не про код — покажите этот текст разработчику)';
+      } else {
+        msg.textContent = 'Неверный код.';
+      }
+    }catch(e){
+      msg.textContent = e.message === 'API_URL_NOT_SET' ? 'Не указан адрес сервера (API_URL в index.html).' : 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.';
+    }
+    btn.disabled = false;
+  };
+
+  function enterApp(){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('codeInput').value = '';
+    document.getElementById('loginMsg').textContent = '';
+
+    if(session.role==='tovaroved'){
+      document.getElementById('roleLabel').textContent = 'Товаровед';
+      document.getElementById('codesLink').style.display = 'flex';
+      document.getElementById('trashBtn').style.display = 'block';
+      activeRestaurant = activeRestaurant || RESTAURANTS[0].id;
+      catalogListVisible = false;
+    } else {
+      document.getElementById('roleLabel').textContent = (session.position || 'Шеф') + ' · ' + restName(session.restaurant);
+      document.getElementById('codesLink').style.display = 'none';
+      document.getElementById('trashBtn').style.display = 'none';
+      activeRestaurant = session.restaurant;
+      catalogListVisible = true;
+    }
+    renderRestPills();
+    renderCatPills();
+    subscribeRestaurant(activeRestaurant);
+  }
+
+  document.getElementById('logoutBtn').onclick = function(){
+    clearSession();
+    session = null;
+    if(unsubCatalog) unsubCatalog();
+    if(unsubEntries) unsubEntries();
+    showLogin();
+  };
+
+  document.getElementById('codesLink').onclick = function(){
+    if(session && session.role==='tovaroved') openCodesModal();
+  };
+
+  document.getElementById('historyBtn').onclick = openHistoryModal;
+  document.getElementById('trashBtn').onclick = openTrashModal;
+
+  function renderRestPills(){
+    var el = document.getElementById('restPills');
+    if(session.role !== 'tovaroved'){ el.innerHTML=''; el.style.display='none'; return; }
+    el.style.display = 'flex';
+    el.innerHTML = '';
+    RESTAURANTS.forEach(function(r){
+      var b = document.createElement('button');
+      b.className = 'pill' + (r.id===activeRestaurant?' active':'');
+      b.textContent = r.name;
+      b.onclick = function(){
+        if(activeRestaurant===r.id) return;
+        activeRestaurant = r.id;
+        openQtyFor = null;
+        renderRestPills();
+        subscribeRestaurant(activeRestaurant);
+      };
+      el.appendChild(b);
+    });
+  }
+
+  function renderCatPills(){
+    var el = document.getElementById('catPills');
+    el.innerHTML = '';
+    CATEGORIES.forEach(function(c){
+      var b = document.createElement('button');
+      b.className = 'pill' + (c===activeCategory?' active':'');
+      b.textContent = c;
+      b.onclick = function(){
+        activeCategory = c; openQtyFor=null; checkedForArchive={};
+        renderCatPills(); renderAll();
+      };
+      el.appendChild(b);
+    });
+  }
+
+  function subscribeRestaurant(rid){
+    if(unsubCatalog) unsubCatalog();
+    if(unsubEntries) unsubEntries();
+    catalogData = {}; entriesData = []; checkedForArchive = {};
+    renderAll();
+    unsubCatalog = db.doc('catalog/'+rid).onSnapshot(function(snap){
+      catalogData = snap.exists ? (snap.data() || {}) : {};
+      if(openQtyFor) renderSummary(); else renderAll();
+    }, function(err){ console.error(err); });
+    unsubEntries = db.doc('entries/'+rid).onSnapshot(function(snap){
+      entriesData = snap.exists ? (snap.data().items || []) : [];
+      renderSummary();
+    }, function(err){ console.error(err); });
+  }
+
+  document.getElementById('search').addEventListener('input', function(e){
+    searchTerm = e.target.value;
+    if(searchTerm) catalogListVisible = true;
+    renderCatalogArea();
+  });
+
+  function renderAll(){
+    renderSummary();
+    renderCatalogArea();
+  }
+
+  var checkedForArchive = {};
+
+  function fmtDateLabel(dateStr){
+    if(dateStr === todayStr()) return 'Сегодня';
+    var d = new Date(dateStr+'T00:00:00');
+    return d.toLocaleDateString('ru-RU', {day:'numeric', month:'long'});
+  }
+
+  function renderSummary(){
+    document.getElementById('summaryLabel').textContent =
+      activeCategory.toUpperCase() + ' · ' + restName(activeRestaurant).toUpperCase();
+    var el = document.getElementById('todayList');
+    var isTov = session.role==='tovaroved';
+    var list = entriesData.filter(function(e){ return e.category===activeCategory && e.archived!==true && e.trashed!==true; });
+    if(list.length===0){
+      el.innerHTML = '<div class="empty">Пока ничего не вписано</div>';
+      if(isTov){
+        var btnWrapEmpty = document.createElement('div');
+        btnWrapEmpty.style.marginTop = '10px';
+        btnWrapEmpty.innerHTML = '<button class="ghost-btn" id="clearArchiveBtn" disabled style="opacity:0.5;">Списано</button>';
+        el.appendChild(btnWrapEmpty);
+      }
+      return;
+    }
+    el.innerHTML = '';
+    var byDate = {};
+    list.forEach(function(e){ (byDate[e.date] = byDate[e.date]||[]).push(e); });
+    var dates = Object.keys(byDate).sort().reverse();
+    dates.forEach(function(dateKey){
+      var dateHeader = document.createElement('div');
+      dateHeader.className = 'date-group';
+      dateHeader.style.marginTop = '4px';
+      var authorsSet = {};
+      byDate[dateKey].forEach(function(e){ if(e.author) authorsSet[e.author] = true; });
+      var authorsList = Object.keys(authorsSet);
+      var authorsSuffix = authorsList.length ? ('  ·  списывал(и): ' + authorsList.join(', ')) : '';
+      dateHeader.textContent = fmtDateLabel(dateKey) + authorsSuffix;
+      el.appendChild(dateHeader);
+
+      byDate[dateKey].slice().reverse().forEach(function(e){
+        var row = document.createElement('div');
+        var marked = isTov && checkedForArchive[e.id];
+        row.className = 'entry-row' + (marked ? ' marked' : '');
+        row.innerHTML = '<span class="entry-text">'+esc(e.name)+' — '+e.qty+' '+esc(e.unit)+'</span>'+
+          '<span style="display:flex; align-items:center;"><button class="del">Удалить</button></span>';
+        row.querySelector('.del').onclick = function(ev){
+          ev.stopPropagation();
+          askConfirm('Точно удалить «'+e.name+'» — '+e.qty+' '+e.unit+'?', function(){ removeEntry(e.id); });
+        };
+        if(isTov){
+          row.onclick = function(){
+            if(checkedForArchive[e.id]) delete checkedForArchive[e.id]; else checkedForArchive[e.id] = true;
+            renderSummary();
+          };
+          row.style.cursor = 'pointer';
+        }
+        el.appendChild(row);
+      });
+    });
+
+    if(isTov){
+      var btnWrap = document.createElement('div');
+      btnWrap.style.marginTop = '10px';
+      btnWrap.innerHTML = '<button class="ghost-btn" id="clearArchiveBtn">Списано</button>';
+      el.appendChild(btnWrap);
+      document.getElementById('clearArchiveBtn').onclick = archiveChecked;
+      updateClearBtn();
+    }
+  }
+
+
+  function updateClearBtn(){
+    var btn = document.getElementById('clearArchiveBtn');
+    if(!btn) return;
+    var count = Object.keys(checkedForArchive).length;
+    btn.disabled = count===0;
+    btn.style.opacity = count===0 ? '0.5' : '1';
+    btn.textContent = count>0 ? ('Списано ('+count+')') : 'Списано';
+  }
+
+  async function archiveChecked(){
+    var ids = Object.keys(checkedForArchive);
+    if(ids.length===0) return;
+    var idSet = {};
+    ids.forEach(function(id){ idSet[id]=true; });
+    var next = entriesData.map(function(e){
+      if(idSet[e.id]) return Object.assign({}, e, {archived:true});
+      return e;
+    });
+    try{
+      await db.doc('entries/'+activeRestaurant).set({items: next});
+      checkedForArchive = {};
+    }catch(e){ console.error(e); }
+  }
+
+  async function removeEntry(entryId){
+    var next = entriesData.filter(function(x){ return x.id!==entryId; });
+    try{
+      await db.doc('entries/'+activeRestaurant).set({items: next});
+    }catch(e){ console.error(e); }
+  }
+
+  var QTY_WARN_THRESHOLD = 100;
+
+  async function addEntry(product){
+    var input = document.getElementById('qtyInputField');
+    var qty = parseFloat(input.value);
+    if(!qty || qty<=0) return;
+    if(qty >= QTY_WARN_THRESHOLD){
+      askConfirm('Указано '+qty+' '+product.unit+' — «'+product.name+'». Обычно списывают меньше. Точно верное количество?', function(){
+        saveEntry(product, qty);
+      }, 'Да, верно', 'Проверю ещё раз');
+      return;
+    }
+    saveEntry(product, qty);
+  }
+
+  async function saveEntry(product, qty){
+    var author = session.role==='tovaroved' ? 'Товаровед' : (session.position || 'Шеф');
+    var entry = {id:uid(), name:product.name, unit:product.unit, category:activeCategory, qty:qty, date:todayStr(), ts:Date.now(), author:author};
+    var next = entriesData.concat([entry]);
+    try{
+      await db.doc('entries/'+activeRestaurant).set({items: next});
+      openQtyFor = null;
+      renderCatalogArea();
+    }catch(e){ console.error(e); }
+  }
+
+  function currentCatalogList(){
+    var list = catalogData[activeCategory] || [];
+    if(searchTerm){
+      list = list.filter(function(p){ return p.name.toLowerCase().indexOf(searchTerm.toLowerCase())>-1; });
+    }
+    return list;
+  }
+
+  var editCatalogMode = false;
+  var catalogListVisible = false;
+
+  function renderCatalogArea(){
+    var el = document.getElementById('catalogArea');
+    var isTov = session.role==='tovaroved';
+    var list = currentCatalogList();
+    var html = '';
+    if(isTov){
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">'+
+        '<button class="addcatalog" id="addToCatalogBtn" style="margin-bottom:0;">+ Добавить товар в каталог</button>'+
+        '<button class="linkbtn" id="toggleEditBtn" style="font-size:13px;">'+(editCatalogMode ? 'Готово' : '✏️ Редактировать')+'</button>'+
+        '</div>';
+    }
+    html += '<button class="linkbtn" id="toggleListBtn" style="display:block; margin-bottom:10px; font-size:13px;">'+
+      (catalogListVisible ? '🙈 Скрыть список товаров' : '👁 Показать список товаров ('+list.length+')')+'</button>';
+    el.innerHTML = html;
+
+    if(isTov){
+      document.getElementById('addToCatalogBtn').onclick = openAddProductModal;
+      document.getElementById('toggleEditBtn').onclick = function(){ editCatalogMode = !editCatalogMode; renderCatalogArea(); };
+    }
+    document.getElementById('toggleListBtn').onclick = function(){ catalogListVisible = !catalogListVisible; renderCatalogArea(); };
+
+    if(!catalogListVisible){ return; }
+
+    if(list.length===0){
+      var msg = document.createElement('div');
+      msg.className = 'empty-state';
+      msg.textContent = isTov
+        ? 'Каталог пуст. Добавьте товар кнопкой выше.'
+        : 'Каталог пуст. Товаровед может добавить товары.';
+      el.appendChild(msg);
+      return;
+    }
+
+    list.forEach(function(p){
+      var row = document.createElement('div');
+      row.className = 'card';
+      if(openQtyFor === p.id){
+        row.innerHTML =
+          '<div><div class="name">'+esc(p.name)+'</div><div class="tags"><span class="tag">'+esc(p.unit)+'</span>'+(p.article?'<span class="tag">№'+esc(p.article)+'</span>':'')+'</div></div>'+
+          '<div class="qtybox">'+
+            '<input type="number" id="qtyInputField" min="0" step="any" value="1">'+
+            '<button id="qtyConfirm">OK</button>'+
+            '<button class="cancel" id="qtyCancel">✕</button>'+
+          '</div>';
+        el.appendChild(row);
+        var input = row.querySelector('#qtyInputField');
+        input.focus(); input.select();
+        row.querySelector('#qtyConfirm').onclick = function(){ addEntry(p); };
+        row.querySelector('#qtyCancel').onclick = function(){ openQtyFor=null; renderCatalogArea(); };
+      } else {
+        var editBtn = (isTov && editCatalogMode) ? '<button class="del" data-role="edit" style="color:var(--green); background:none; border:none; font-size:13px; cursor:pointer; margin-right:6px;">Изменить</button>' : '';
+        var delBtn = (isTov && editCatalogMode) ? '<button class="del" data-role="del" style="color:var(--danger);background:none;border:none;font-size:13px;cursor:pointer;margin-right:6px;">Удалить</button>' : '';
+        row.innerHTML =
+          '<div><div class="name">'+esc(p.name)+'</div><div class="tags"><span class="tag">'+esc(p.unit)+'</span>'+(p.article?'<span class="tag">№'+esc(p.article)+'</span>':'')+'</div></div>'+
+          '<div style="display:flex;align-items:center;">'+editBtn+delBtn+'<button class="addbtn">+</button></div>';
+        row.querySelector('.addbtn').onclick = function(){ openQtyFor = p.id; renderCatalogArea(); };
+        if(isTov && editCatalogMode){
+          row.querySelector('[data-role=del]').onclick = function(){
+            askConfirm('Точно удалить «'+p.name+'» из каталога?', function(){ deleteProduct(p); });
+          };
+          row.querySelector('[data-role=edit]').onclick = function(){
+            openEditProductModal(p);
+          };
+        }
+        el.appendChild(row);
+      }
+    });
+  }
+
+  // Ассортимент общий для всех ресторанов: любое изменение каталога применяем ко всем четырём
+  async function updateCatalogEverywhere(mutate){
+    // Каталог один на все рестораны (лист «Товары»), поэтому пишем один раз
+    var ref = db.doc('catalog/'+activeRestaurant);
+    var snap = await ref.get();
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var next = Object.assign({}, data);
+    next[activeCategory] = mutate((data[activeCategory] || []).slice());
+    await ref.set(next);
+  }
+  function sameProduct(x, prod){ return x.id===prod.id || (x.name===prod.name && x.unit===prod.unit); }
+
+  async function deleteProduct(prod){
+    try{ await updateCatalogEverywhere(function(list){ return list.filter(function(x){ return !sameProduct(x, prod); }); }); }
+    catch(e){ console.error(e); }
+  }
+
+  function openEditProductModal(product){
+    var root = document.getElementById('modalRoot');
+    root.innerHTML =
+      '<div class="modal-bg" id="modalBg"><div class="modal">'+
+      '<h3>Изменить товар</h3>'+
+      '<div class="field"><label>Название товара</label><input type="text" id="ePName" value="'+esc(product.name)+'"></div>'+
+      '<div class="field"><label>Единица измерения</label>'+
+      '<select id="ePUnit">'+
+        ['кг','шт','л','г'].map(function(u){ return '<option value="'+u+'"'+(u===product.unit?' selected':'')+'>'+u+'</option>'; }).join('')+
+      '</select></div>'+
+      '<div class="field"><label>Артикул (необязательно)</label><input type="text" id="ePArticle" value="'+esc(product.article||'')+'" placeholder="Например, 13601"></div>'+
+      '<button class="primary-btn" id="ePSave">Сохранить</button>'+
+      '<button class="close" id="ePClose">Отмена</button>'+
+      '</div></div>';
+    root.querySelector('#ePClose').onclick = function(){ root.innerHTML=''; };
+    root.querySelector('#modalBg').addEventListener('click', function(e){ if(e.target.id==='modalBg') root.innerHTML=''; });
+    root.querySelector('#ePSave').onclick = async function(){
+      var newName = root.querySelector('#ePName').value.trim();
+      if(!newName) return;
+      var newUnit = root.querySelector('#ePUnit').value;
+      var newArticle = root.querySelector('#ePArticle').value.trim();
+      try{
+        await updateCatalogEverywhere(function(list){
+          return list.map(function(x){
+            if(!sameProduct(x, product)) return x;
+            var updated = Object.assign({}, x, {name:newName, unit:newUnit});
+            if(newArticle){ updated.article = newArticle; } else { delete updated.article; }
+            return updated;
+          });
+        });
+        root.innerHTML = '';
+      }catch(e){ console.error(e); }
+    };
+  }
+
+  function openAddProductModal(){
+    var root = document.getElementById('modalRoot');
+    root.innerHTML =
+      '<div class="modal-bg" id="modalBg"><div class="modal">'+
+      '<h3>Добавить товар</h3>'+
+      '<div class="field"><label>Название товара</label><input type="text" id="pName"></div>'+
+      '<div class="field"><label>Единица измерения</label>'+
+      '<select id="pUnit"><option value="кг">кг</option><option value="шт">шт</option><option value="л">л</option><option value="г">г</option></select></div>'+
+      '<div class="field"><label>Артикул (необязательно)</label><input type="text" id="pArticle" placeholder="Например, 13601"></div>'+
+      '<button class="primary-btn" id="pSave">Добавить</button>'+
+      '<button class="close" id="pClose">Отмена</button>'+
+      '</div></div>';
+    root.querySelector('#pClose').onclick = function(){ root.innerHTML=''; };
+    root.querySelector('#modalBg').addEventListener('click', function(e){ if(e.target.id==='modalBg') root.innerHTML=''; });
+    root.querySelector('#pSave').onclick = async function(){
+      var name = root.querySelector('#pName').value.trim();
+      if(!name) return;
+      var unit = root.querySelector('#pUnit').value;
+      var article = root.querySelector('#pArticle').value.trim();
+      var newProduct = {id:uid(), name:name, unit:unit};
+      if(article) newProduct.article = article;
+      try{
+        await updateCatalogEverywhere(function(list){
+          var exists = list.some(function(x){ return x.name===name && x.unit===unit; });
+          return exists ? list : list.concat([newProduct]);
+        });
+        root.innerHTML = '';
+      }catch(e){ console.error(e); }
+    };
+  }
+
+  function askConfirm(message, onYes, yesLabel, noLabel){
+    var root = document.getElementById('confirmRoot');
+    root.innerHTML =
+      '<div class="modal-bg" id="confirmBg" style="z-index:60;"><div class="modal" style="max-width:380px;">'+
+      '<h3 style="margin-bottom:20px;">'+esc(message)+'</h3>'+
+      '<button class="primary-btn" id="confirmYes" style="background:var(--danger); margin-bottom:8px;">'+esc(yesLabel||'Удалить')+'</button>'+
+      '<button class="ghost-btn" id="confirmNo">'+esc(noLabel||'Отмена')+'</button>'+
+      '</div></div>';
+    root.querySelector('#confirmYes').onclick = function(){ root.innerHTML=''; onYes(); };
+    root.querySelector('#confirmNo').onclick = function(){ root.innerHTML=''; };
+    root.querySelector('#confirmBg').addEventListener('click', function(e){ if(e.target.id==='confirmBg') root.innerHTML=''; });
+  }
+
+
+  function pad2(n){ return n<10 ? '0'+n : ''+n; }
+  function getISOWeekString(d){
+    var date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    var dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    var yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+    var weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+    return date.getUTCFullYear() + '-W' + pad2(weekNo);
+  }
+  function weekStringToRange(wk){
+    var parts = wk.split('-W');
+    var year = parseInt(parts[0],10), week = parseInt(parts[1],10);
+    var jan4 = new Date(Date.UTC(year,0,4));
+    var jan4Day = jan4.getUTCDay() || 7;
+    var monday = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week-1)*7);
+    var sunday = new Date(monday);
+    sunday.setUTCDate(monday.getUTCDate()+6);
+    function fmt(d){ return d.getUTCFullYear()+'-'+pad2(d.getUTCMonth()+1)+'-'+pad2(d.getUTCDate()); }
+    return {from: fmt(monday), to: fmt(sunday)};
+  }
+
+
+  function openTrashModal(){
+    var root = document.getElementById('modalRoot');
+    var trashSearchTerm = '';
+
+    root.innerHTML =
+      '<div class="modal-bg" id="modalBg"><div class="modal">'+
+      '<h3>🗑 Корзина · '+esc(activeCategory)+' · '+esc(restName(activeRestaurant))+'</h3>'+
+      '<input type="text" id="trashSearch" placeholder="Найти товар в корзине..." style="margin-bottom:14px;">'+
+      '<div id="trashBody"></div>'+
+      '<button class="close" id="trashClose">Закрыть</button>'+
+      '</div></div>';
+
+    root.querySelector('#trashSearch').addEventListener('input', function(ev){
+      trashSearchTerm = ev.target.value;
+      renderBody();
+    });
+    root.querySelector('#trashClose').onclick = function(){ root.innerHTML=''; };
+    root.querySelector('#modalBg').addEventListener('click', function(e){ if(e.target.id==='modalBg') root.innerHTML=''; });
+
+    function renderBody(){
+      var bodyEl = root.querySelector('#trashBody');
+      var list = entriesData.filter(function(e){
+        var matchesSearch = !trashSearchTerm || e.name.toLowerCase().indexOf(trashSearchTerm.toLowerCase())>-1;
+        return e.category===activeCategory && e.trashed===true && matchesSearch;
+      });
+      var bodyHtml;
+      if(list.length===0){
+        bodyHtml = '<div class="empty-state">Корзина пуста.</div>';
+      } else {
+        var byDate = {};
+        list.forEach(function(e){ (byDate[e.date] = byDate[e.date]||[]).push(e); });
+        var dates = Object.keys(byDate).sort().reverse();
+        bodyHtml = '';
+        dates.forEach(function(d){
+          bodyHtml += '<div class="date-group">'+esc(d)+'</div>';
+          byDate[d].slice().reverse().forEach(function(e){
+            bodyHtml += '<div class="entry-row"><span>'+esc(e.name)+' — '+e.qty+' '+esc(e.unit)+'</span>'+
+              '<button class="del" data-trash-del="'+esc(e.id)+'">Удалить</button></div>';
+          });
+        });
+        bodyHtml += '<button class="ghost-btn" id="trashClearAllBtn" style="margin-top:16px; color:var(--danger); border-color:var(--danger);">Очистить корзину ('+list.length+')</button>';
+      }
+      bodyEl.innerHTML = bodyHtml;
+
+      bodyEl.querySelectorAll('[data-trash-del]').forEach(function(btn){
+        btn.onclick = function(){
+          var id = btn.getAttribute('data-trash-del');
+          var entry = list.find(function(x){ return x.id===id; });
+          var label = entry ? ('«'+entry.name+'» — '+entry.qty+' '+entry.unit) : 'эту запись';
+          askConfirm('Точно удалить '+label+' из корзины насовсем?', async function(){
+            await removeEntry(id);
+            renderBody();
+          }, 'Да', 'Нет');
+        };
+      });
+
+      var clearAllBtn = bodyEl.querySelector('#trashClearAllBtn');
+      if(clearAllBtn){
+        clearAllBtn.onclick = function(){
+          askConfirm('Точно очистить корзину? Будет удалено записей: '+list.length, async function(){
+            var idsToRemove = {};
+            list.forEach(function(e){ idsToRemove[e.id] = true; });
+            var next = entriesData.filter(function(e){ return !idsToRemove[e.id]; });
+            try{
+              await db.doc('entries/'+activeRestaurant).set({items: next});
+              renderBody();
+            }catch(err){ console.error(err); }
+          }, 'Да', 'Нет');
+        };
+      }
+    }
+
+    renderBody();
+  }
+
+  function openHistoryModal(){
+    var root = document.getElementById('modalRoot');
+    var mode = 'day';
+    var today = todayStr();
+    var curMonth = today.slice(0,7);
+
+    root.innerHTML =
+      '<div class="modal-bg" id="modalBg"><div class="modal">'+
+      '<h3>История · '+esc(activeCategory)+' · '+esc(restName(activeRestaurant))+'</h3>'+
+      '<div class="roletabs" style="margin-bottom:16px;">'+
+        '<button class="roletab active" id="modeDay">День</button>'+
+        '<button class="roletab" id="modeWeek">Неделя</button>'+
+        '<button class="roletab" id="modeMonth">Месяц</button>'+
+        '<button class="roletab" id="modePeriod">Период</button>'+
+      '</div>'+
+      '<div id="dateFields"></div>'+
+      '<button class="primary-btn" id="histShow" style="margin-top:6px;">Показать</button>'+
+      '<input type="text" id="histSearch" placeholder="Найти товар в результатах..." style="margin-top:12px;">'+
+      '<div id="histResults"></div>'+
+      '<button class="close" id="histClose">Закрыть</button>'+
+      '</div></div>';
+
+    var histSearchTerm = '';
+    root.querySelector('#histSearch').addEventListener('input', function(ev){
+      histSearchTerm = ev.target.value;
+      showResults();
+    });
+
+    function renderFields(){
+      var el = root.querySelector('#dateFields');
+      if(mode==='day'){
+        el.innerHTML = '<div class="field"><label>Дата</label><input type="date" id="fDay" value="'+today+'"></div>';
+      } else if(mode==='week'){
+        el.innerHTML = '<div class="field"><label>Неделя</label><input type="week" id="fWeek" value="'+getISOWeekString(new Date())+'"></div>';
+      } else if(mode==='month'){
+        el.innerHTML = '<div class="field"><label>Месяц</label><input type="month" id="fMonth" value="'+curMonth+'"></div>';
+      } else {
+        el.innerHTML = '<div class="field"><label>С</label><input type="date" id="fFrom" value="'+today+'"></div>'+
+          '<div class="field"><label>По</label><input type="date" id="fTo" value="'+today+'"></div>';
+      }
+    }
+    function setMode(m){
+      mode = m;
+      ['modeDay','modeWeek','modeMonth','modePeriod'].forEach(function(id){ root.querySelector('#'+id).classList.remove('active'); });
+      root.querySelector('#mode'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('active');
+      renderFields();
+    }
+    root.querySelector('#modeDay').onclick = function(){ setMode('day'); };
+    root.querySelector('#modeWeek').onclick = function(){ setMode('week'); };
+    root.querySelector('#modeMonth').onclick = function(){ setMode('month'); };
+    root.querySelector('#modePeriod').onclick = function(){ setMode('period'); };
+    renderFields();
+
+    var lastFrom = null, lastTo = null;
+
+    function computeRange(){
+      var from, to;
+      if(mode==='day'){
+        from = to = root.querySelector('#fDay').value;
+      } else if(mode==='week'){
+        var wk = root.querySelector('#fWeek').value; // YYYY-Www
+        var range = weekStringToRange(wk);
+        from = range.from; to = range.to;
+      } else if(mode==='month'){
+        var m = root.querySelector('#fMonth').value; // YYYY-MM
+        from = m + '-01';
+        var d = new Date(m+'-01T00:00:00');
+        var last = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+        to = m + '-' + String(last).padStart(2,'0');
+      } else {
+        from = root.querySelector('#fFrom').value;
+        to = root.querySelector('#fTo').value;
+      }
+      return {from:from, to:to};
+    }
+
+    function showResults(){
+      var range = computeRange();
+      lastFrom = range.from; lastTo = range.to;
+      if(!lastFrom || !lastTo){ return; }
+      var resEl = root.querySelector('#histResults');
+      var list = entriesData.filter(function(e){
+        var matchesSearch = !histSearchTerm || e.name.toLowerCase().indexOf(histSearchTerm.toLowerCase())>-1;
+        return e.category===activeCategory && e.date>=lastFrom && e.date<=lastTo && e.trashed!==true && matchesSearch;
+      });
+      if(list.length===0){
+        resEl.innerHTML = '<div class="empty-state">Списаний за этот период нет.</div>';
+        return;
+      }
+      var byDate = {};
+      list.forEach(function(e){ (byDate[e.date] = byDate[e.date]||[]).push(e); });
+      var dates = Object.keys(byDate).sort().reverse();
+      var html = '';
+      dates.forEach(function(d){
+        html += '<div class="date-group">'+esc(d)+'</div>';
+        byDate[d].slice().reverse().forEach(function(e){
+          var statusHtml = e.archived===true
+            ? '<span style="color:var(--green); font-size:12px; font-weight:600;">✓ внесено</span>'
+            : '<span style="color:var(--muted); font-size:12px;">не внесено</span>';
+          html += '<div class="entry-row"><span>'+esc(e.name)+' — '+e.qty+' '+esc(e.unit)+'</span>'+
+            '<span style="display:flex; align-items:center; gap:10px;">'+statusHtml+
+            (session && session.role==='tovaroved' ? '<button class="del" data-hist-del="'+esc(e.id)+'">Удалить</button>' : '')+'</span></div>';
+        });
+      });
+      var totals = {};
+      list.forEach(function(e){
+        var key = e.name+'|'+e.unit;
+        totals[key] = (totals[key]||0) + e.qty;
+      });
+      var keys = Object.keys(totals).sort();
+      html += '<div class="date-group">Итого за период</div>';
+      keys.forEach(function(k){
+        var parts = k.split('|');
+        html += '<div class="entry-row"><span>'+esc(parts[0])+'</span><span>'+ (Math.round(totals[k]*100)/100) +' '+esc(parts[1])+'</span></div>';
+      });
+      html += '<button class="ghost-btn" id="histExportBtn" style="margin-top:16px;">⬇️ Скачать CSV</button>';
+      if(session && session.role==='tovaroved'){
+        html += '<button class="ghost-btn" id="histDeleteAllBtn" style="margin-top:10px; color:var(--danger); border-color:var(--danger);">Переместить все записи за период в корзину ('+list.length+')</button>';
+      }
+      resEl.innerHTML = html;
+
+      resEl.querySelector('#histExportBtn').onclick = async function(){
+        if(!downloadsCap){
+          alert('Скачивание файлов недоступно в этом окне просмотра.');
+          return;
+        }
+        var csvRows = [['Дата','Товар','Количество','Ед.','Статус','Кто списал']];
+        list.forEach(function(e){
+          csvRows.push([e.date, e.name, e.qty, e.unit, e.archived===true?'внесено':'не внесено', e.author||'']);
+        });
+        var csv = csvRows.map(function(row){
+          return row.map(function(cell){
+            var s = String(cell==null?'':cell);
+            if(s.indexOf(';')>-1 || s.indexOf('"')>-1 || s.indexOf('\n')>-1){
+              s = '"'+s.replace(/"/g,'""')+'"';
+            }
+            return s;
+          }).join(';');
+        }).join('\r\n');
+        var csvWithBom = '\uFEFF' + csv;
+        var fname = 'spisaniya_'+esc(activeCategory)+'_'+lastFrom+'_'+lastTo+'.csv';
+        try{
+          await downloadsCap.save({filename: fname, data: csvWithBom});
+        }catch(err){ console.error(err); }
+      };
+
+      var delAllBtn = resEl.querySelector('#histDeleteAllBtn');
+      if(delAllBtn) delAllBtn.onclick = function(){
+        askConfirm('Переместить все записи за этот период в корзину? Позиций: '+list.length, async function(){
+          var idSet = {};
+          list.forEach(function(e){ idSet[e.id] = true; });
+          var next = entriesData.map(function(e){
+            return idSet[e.id] ? Object.assign({}, e, {trashed:true}) : e;
+          });
+          try{
+            await db.doc('entries/'+activeRestaurant).set({items: next});
+            showResults();
+          }catch(err){ console.error(err); }
+        }, 'Да', 'Нет');
+      };
+
+      resEl.querySelectorAll('[data-hist-del]').forEach(function(btn){
+        btn.onclick = function(){
+          var id = btn.getAttribute('data-hist-del');
+          var entry = list.find(function(x){ return x.id===id; });
+          var label = entry ? ('«'+entry.name+'» — '+entry.qty+' '+entry.unit) : 'эту запись';
+          askConfirm('Переместить '+label+' в корзину?', async function(){
+            var next = entriesData.map(function(x){
+              return x.id===id ? Object.assign({}, x, {trashed:true}) : x;
+            });
+            try{
+              await db.doc('entries/'+activeRestaurant).set({items: next});
+              showResults();
+            }catch(err){ console.error(err); }
+          }, 'Да', 'Нет');
+        };
+      });
+    }
+
+    root.querySelector('#histShow').onclick = showResults;
+
+    root.querySelector('#histClose').onclick = function(){ root.innerHTML=''; };
+    root.querySelector('#modalBg').addEventListener('click', function(e){ if(e.target.id==='modalBg') root.innerHTML=''; });
+  }
+
+  async function openCodesModal(){
+    var root = document.getElementById('modalRoot');
+    var c;
+    try{ c = (await db.doc('config/codes').get()).data() || {}; }catch(e){ return; }
+    var rows = '<div class="code-row"><span>Товаровед</span><input type="text" id="code_tovaroved" value="'+esc(c.tovaroved||'')+'"></div>';
+    RESTAURANTS.forEach(function(r){
+      rows += '<div class="code-row"><span>'+esc(r.name)+'</span><input type="text" id="code_'+r.id+'" value="'+esc(c[r.id]||'')+'"></div>';
+    });
+    root.innerHTML =
+      '<div class="modal-bg" id="modalBg"><div class="modal">'+
+      '<h3>Коды доступа</h3>'+
+      rows+
+      '<button class="primary-btn" id="codesSave" style="margin-top:14px;">Сохранить</button>'+
+      '<button class="close" id="codesClose">Закрыть</button>'+
+      '</div></div>';
+    root.querySelector('#codesClose').onclick = function(){ root.innerHTML=''; };
+    root.querySelector('#modalBg').addEventListener('click', function(e){ if(e.target.id==='modalBg') root.innerHTML=''; });
+    root.querySelector('#codesSave').onclick = async function(){
+      var updated = {tovaroved: root.querySelector('#code_tovaroved').value.trim() || c.tovaroved};
+      RESTAURANTS.forEach(function(r){
+        updated[r.id] = root.querySelector('#code_'+r.id).value.trim() || c[r.id];
+      });
+      var tooShort = Object.keys(updated).some(function(k){ return String(updated[k]).length < 4; });
+      if(tooShort){ alert('Каждый код должен быть не короче 4 символов. Чем длиннее, тем безопаснее.'); return; }
+      try{
+        await db.doc('config/codes').set(updated);
+        if(session && session.role === 'tovaroved'){ session.code = updated.tovaroved; saveSession(session); }
+        root.innerHTML = '';
+      }catch(e){ console.error(e); }
+    };
+  }
+
+  init();
+})();
+</script>
 </body>
 </html>
