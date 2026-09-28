@@ -87,6 +87,9 @@ select{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(-
 .field label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px;}
 .hint{font-size:12px; color:var(--muted); margin-top:10px; text-align:center;}
 input,select,textarea{font-size:16px !important;}
+.statusbar{background:#e6f3ec; color:#175c3a; border-radius:12px; padding:10px 12px; margin:0 0 12px; font-size:14px;}
+.statusbar.err{background:#fdecea; color:#c0453a;}
+.statusbar .linkbtn{color:#c0453a; padding:6px 0 0;}
 </style>
 </head>
 <body>
@@ -129,6 +132,7 @@ input,select,textarea{font-size:16px !important;}
       <div class="lockrow" id="codesLink" style="display:none;">🔒 Управление кодами доступа</div>
     </header>
 
+    <div id="statusBar" class="statusbar" style="display:none;"></div>
     <div class="pillrow" id="restPills"></div>
     <div class="pillrow" id="catPills"></div>
     <div class="summary">
@@ -170,10 +174,73 @@ input,select,textarea{font-size:16px !important;}
 
   function apiConfigured(){ return API_URL.indexOf('/exec') > 0; }
 
+  // Журнал запросов (виден, если открыть сайт с ?debug=1)
+  var apiLog = [];
+  function dlog(s){
+    apiLog.push(new Date().toTimeString().slice(0,8) + ' ' + s);
+    if(apiLog.length > 40) apiLog.shift();
+    var d = document.getElementById('dbgPanel');
+    if(d){ d.textContent = apiLog.join('\n'); d.scrollTop = d.scrollHeight; }
+  }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  // До 3 попыток: у Google бывают разовые сбои и медленный «холодный» старт.
+  // Повторять безопасно: сервер игнорирует повторную отправку одной и той же записи.
   async function apiRaw(action, body){
     if(!apiConfigured()) throw new Error('API_URL_NOT_SET');
-    var res = await fetch(API_URL, {method:'POST', body: JSON.stringify(Object.assign({action:action}, body||{}))});
-    return res.json();
+    var payload = JSON.stringify(Object.assign({action:action}, body||{}));
+    var lastErr = null;
+    for(var attempt = 1; attempt <= 3; attempt++){
+      var t0 = Date.now();
+      try{
+        var res = await fetch(API_URL, {method:'POST', body: payload});
+        var text = await res.text();
+        var data;
+        try{ data = JSON.parse(text); }
+        catch(parseErr){
+          lastErr = new Error('BAD_RESPONSE');
+          lastErr.detail = 'HTTP ' + res.status + ': ' + text.replace(/\s+/g, ' ').slice(0, 120);
+          dlog(action + ' #' + attempt + ' ответ не JSON: ' + lastErr.detail);
+          if(attempt < 3) await sleep(1200 * attempt);
+          continue;
+        }
+        dlog(action + ' #' + attempt + ' ok, ' + (Date.now() - t0) + ' мс, ' + text.length + ' байт' + (data && data.ok === false ? ', ответ: ' + data.error : ''));
+        return data;
+      }catch(netErr){
+        lastErr = netErr;
+        lastErr.detail = String(netErr && netErr.message || netErr);
+        dlog(action + ' #' + attempt + ' сеть: ' + lastErr.detail);
+        if(attempt < 3) await sleep(1200 * attempt);
+      }
+    }
+    throw lastErr;
+  }
+
+  function describeError(e){
+    if(!e) return 'неизвестная ошибка';
+    if(e.message === 'API_URL_NOT_SET') return 'не указан адрес сервера (API_URL в index.html)';
+    if(e.message === 'BAD_RESPONSE') return 'Google вернул страницу с ошибкой (' + (e.detail || '') + ')';
+    if(e.detail) return 'нет связи с сервером (' + e.detail + ')';
+    return String(e.message || e);
+  }
+
+  // Состояние первой загрузки: чтобы «Загрузка…» не выглядело как «пусто»
+  var loadState = {catalog:false, entries:false, error:'', retries:0};
+  function isLoaded(){ return loadState.catalog && loadState.entries; }
+  function renderStatus(){
+    var el = document.getElementById('statusBar');
+    if(!el) return;
+    if(isLoaded()){ el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    if(loadState.error){
+      el.className = 'statusbar err';
+      el.innerHTML = '<div>Не удалось загрузить данные: ' + esc(loadState.error) + '</div><button class="linkbtn" id="retryBtn">Повторить</button>';
+      var b = document.getElementById('retryBtn');
+      if(b) b.onclick = function(){ loadState.error = ''; loadState.retries = 0; renderStatus(); db.refreshNow(); };
+    } else {
+      el.className = 'statusbar';
+      el.textContent = '⏳ Загрузка данных… (в первый раз может занять до 15 секунд)';
+    }
   }
 
   function toast(text){
@@ -189,6 +256,7 @@ input,select,textarea{font-size:16px !important;}
 
   function handleAuthLost(){
     if(!session) return;
+    dlog('сервер не принял код (auth) — выход на экран входа');
     clearSession(); session = null;
     if(unsubCatalog) unsubCatalog();
     if(unsubEntries) unsubEntries();
@@ -200,7 +268,12 @@ input,select,textarea{font-size:16px !important;}
     var payload = Object.assign({auth: session ? {role:session.role, restaurant:session.restaurant||null, code:session.code} : null}, body||{});
     var data;
     try{ data = await apiRaw(action, payload); }
-    catch(e){ toast(e.message==='API_URL_NOT_SET' ? 'Не указан адрес сервера (API_URL в index.html).' : 'Нет связи с сервером. Проверьте интернет.'); throw e; }
+    catch(e){
+      toast(e.message === 'API_URL_NOT_SET' ? 'Не указан адрес сервера (API_URL в index.html).'
+          : e.message === 'BAD_RESPONSE' ? 'Google вернул ошибку вместо ответа. Попробуйте ещё раз через минуту.'
+          : 'Нет связи с сервером. Проверьте интернет.');
+      throw e;
+    }
     if(data && data.ok === false){
       if(data.error === 'auth'){ handleAuthLost(); }
       else { toast('Ошибка: ' + (data.message || data.error)); }
@@ -242,12 +315,28 @@ input,select,textarea{font-size:16px !important;}
       if(chC) notifyCatalog();
     }
     async function refresh(rid, full){
-      var r = await api('getState', {
-        restaurant: rid,
-        entriesVersion: (full || st.entriesVer[rid] === undefined) ? null : st.entriesVer[rid],
-        catalogVersion: (full || st.catalogVer === null) ? null : st.catalogVer
-      });
-      applyState(rid, r);
+      try{
+        var r = await api('getState', {
+          restaurant: rid,
+          entriesVersion: (full || st.entriesVer[rid] === undefined) ? null : st.entriesVer[rid],
+          catalogVersion: (full || st.catalogVer === null) ? null : st.catalogVer
+        });
+        applyState(rid, r);
+        if(st.entries[rid] !== undefined) loadState.entries = true;
+        if(st.catalog !== null) loadState.catalog = true;
+        loadState.error = ''; loadState.retries = 0;
+        renderStatus();
+      }catch(e){
+        if(session && !isLoaded()){
+          loadState.error = describeError(e);
+          renderStatus();
+          if(loadState.retries < 3){
+            loadState.retries++;
+            setTimeout(function(){ if(session && !isLoaded()) refresh(rid, true).catch(function(){}); }, 4000);
+          }
+        }
+        throw e;
+      }
     }
     async function tick(force){
       if(document.hidden || !session) return;
@@ -297,6 +386,7 @@ input,select,textarea{font-size:16px !important;}
     }
 
     return {
+      refreshNow: function(){ return refresh(activeRestaurant, true).catch(function(){}); },
       doc: function(path){
         var kind = path.split('/')[0], id = path.split('/')[1];
         return {
@@ -364,6 +454,12 @@ input,select,textarea{font-size:16px !important;}
 
   async function init(){
     db = makeDb();
+    if(/[?&]debug/.test(location.search)){
+      var dp = document.createElement('pre'); dp.id = 'dbgPanel';
+      dp.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;margin:0;padding:8px;background:#111;color:#9f9;font:11px/1.35 monospace;z-index:98;white-space:pre-wrap;';
+      document.body.appendChild(dp);
+      dlog('debug включён · ' + navigator.userAgent);
+    }
     downloadsCap = {save: async function(o){
       var blob = new Blob([o.data], {type:'text/csv;charset=utf-8'});
       var url = URL.createObjectURL(blob);
@@ -436,7 +532,9 @@ input,select,textarea{font-size:16px !important;}
         msg.textContent = 'Неверный код.';
       }
     }catch(e){
-      msg.textContent = e.message === 'API_URL_NOT_SET' ? 'Не указан адрес сервера (API_URL в index.html).' : 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.';
+      msg.textContent = e.message === 'API_URL_NOT_SET' ? 'Не указан адрес сервера (API_URL в index.html).'
+        : e.message === 'BAD_RESPONSE' ? 'Google вернул ошибку вместо ответа (' + (e.detail || '').slice(0, 90) + '). Попробуйте ещё раз через минуту.'
+        : 'Нет связи с сервером (' + (e.detail || 'сеть') + '). Проверьте интернет и попробуйте ещё раз.';
     }
     btn.disabled = false;
   };
@@ -519,13 +617,17 @@ input,select,textarea{font-size:16px !important;}
     if(unsubCatalog) unsubCatalog();
     if(unsubEntries) unsubEntries();
     catalogData = {}; entriesData = []; checkedForArchive = {};
+    loadState.catalog = false; loadState.entries = false; loadState.error = ''; loadState.retries = 0;
+    renderStatus();
     renderAll();
     unsubCatalog = db.doc('catalog/'+rid).onSnapshot(function(snap){
       catalogData = snap.exists ? (snap.data() || {}) : {};
+      loadState.catalog = true; renderStatus();
       if(openQtyFor) renderSummary(); else renderAll();
     }, function(err){ console.error(err); });
     unsubEntries = db.doc('entries/'+rid).onSnapshot(function(snap){
       entriesData = snap.exists ? (snap.data().items || []) : [];
+      loadState.entries = true; renderStatus();
       renderSummary();
     }, function(err){ console.error(err); });
   }
@@ -556,7 +658,7 @@ input,select,textarea{font-size:16px !important;}
     var isTov = session.role==='tovaroved';
     var list = entriesData.filter(function(e){ return e.category===activeCategory && e.archived!==true && e.trashed!==true; });
     if(list.length===0){
-      el.innerHTML = '<div class="empty">Пока ничего не вписано</div>';
+      el.innerHTML = '<div class="empty">' + (loadState.entries ? 'Пока ничего не вписано' : (loadState.error ? 'Не загружено (см. сообщение вверху)' : 'Загрузка…')) + '</div>';
       if(isTov){
         var btnWrapEmpty = document.createElement('div');
         btnWrapEmpty.style.marginTop = '10px';
@@ -706,9 +808,9 @@ input,select,textarea{font-size:16px !important;}
     if(list.length===0){
       var msg = document.createElement('div');
       msg.className = 'empty-state';
-      msg.textContent = isTov
-        ? 'Каталог пуст. Добавьте товар кнопкой выше.'
-        : 'Каталог пуст. Товаровед может добавить товары.';
+      msg.textContent = !loadState.catalog
+        ? (loadState.error ? 'Каталог не загружен (см. сообщение вверху).' : 'Загрузка каталога…')
+        : (isTov ? 'Каталог пуст. Добавьте товар кнопкой выше.' : 'Каталог пуст. Товаровед может добавить товары.');
       el.appendChild(msg);
       return;
     }
