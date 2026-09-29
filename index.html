@@ -186,14 +186,19 @@ input,select,textarea{font-size:16px !important;}
 
   // До 3 попыток: у Google бывают разовые сбои и медленный «холодный» старт.
   // Повторять безопасно: сервер игнорирует повторную отправку одной и той же записи.
+  var REQUEST_TIMEOUT_MS = 12000; // если сервер за 12 сек не ответил — считаем попытку неудачной и пробуем снова
+
   async function apiRaw(action, body){
     if(!apiConfigured()) throw new Error('API_URL_NOT_SET');
     var payload = JSON.stringify(Object.assign({action:action}, body||{}));
     var lastErr = null;
     for(var attempt = 1; attempt <= 3; attempt++){
       var t0 = Date.now();
+      var controller = ('AbortController' in window) ? new AbortController() : null;
+      var timer = controller ? setTimeout(function(){ controller.abort(); }, REQUEST_TIMEOUT_MS) : null;
       try{
-        var res = await fetch(API_URL, {method:'POST', body: payload});
+        var res = await fetch(API_URL, {method:'POST', body: payload, signal: controller ? controller.signal : undefined});
+        clearTimeout(timer);
         var text = await res.text();
         var data;
         try{ data = JSON.parse(text); }
@@ -207,9 +212,11 @@ input,select,textarea{font-size:16px !important;}
         dlog(action + ' #' + attempt + ' ok, ' + (Date.now() - t0) + ' мс, ' + text.length + ' байт' + (data && data.ok === false ? ', ответ: ' + data.error : ''));
         return data;
       }catch(netErr){
-        lastErr = netErr;
-        lastErr.detail = String(netErr && netErr.message || netErr);
-        dlog(action + ' #' + attempt + ' сеть: ' + lastErr.detail);
+        clearTimeout(timer);
+        var timedOut = netErr && netErr.name === 'AbortError';
+        lastErr = timedOut ? new Error('TIMEOUT') : netErr;
+        lastErr.detail = timedOut ? ('нет ответа за ' + (REQUEST_TIMEOUT_MS/1000) + ' сек') : String(netErr && netErr.message || netErr);
+        dlog(action + ' #' + attempt + (timedOut ? ' завис, отменили: ' : ' сеть: ') + lastErr.detail);
         if(attempt < 3) await sleep(1200 * attempt);
       }
     }
@@ -219,6 +226,7 @@ input,select,textarea{font-size:16px !important;}
   function describeError(e){
     if(!e) return 'неизвестная ошибка';
     if(e.message === 'API_URL_NOT_SET') return 'не указан адрес сервера (API_URL в index.html)';
+    if(e.message === 'TIMEOUT') return 'сервер завис и не ответил (плохая связь или Google перегружен)';
     if(e.message === 'BAD_RESPONSE') return 'Google вернул страницу с ошибкой (' + (e.detail || '') + ')';
     if(e.detail) return 'нет связи с сервером (' + e.detail + ')';
     return String(e.message || e);
