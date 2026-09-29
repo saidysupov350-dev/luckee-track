@@ -230,7 +230,11 @@ input,select,textarea{font-size:16px !important;}
   function renderStatus(){
     var el = document.getElementById('statusBar');
     if(!el) return;
-    if(isLoaded()){ el.style.display = 'none'; return; }
+    if(isLoaded()){
+      if(pendingOps > 0){ el.style.display = 'block'; el.className = 'statusbar'; el.textContent = '⏳ Сохраняем…'; }
+      else { el.style.display = 'none'; }
+      return;
+    }
     el.style.display = 'block';
     if(loadState.error){
       el.className = 'statusbar err';
@@ -728,27 +732,45 @@ input,select,textarea{font-size:16px !important;}
     if(ids.length===0) return;
     var idSet = {};
     ids.forEach(function(id){ idSet[id]=true; });
+    var prev = entriesData;
     var next = entriesData.map(function(e){
       if(idSet[e.id]) return Object.assign({}, e, {archived:true});
       return e;
     });
-    try{
-      await db.doc('entries/'+activeRestaurant).set({items: next});
-      checkedForArchive = {};
-    }catch(e){ console.error(e); }
+    entriesData = next; checkedForArchive = {}; renderSummary();
+    return syncEntries(prev, next, 'Не удалось отметить записи как внесённые.');
+  }
+
+  // Изменения сразу показываются на экране, а на сервер уходят в фоне по очереди
+  // (в порядке нажатий). Если сохранить не удалось — откат и понятное сообщение.
+  var pendingOps = 0;
+  var syncChain = Promise.resolve();
+  function syncEntries(prev, next, failText){
+    var rid = activeRestaurant;
+    pendingOps++; renderStatus();
+    syncChain = syncChain.then(function(){
+      return db.doc('entries/'+rid).set({items: next});
+    }).catch(function(e){
+      console.error(e);
+      if(rid === activeRestaurant){ entriesData = prev; checkedForArchive = {}; renderSummary(); }
+      toast(failText + ' ' + (e && e.message === 'BAD_RESPONSE' ? 'Google вернул ошибку.' : 'Нет связи с сервером.') + ' Попробуйте ещё раз.');
+      if(db && db.refreshNow) db.refreshNow();
+    }).then(function(){ pendingOps--; renderStatus(); });
+    return syncChain;
   }
 
   async function removeEntry(entryId){
+    var prev = entriesData;
     var next = entriesData.filter(function(x){ return x.id!==entryId; });
-    try{
-      await db.doc('entries/'+activeRestaurant).set({items: next});
-    }catch(e){ console.error(e); }
+    entriesData = next; renderSummary();
+    return syncEntries(prev, next, 'Не удалось удалить запись.');
   }
 
   var QTY_WARN_THRESHOLD = 100;
 
   async function addEntry(product){
     var input = document.getElementById('qtyInputField');
+    if(!input) return;                          // второе нажатие: окно ввода уже закрыто
     var qty = parseFloat(input.value);
     if(!qty || qty<=0) return;
     if(qty >= QTY_WARN_THRESHOLD){
@@ -763,12 +785,11 @@ input,select,textarea{font-size:16px !important;}
   async function saveEntry(product, qty){
     var author = session.role==='tovaroved' ? 'Товаровед' : (session.position || 'Шеф');
     var entry = {id:uid(), name:product.name, unit:product.unit, category:activeCategory, qty:qty, date:todayStr(), ts:Date.now(), author:author};
+    var prev = entriesData;
     var next = entriesData.concat([entry]);
-    try{
-      await db.doc('entries/'+activeRestaurant).set({items: next});
-      openQtyFor = null;
-      renderCatalogArea();
-    }catch(e){ console.error(e); }
+    entriesData = next; openQtyFor = null;      // запись видна сразу
+    renderSummary(); renderCatalogArea();
+    return syncEntries(prev, next, 'Не удалось сохранить запись.');
   }
 
   function currentCatalogList(){
@@ -822,13 +843,17 @@ input,select,textarea{font-size:16px !important;}
         row.innerHTML =
           '<div><div class="name">'+esc(p.name)+'</div><div class="tags"><span class="tag">'+esc(p.unit)+'</span>'+(p.article?'<span class="tag">№'+esc(p.article)+'</span>':'')+'</div></div>'+
           '<div class="qtybox">'+
-            '<input type="number" id="qtyInputField" min="0" step="any" value="1">'+
-            '<button id="qtyConfirm">OK</button>'+
-            '<button class="cancel" id="qtyCancel">✕</button>'+
+            '<input type="number" id="qtyInputField" min="0" step="any" value="1" inputmode="decimal" enterkeyhint="done">'+
+            '<button id="qtyConfirm" aria-label="Подтвердить">\u2713</button>'+
+            '<button class="cancel" id="qtyCancel">\u2715</button>'+
           '</div>';
         el.appendChild(row);
         var input = row.querySelector('#qtyInputField');
         input.focus(); input.select();
+        // Галочка на самой клавиатуре (кнопка Done/Enter) подтверждает так же, как кнопка в окошке
+        input.addEventListener('keydown', function(ev){
+          if(ev.key === 'Enter'){ ev.preventDefault(); addEntry(p); }
+        });
         row.querySelector('#qtyConfirm').onclick = function(){ addEntry(p); };
         row.querySelector('#qtyCancel').onclick = function(){ openQtyFor=null; renderCatalogArea(); };
       } else {
