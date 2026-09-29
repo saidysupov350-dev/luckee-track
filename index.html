@@ -844,17 +844,15 @@ input,select,textarea{font-size:16px !important;}
           '<div><div class="name">'+esc(p.name)+'</div><div class="tags"><span class="tag">'+esc(p.unit)+'</span>'+(p.article?'<span class="tag">№'+esc(p.article)+'</span>':'')+'</div></div>'+
           '<div class="qtybox">'+
             '<input type="number" id="qtyInputField" min="0" step="any" value="1" inputmode="decimal" enterkeyhint="done">'+
-            '<button id="qtyConfirm" aria-label="Подтвердить">\u2713</button>'+
             '<button class="cancel" id="qtyCancel">\u2715</button>'+
           '</div>';
         el.appendChild(row);
         var input = row.querySelector('#qtyInputField');
         input.focus(); input.select();
-        // Галочка на самой клавиатуре (кнопка Done/Enter) подтверждает так же, как кнопка в окошке
+        // Подтверждение — только галочкой на клавиатуре (Done/Enter), без отдельной кнопки в окошке
         input.addEventListener('keydown', function(ev){
           if(ev.key === 'Enter'){ ev.preventDefault(); addEntry(p); }
         });
-        row.querySelector('#qtyConfirm').onclick = function(){ addEntry(p); };
         row.querySelector('#qtyCancel').onclick = function(){ openQtyFor=null; renderCatalogArea(); };
       } else {
         var editBtn = (isTov && editCatalogMode) ? '<button class="del" data-role="edit" style="color:var(--green); background:none; border:none; font-size:13px; cursor:pointer; margin-right:6px;">Изменить</button>' : '';
