@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Обучение поваров</title>
+<style>
+:root{
+  --accent:#1f7a4d; --accent-dark:#175c3a; --accent-light:#e6f3ec;
+  --bg:#f6f7f5; --card:#ffffff; --text:#16201b; --muted:#6b7972; --border:#e2e6e3;
+}
+*{box-sizing:border-box;}
+body{margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
+.wrap{max-width:640px; margin:0 auto; padding:16px 16px 60px;}
+h1{font-size:22px; margin:0 0 4px; font-weight:700;}
+.sub{color:var(--muted); font-size:14px; margin-bottom:16px;}
+.tabs{display:flex; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:16px;}
+.tab{flex:1; text-align:center; padding:10px 8px; border-radius:9px; font-size:14px; font-weight:600; color:var(--muted); cursor:pointer; border:none; background:none;}
+.tab.active{background:var(--accent-light); color:var(--accent-dark);}
+.pillrow{display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; padding-bottom:2px;}
+.pill{flex:none; padding:9px 16px; border-radius:20px; border:1px solid var(--border); background:var(--card); font-size:14px; cursor:pointer; white-space:nowrap;}
+.pill.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:10px; cursor:pointer;}
+.card .name{font-weight:600; font-size:15px;}
+.card .meta{color:var(--muted); font-size:12px; margin-top:2px;}
+.detail{margin-top:10px; border-top:1px solid var(--border); padding-top:10px; display:none;}
+.detail.open{display:block;}
+.ing-row{display:flex; justify-content:space-between; padding:5px 0; font-size:14px; border-bottom:1px solid #f0f0ee;}
+.ing-row:last-child{border-bottom:none;}
+.method{font-size:13px; color:var(--muted); margin-top:10px; line-height:1.5;}
+.badge{display:inline-block; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:12px; color:var(--muted); margin-right:6px;}
+.primary-btn{background:var(--accent); color:#fff; border:none; border-radius:10px; padding:13px; font-size:15px; font-weight:600; cursor:pointer; width:100%;}
+.ghost-btn{background:none; border:1px solid var(--border); color:var(--text); border-radius:10px; padding:11px; font-size:14px; font-weight:600; cursor:pointer; width:100%;}
+.qcard{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; text-align:center;}
+.qcard .dish{font-size:13px; color:var(--muted); margin-bottom:6px;}
+.qcard .question{font-size:17px; font-weight:600; margin-bottom:20px;}
+.opt{display:block; width:100%; padding:14px; margin-bottom:10px; border-radius:12px; border:1px solid var(--border); background:var(--card); font-size:15px; cursor:pointer; text-align:center;}
+.opt.correct{background:#e8f5e9; border-color:#4caf50; color:#2e7d32; font-weight:700;}
+.opt.wrong{background:#fdecea; border-color:#e57373; color:#c62828;}
+.opt[disabled]{cursor:default;}
+.progress{font-size:13px; color:var(--muted); margin-bottom:10px; text-align:center;}
+.result{text-align:center; padding:30px 16px;}
+.result .score{font-size:48px; font-weight:800; color:var(--accent);}
+.result .label{color:var(--muted); font-size:14px; margin-top:4px;}
+.setup-field{margin-bottom:16px;}
+.setup-field label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px; font-weight:600;}
+
+input[type=text],input[type=number],select,textarea{font-family:inherit; font-size:16px; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); width:100%;}
+textarea{resize:vertical;}
+.linkbtn{background:none; border:none; color:var(--accent); font-size:15px; font-weight:600; cursor:pointer; padding:8px 0; font-family:inherit;}
+.empty{color:var(--muted); font-size:14px; padding:8px 0;}
+.card.row{display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:default;}
+.card.row .ghost-btn{width:auto; padding:9px 14px;}
+.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; z-index:50;}
+.modal{background:var(--card); border-radius:18px 18px 0 0; padding:20px; width:100%; max-width:640px; max-height:88vh; overflow:auto; padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));}
+.modal h3{margin:0 0 14px;}
+.modal .close{display:block; margin:14px auto 0; background:none; border:none; color:var(--muted); font-size:15px; cursor:pointer;}
+.big-add{margin-bottom:14px;}
+
+.pick-btn{flex:1 1 100%; text-align:left; font-family:inherit; font-size:16px; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px;}
+.pick-btn.placeholder{color:var(--muted);}
+.pick-sub{display:block; font-size:12px; color:var(--muted); margin-top:2px;}
+.picker-bg{position:fixed; inset:0; background:var(--bg); z-index:80;}
+.picker{max-width:640px; height:100%; margin:0 auto; display:flex; flex-direction:column; padding:16px; padding-top:calc(16px + env(safe-area-inset-top,0px)); padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}
+.picker-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.picker-title{font-size:18px; font-weight:700;}
+.picker-list{flex:1; overflow-y:auto; margin-top:4px; -webkit-overflow-scrolling:touch;}
+.pk-item{display:block; width:100%; text-align:left; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; cursor:pointer; font-family:inherit; font-size:15px; color:var(--text);}
+.pk-item .pk-name{font-weight:600;}
+.pk-item .pk-tags{margin-top:5px;}
+.pk-hint{color:var(--muted); font-size:13px; text-align:center; padding:8px 0;}
+</style>
+</head>
+<body>
+<div id="entryScreen" style="max-width:420px; margin:40px auto; padding:20px;">
+  <h1 style="text-align:center;">Гид для поваров</h1>
+  <div class="sub" style="text-align:center;">Прежде чем начать, представьтесь</div>
+  <div class="setup-field">
+    <label>Имя</label>
+    <input type="text" id="entryName" placeholder="Например, Асан">
+  </div>
+  <div class="setup-field">
+    <label>Ресторан</label>
+    <select id="entryRest" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); font-size:15px;">
+      <option>Luckee Yu Достык</option>
+      <option>Luckee Yu Достык Плаза</option>
+      <option>Luckee Yu Мега Алматы</option>
+      <option>Luckee Yu Мега Астана</option>
+    </select>
+  </div>
+  <div class="setup-field">
+    <label>Станция</label>
+    <div class="pillrow" id="entryStationPills"></div>
+  </div>
+  <div class="setup-field">
+    <label>Что хотите сделать</label>
+    <div class="pillrow" id="entryModePills"></div>
+  </div>
+  <button class="primary-btn" id="entryStartBtn">Начать</button>
+  <div class="msg" id="entryMsg" style="color:#c0453a; font-size:13px; margin-top:8px; min-height:16px;"></div>
+  <button class="linkbtn" id="showAdminLoginBtn" style="display:block; margin:16px auto 0;">🔐 Я администратор</button>
+  <div style="text-align:center; color:#9aa79f; font-size:11px; margin-top:8px;">версия 10</div>
+</div>
+
+<div id="adminLoginScreen" style="display:none; max-width:420px; margin:40px auto; padding:20px;">
+  <h1 style="text-align:center;">Вход администратора</h1>
+  <div class="setup-field">
+    <label>Код администратора</label>
+    <input type="text" id="adminCodeInput" placeholder="Код">
+  </div>
+  <button class="primary-btn" id="adminCodeBtn">Войти</button>
+  <div class="msg" id="adminCodeMsg" style="color:#c0453a; font-size:13px; margin-top:8px; min-height:16px;"></div>
+  <button class="linkbtn" id="backToEntryBtn" style="display:block; margin:16px auto 0;">← Назад</button>
+</div>
+
+<div id="mainApp" style="display:none;">
+<div class="wrap">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <h1>Гид для поваров</h1>
+      <div class="sub" id="userInfoLine" style="margin-bottom:0;"></div>
+    </div>
+    <button class="tab" id="changeUserBtn" style="width:auto; padding:8px 12px;">Сменить</button>
+  </div>
+  <div class="sub">Граммовки и приготовление — изучение и тест</div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabStudy">📖 Изучение</button>
+    <button class="tab" id="tabQuiz">📝 Тест</button>
+    <button class="tab" id="tabResults">📊 Результаты</button>
+  </div>
+
+  <div id="studyScreen">
+    <div class="pillrow" id="stationPillsStudy"></div>
+    <div class="pillrow" id="typePillsStudy"></div>
+    <div id="dishList"></div>
+  </div>
+
+  <div id="quizScreen" style="display:none;">
+    <div id="quizSetup">
+      <div class="setup-field">
+        <label>Станция</label>
+        <div class="pillrow" id="stationPillsQuiz"></div>
+      </div>
+      <div class="setup-field">
+        <label>Тип</label>
+        <div class="pillrow" id="typePillsQuiz"></div>
+      </div>
+      <div class="setup-field">
+        <label>Сложность</label>
+        <div class="pillrow" id="difficultyPills"></div>
+      </div>
+      <div class="setup-field">
+        <label>Количество вопросов</label>
+        <div class="pillrow" id="countPills"></div>
+      </div>
+      <button class="primary-btn" id="startQuizBtn">Начать тест</button>
+    </div>
+    <div id="quizPlay" style="display:none;"></div>
+    <div id="quizResult" style="display:none;"></div>
+  </div>
+
+  <div id="resultsScreen" style="display:none;">
+    <div class="pillrow" id="resultsStationPills"></div>
+    <div id="resultsList"></div>
+  </div>
+</div>
+</div>
+
+<div id="adminScreen" style="display:none;">
+  <div class="wrap">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <h1>Тех.карты (админ) <span style="font-size:11px; color:#9aa79f; font-weight:400;">v10</span></h1>
+      <button class="tab" id="adminLogoutBtn" style="width:auto; padding:8px 12px;">Выйти</button>
+    </div>
+
+    <div id="adminDishesScreen">
+      <button class="primary-btn big-add" id="addDishBtn">+ Создать ТТК (тех.карту)</button>
+      <div class="pillrow" id="adminDishStationPills"></div>
+      <div id="adminDishList"></div>
+    </div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="pickerRoot"></div>
+
+<script>
+const DISHES_SEED = [{"section":"Закуски и Бао","name":"БИТЫЕОГУРЦЫ","ingredients":[{"name":"Битые огурцы п/ф","unit":"кг","netto":0.14},{"name":"Кинза п\\ф","unit":"кг","netto":0.005},{"name":"Арахис","unit":"кг","netto":0.001}],"method":"","yield":"0.150","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"ЭДАММАМЕ","ingredients":[{"name":"Эдаммаме","unit":"кг","netto":0.15},{"name":"норри соленные","unit":"кг","netto":0.001},{"name":"масло подсолнечное","unit":"кг","netto":0.015},{"name":"масло сливочное","unit":"кг","netto":0.015},{"name":"соль","unit":"кг","netto":0.005},{"name":"соус сладкий чили","unit":"кг","netto":0.05}],"method":"Раскаливаем вок наливаем подсолнечное масло и сливочное, закидываем Эдаммаме обжариваем до слегка обугленного состояния добавляем соус сладкий чили перемешиваем и снимаем с огня выкладываем на круглую глубокую тарелку посыпаем солью и норри","yield":"0.210","time":null,"station":"Вок","type":"блюдо"},{"section":"Закуски и Бао","name":"ВЕШЕНКИ ТЕМПУРА","ingredients":[{"name":"Кукурузный крахмал","unit":"кг","netto":0.01},{"name":"мука темпупа","unit":"кг","netto":0.03},{"name":"п\\ф вешенки","unit":"кг","netto":0.07},{"name":"лук зеленый","unit":"кг","netto":0.002},{"name":"посыпка из курта","unit":"кг","netto":0.002},{"name":"п\\ф чукка","unit":"кг","netto":0.09},{"name":"кунжут","unit":"кг","netto":0.002},{"name":"соус кунжутный","unit":"кг","netto":0.04}],"method":"вешенки панируем в крахмале, кляре опускаем не большими партиями во фритюр обжариваем до золотистой корочки после откидываем на бумажнные палотенце даем лишнему маслу стечь обсыпаем посыпкой для курта. На дно овальной железной тарелки выкладываем чукку сверху обжаренные вешанки, поливаем все кунжутным соусом и украшаем местами чуккой","yield":"0.300","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"ДРЕВЕСНЫЕ ГРИБЫ","ingredients":[{"name":"масло подсолнечное","unit":"кг","netto":0.015},{"name":"грибы древесные п\\ф вымочинные","unit":"кг","netto":0.13},{"name":"кинза п\\ф","unit":"кг","netto":0.004},{"name":"лук зеленный п\\ф","unit":"кг","netto":0.04},{"name":"перец болгарский красный","unit":"кг","netto":0.035},{"name":"соус на древеснные грибы","unit":"кг","netto":0.05},{"name":"кунжут белый","unit":"кг","netto":0.002}],"method":"нагреваем вок наливаем масло, обжариваем болгарский перец, добавляем древеснные грибы и соус тушим 2 минуты добавляем зеленный лук перемешиваем и убираем с огня выкладываем в глубокую супницу посыпаем кунжутом и кинзой","yield":"0.210","time":null,"station":"Вок","type":"блюдо"},{"section":"Закуски и Бао","name":"ХРУСТЯЩИЕ БАКЛАЖАНЫ","ingredients":[{"name":"крахмал кукурузный","unit":"кг","netto":0.03},{"name":"Баклажан п\\ф","unit":"кг","netto":0.15},{"name":"кинза","unit":"кг","netto":0.005},{"name":"помидоры черри","unit":"кг","netto":0.05},{"name":"кунжут","unit":"кг","netto":0.001},{"name":"соус для баклажан","unit":"кг","netto":0.08}],"method":"баклажаны нарезаем крупными ромбиками, панируем в крахмале обжариваем во фритюре до золотистой хрустящей корочки. откидываем на бумажное полотенце, даем стечь лишнему маслу, выкладываем в глубокую супницу добавляем помидоры черри порезанные пополам, поливаем соусом. Украшаем кинзой и семенами кунжута","yield":"0.260","time":null,"station":"Вок","type":"блюдо"},{"section":"Закуски и Бао","name":"КАПУСТА КИМЧИ","ingredients":[{"name":"капуста кимчи п\\ф","unit":"кг","netto":0.15},{"name":"кинза п\\ф","unit":"кг","netto":0.003}],"method":"В маленькую тарелку выкладываем горкой капусту кимчи украшаем листьми кинзы","yield":"0.150","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"БАО С КРЕВЕТКАМИ 1 ШТ","ingredients":[{"name":"японский майонез","unit":"кг","netto":0.01},{"name":"булочка бао","unit":"кг","netto":0.06},{"name":"капуста белокачанная","unit":"кг","netto":0.01},{"name":"креветки","unit":"кг","netto":0.03},{"name":"майонез-тонкацу","unit":"кг","netto":0.03},{"name":"сухари панировочные","unit":"кг","netto":0.015},{"name":"яйцо","unit":"шт","netto":0.5}],"method":"на креветках со стороны живота делаем надрезы выпримляем криветки паниреум в муке, яйце, сухарях после закидываем во фритюр 180С жарим до золотистой хрустящей корочки перекладываем на противень постеленной салфеткой даем стечь лижнему маслу. В пароварки греем булочку бао до мягкого состояния Открываем булочку тонкой струйкой поливаем соусом выкладываем маринованые огурчики, жаренные креветки так же поливаем тонкой струйкой соуса, капусту замешиваем майонезом и выкладываем на криветки закрываем бао накалываем шпажкой","yield":"0.175","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"БАО С КУРИЦЕЙ 1ШТ","ingredients":[{"name":"Японский майонез","unit":"кг","netto":0.01},{"name":"куриное бедро п\\ф","unit":"кг","netto":0.08},{"name":"битые огурцы п\\ф","unit":"кг","netto":0.02},{"name":"булочка бао","unit":"кг","netto":0.06},{"name":"капуста белокачанная","unit":"кг","netto":0.01},{"name":"майонез-кочуджан","unit":"кг","netto":0.04},{"name":"сухари панировочные","unit":"кг","netto":0.025},{"name":"яйца","unit":"шт","netto":0.5}],"method":"куриное бедро паниреум в муке, яйце, сухарях после закидываем во фритюр 180С жарим до золотистой хрустящей корочки перекладываем на противень постеленной салфеткой даем стечь лижнему маслу. В пароварки греем булочку бао до мягкого состояния Открываем булочку тонкой струйкой поливаем соусом выкладываем маринованые огурчики, жаренное куриное бедро так же поливаем тонкой струйкой соуса, капусту замешиваем майонезом и выкладываем на курицу закрываем бао накалываем шпажкой","yield":"0.175","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"БАО С КУРИЦЕЙ ПО КАНТОНСКИ","ingredients":[{"name":"Булочка","unit":"кг","netto":0.09},{"name":"Бедро маринованное на коже","unit":"кг","netto":0.13},{"name":"Трюфельная-креметта","unit":"кг","netto":0.04},{"name":"Шисо листья","unit":"кг","netto":1.0},{"name":"Огурцы шисо","unit":"кг","netto":0.02},{"name":"Картофель Пай","unit":"кг","netto":0.01},{"name":"Глазировка","unit":"кг","netto":0.03}],"method":"Булочку делим на две части ставим на пар до мягкости, куриное бедро смазываем Глазировкой ставим под саламандр запекаем до хрустящей корочки смазываем еще раз. Горячую булочку смазываем креметтой выкладываем шисо листья маринованые огурцы куриное бедро сверху посыпаем картофелем Пай смазываем верхнюю часть креметой и закрываем сверху накалываем шпажкой","yield":"0.250","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"КУРИНЫЕ КРЫЛЬЯ","ingredients":[{"name":"Куриные крылья","unit":"кг","netto":0.33},{"name":"Панировка мука-крахмал","unit":"кг","netto":0.03},{"name":"Соус на крылья","unit":"кг","netto":0.07},{"name":"кунжут","unit":"кг","netto":0.003},{"name":"Дайкон маринованый","unit":"кг","netto":0.03},{"name":"Имбирьное масло","unit":"кг","netto":0.005}],"method":"Панируем крылья после окунаем воду и обратно в панировку хорошо прижимаем руками закидываем во фритюр и обжариваем до хрустящей корочки после откидываем в полусферу на салфетки даем лишнему маслу стечь добавляем соус хорошо перемешиваем выкладываем на тарелку рядом выкладываем тонко нарезанный дайкон поливаем соком юдзу","yield":"0.345","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"ПИБИМПАБ","ingredients":[{"name":"Битые огурцы п\\ф","unit":"кг","netto":0.03},{"name":"Морковча п\\ф","unit":"кг","netto":0.03},{"name":"шпинат п\\ф","unit":"кг","netto":0.03},{"name":"кимчи п\\ф","unit":"кг","netto":0.03},{"name":"Рис шинаке","unit":"кг","netto":0.1},{"name":"Дайкон","unit":"кг","netto":0.03},{"name":"яйцо маринованое","unit":"шт","netto":1.0},{"name":"бульгоги","unit":"кг","netto":0.01},{"name":"говядина бульгоги п\\ф","unit":"кг","netto":0.09},{"name":"кунжут","unit":"кг","netto":0.003},{"name":"Норри жареный","unit":"кг","netto":0.002},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"шитаке маринованые","unit":"кг","netto":0.02}],"method":"говядину нарезаем тонкой соломкой добавляем 10 гр бульгоги панируем в крахмале и обжариваем во фритюре добавляем оставшуюся часть бульгоги перемешиваем. На тарелку выкладываем горячий рис, обжаренную говядину, маринованый шпинат, кимчи, морковчу, Дайкон, битые огурцы, тонко нарезанные шитаке и половину маринованого яйца, украшаем зеленым луком посыпаем кунжутом","yield":null,"time":null,"station":"Вок","type":"блюдо"},{"section":"Закуски и Бао","name":"ЦЕЗАРЬ С КУРИЦЕЙ","ingredients":[{"name":"Айсберг","unit":"кг","netto":0.08},{"name":"Соус йогуртовый","unit":"кг","netto":0.04},{"name":"Лук зеленый","unit":"кг","netto":0.005},{"name":"Куриные стрипсы","unit":"кг","netto":0.1},{"name":"панировка","unit":"кг","netto":0.03},{"name":"фурикаки","unit":"кг","netto":0.005},{"name":"пармезан","unit":"кг","netto":0.01}],"method":"на низ тарелки выкладываем соус, айсберг перемешиваем с соусом, обжаренное куриное бедро нарезаем выкладываем на тарелку сверху выкладываем айсберг, натираем пармезан, посыпаем фурикаки.","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски и Бао","name":"РИС КАРРИ","ingredients":[{"name":"Рис шинаке","unit":"кг","netto":0.1},{"name":"Куриные стрипсы","unit":"кг","netto":0.1},{"name":"панировка п\\ф","unit":"кг","netto":0.03},{"name":"карри соус п\\ф","unit":"кг","netto":0.07},{"name":"дайкон п\\ф","unit":"кг","netto":0.025},{"name":"фурикаке","unit":"кг","netto":0.005},{"name":"зеленый лук","unit":"кг","netto":0.005},{"name":"Битые огурцы","unit":"кг","netto":0.03}],"method":"Куриное бедро панируем в муке после окунаем в воду и обратно в муку хорошо прижимаем рукой, обжариваем во фритюре 180С до золотистой хрустящей корочки, на белую круглую тарелку слева выкладываем горячий рис справа подогретый карри соус, на карри обжаренное нарезанное куриное бедро. Украшаем маринованым дайконом и зеленым крученым луком, посыпаем фурикаке.","yield":null,"time":null,"station":"Вок","type":"блюдо"},{"section":"Закуски и Бао","name":"ЗЕЛЕНЫЙ САЛАТ","ingredients":[{"name":"Микс салата","unit":"кг","netto":0.04},{"name":"Огурец свежий","unit":"кг","netto":0.03},{"name":"Заправка на салат","unit":"кг","netto":0.03},{"name":"Авокадо","unit":"кг","netto":0.03},{"name":"Фурикаке","unit":"кг","netto":0.005},{"name":"Кабачок","unit":"кг","netto":0.03},{"name":"Яйцо маринованое","unit":"шт","netto":0.5}],"method":"Огурец и кабачок нарезаем тонким слайсом добавляем микс салата кубиком нарезанное авокадо добавляем заправку все хорошо перемешиваем и выкладываем в белую тарелку добавляем пол яйца и посыпаем фурикаке","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Дамплинги и Супы","name":"ЖАРЕНЫЕ ДАМПЛИНГИ","ingredients":[{"name":"дамплинги с говядиной","unit":"шт","netto":4.0},{"name":"соус на дамплинги с говядиной","unit":"кг","netto":0.03},{"name":"приправа панка","unit":"кг","netto":0.001},{"name":"семена кунжута","unit":"кг","netto":0.001},{"name":"тагараши","unit":"кг","netto":0.001}],"method":"На раскаленную сковороду ложим дамплинги обжариваем с каждой стороны до золотистой корочки добавляем 50 гр воды и закрываем крышкой тушим 2-3 минуты до готовности. Выкладываем на круглую тарелку поливаем соусом посыпаем приправой панка, тагараши и кунжутом","yield":"0.146","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Дамплинги и Супы","name":"ЖАРЕНЫЕ ДАМПЛИНГИ С ЦЫПЛЕНКОМ И ФУНЧОЗОЙ","ingredients":[{"name":"Дамплинги с курицей 1шт","unit":"шт","netto":5.0},{"name":"соус на димпсамы","unit":"кг","netto":0.03},{"name":"Имбирь корень","unit":"кг","netto":0.005},{"name":"Лук зеленый","unit":"кг","netto":0.005},{"name":"масло подсолнечное","unit":"кг","netto":0.03}],"method":"на холодную сковородку наливаем подсолнечное масло выкладываем дамплинги ставим на плиту на средний огонь наливаем 200 гр воды накрываем крышкой томим под крышкой 10 минут до полного выпаривания воды. Выкладываем на овальную синюю тарелку. Подаем с соусом димсам и имбирем украшаем зеленым луком","yield":"0.140","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Дамплинги и Супы","name":"МИСО СУП","ingredients":[{"name":"водоросли вакаме","unit":"кг","netto":0.001},{"name":"база на мисо","unit":"кг","netto":0.3},{"name":"вешенки","unit":"кг","netto":0.015},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"сыр тофу","unit":"кг","netto":0.03}],"method":"Базу на мисо наливаем в сотейник ставим на плиту доводим до кипения добавляем водоросли вакаме. В супницу добавляем вешенки, зеленый лук и тофу заливаем горячим бульоном","yield":"0.350","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Дамплинги и Супы","name":"МИСО СУП С ЛОСОСЕМ","ingredients":[{"name":"водоросли вакаме","unit":"кг","netto":0.001},{"name":"база на мисо","unit":"кг","netto":0.3},{"name":"вешенки","unit":"кг","netto":0.015},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"сыр тофу","unit":"кг","netto":0.03},{"name":"лосось","unit":"кг","netto":0.03}],"method":"Базу на мисо наливаем в сотейник ставим на плиту доводим до кипения добавляем водоросли вакаме. В супницу добавляем вешенки, зеленый лук, лосось и тофу заливаем горячим бульоном","yield":"0.380","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Дамплинги и Супы","name":"СУП ТОМ ЯМ С РИСОМ","ingredients":[{"name":"База том ям","unit":"кг","netto":0.3},{"name":"шампиньоны","unit":"кг","netto":0.02},{"name":"кальмары","unit":"кг","netto":0.05},{"name":"кинза","unit":"кг","netto":0.005},{"name":"креветки","unit":"кг","netto":0.04},{"name":"помидоры черри","unit":"кг","netto":0.02},{"name":"рис на пару","unit":"кг","netto":0.12}],"method":"Базу том ям ставим на плиту доводим до кипения добавляем креветки, кальмары и грибы варим 2-3 минуты очень важно чтоб бульон сильно не кипел. В супницу добавляем помидоры черри заливаем это все базой украшаем кинзой и подаем с рисом","yield":"0.380/0.120","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Лапша и Рис","name":"ЛАГМАН","ingredients":[{"name":"Масло подсолнечное","unit":"кг","netto":0.02},{"name":"бобовые ростки","unit":"кг","netto":0.02},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"овощи соломкой","unit":"кг","netto":0.06},{"name":"соус на лапшу","unit":"кг","netto":0.03},{"name":"тесто на лагман","unit":"кг","netto":0.18},{"name":"кунжут","unit":"кг","netto":0.001}],"method":"На раскаленном воке обжариваем овощи добавляем лапшу хорошо перемешиваем добавляем соус тушим 2 минуты выкладываем в круглую тарелку украшаем зеленым луком и жареным кунжутом","yield":"0.290","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ЛАПША С КУРИЦЕЙ","ingredients":[{"name":"Масло подсолнечное","unit":"кг","netto":0.02},{"name":"бобовые ростки","unit":"кг","netto":0.02},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"овощи соломкой","unit":"кг","netto":0.06},{"name":"соус на лапшу","unit":"кг","netto":0.03},{"name":"тесто на лагман","unit":"кг","netto":0.18},{"name":"кунжут","unit":"кг","netto":0.001},{"name":"куриное бедро","unit":"кг","netto":0.08}],"method":"На раскаленном воке обжариваем куриное бедро, овощи добавляем лапшу хорошо перемешиваем добавляем соус тушим 2 минуты выкладываем в круглую тарелку украшаем зеленым луком и кунжутом","yield":"0.305","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ЛАПША ГОВЯДИНА КАЛЬБИ","ingredients":[{"name":"соус кальби","unit":"кг","netto":0.04},{"name":"говядина маринованная","unit":"кг","netto":0.09},{"name":"тесто на лагман","unit":"кг","netto":0.18},{"name":"кунжут","unit":"кг","netto":0.001},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"Масло подсолнечное","unit":"кг","netto":0.03},{"name":"перец болгарский","unit":"кг","netto":0.02},{"name":"лук репчатый","unit":"кг","netto":0.02},{"name":"сельдерей","unit":"кг","netto":0.02}],"method":"Раскаливаем вок обжариваем маринованую говядину, добавляем овощи слегка обжариваем после добавляем лапшу заливаем соус все хорошо перемешиваем. Выкладываем в круглую глубокую тарелку посыпаем обжаренным кунжутом и зеленым луком.","yield":"0.300","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ЛАПША С ГОВЯДИНОЙ","ingredients":[{"name":"Лапша вок","unit":"кг","netto":0.18},{"name":"Говядина маринованая","unit":"кг","netto":0.09},{"name":"Шпинат","unit":"кг","netto":0.015},{"name":"Яйца","unit":"кг","netto":1.0},{"name":"Лук карри","unit":"кг","netto":0.04},{"name":"Соус Пад Тай","unit":"кг","netto":0.05},{"name":"Жареный лук","unit":"кг","netto":0.005}],"method":"Разогреваем вок, обжариваем куриное яйцо скрембл откидываем в полусферу, после обжариваем говядину добавляем вок лапшу и лук карри хорошо все перемешиваем закидываем шпинат добавляем соус тушим 1 минуту выкладываем в глубокую тарелку украшаем жареным и зеленым луком","yield":"0.345","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ФУНЧОЗА С ГОВЯДИНОЙ","ingredients":[{"name":"соус на стекляную лапшу","unit":"кг","netto":0.07},{"name":"овощи соломкой","unit":"кг","netto":0.07},{"name":"говядина маринованная","unit":"кг","netto":0.09},{"name":"древесные грибы","unit":"кг","netto":0.035},{"name":"масло подсолнечное","unit":"кг","netto":0.03},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"фунчоза отварная","unit":"кг","netto":0.18},{"name":"кунжут","unit":"кг","netto":0.001}],"method":"Обжариваем говядину, овощи и древесные грибы с добавлением стеклянной лапши и соуса. Украшается зеленым луком и кунжутом.","yield":"0.360","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"РИС С ОВОЩАМИ","ingredients":[{"name":"рис жасмин п\\ф","unit":"кг","netto":0.18},{"name":"масло подсолнечное","unit":"кг","netto":0.03},{"name":"овощи соломкой","unit":"кг","netto":0.08},{"name":"зеленый горошек","unit":"кг","netto":0.02},{"name":"соус терияки","unit":"кг","netto":0.05},{"name":"лук зеленый","unit":"кг","netto":0.002},{"name":"кунжут","unit":"кг","netto":0.002}],"method":"Рис приготовленный на вок сковороде с такими овощами как: лук репчатый, морковь, болгарский перец, зеленый горошек в соусе терияки. Украшение зеленый лук и кунжут.","yield":"0.290","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ЖАРЕНЫЙ РИС С КУРИЦЕЙ","ingredients":[{"name":"рис жасмин п\\ф","unit":"кг","netto":0.18},{"name":"масло подсолнечное","unit":"кг","netto":0.025},{"name":"овощи соломкой","unit":"кг","netto":0.05},{"name":"куриное бедро","unit":"кг","netto":0.08},{"name":"соус тирияки","unit":"кг","netto":0.05},{"name":"кунжут","unit":"кг","netto":0.002},{"name":"лук зеленый","unit":"кг","netto":0.002}],"method":"Рис с курицей приготовленный на вок сковороде с такими овощами как: лук репчатый, морковь, болгарский перец, зеленый горошек в соусе терияки. Украшение зеленый лук и кунжут.","yield":"0.420","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ЖАРЕНЫЙ РИС С КРЕВЕТКАМИ","ingredients":[{"name":"креветки","unit":"кг","netto":0.04},{"name":"кукурузу консервированная","unit":"кг","netto":0.03},{"name":"ростки бобов","unit":"кг","netto":0.02},{"name":"рис жасмин п\\ф","unit":"кг","netto":0.18},{"name":"лук карри","unit":"кг","netto":0.045},{"name":"чесночные стрелки","unit":"кг","netto":0.01},{"name":"яйцо","unit":"шт","netto":1.0},{"name":"фасоль стручковая","unit":"кг","netto":0.02},{"name":"соевый светлый соус","unit":"кг","netto":0.02},{"name":"лук жареный","unit":"кг","netto":0.01}],"method":"Разогреваем вок обжариваем морепродукты и чесночные стрелки добавляем рис все хорошо обжариваем добавляем светлую сою перемешиваем выкладываем в глубокую тарелку украшаем зеленым луком","yield":"0.270","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"КУРИЦА В КИСЛО-СЛАДКОМ СОУСЕ","ingredients":[{"name":"куриное бедро","unit":"кг","netto":0.15},{"name":"мука темпурная","unit":"кг","netto":0.05},{"name":"масло подсолнечное","unit":"кг","netto":0.02},{"name":"кунжут","unit":"кг","netto":0.002},{"name":"перец болгарский","unit":"кг","netto":0.045},{"name":"соус кисло-сладкий","unit":"кг","netto":0.15},{"name":"лук жареный","unit":"кг","netto":0.015},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"рис отварной","unit":"кг","netto":0.15}],"method":"В кляре панируем маринованную курицу, обжариваем во фритюре до румяного золотистого цвета. На воке обжариваем болгарский перец, добавляем соус AROY-D кисло-сладкий. Добавляем обжаренную курицу, выкладываем горкой в глубокую тарелку, украшаем криспи луком, зеленым луком и семенами кунжута. Подаем с рисом на пару.","yield":"0.320/0.150","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"КУРИЦА ГУНБАО","ingredients":[{"name":"лук зеленый","unit":"кг","netto":0.03},{"name":"арахис","unit":"кг","netto":0.02},{"name":"кунжут","unit":"кг","netto":0.001},{"name":"лук красный","unit":"кг","netto":0.05},{"name":"масло кунжутное","unit":"кг","netto":0.005},{"name":"масло подсолнечное","unit":"кг","netto":0.02},{"name":"куриное бедро","unit":"кг","netto":0.15},{"name":"сычуаньский перец","unit":"кг","netto":0.002},{"name":"крахмал кукурузный","unit":"кг","netto":0.04},{"name":"соус тирияки","unit":"кг","netto":0.05},{"name":"перец острый сушеный","unit":"кг","netto":0.005},{"name":"рис отварной","unit":"кг","netto":0.15}],"method":"Курица гунбао готовится из кусочков куриного бедра с добавлением репчатого и зеленого лука, арахиса и сушеного перца чили. Имеет выраженный вкус остроты и соуса саке. Подается с паровым рисом и посыпается белым кунжутом.","yield":"0.230/0.150","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ГОВЯДИНА В УСТРИЧНОМ СОУСЕ","ingredients":[{"name":"говядина маринованная","unit":"кг","netto":0.15},{"name":"крахмал кукурузный","unit":"кг","netto":0.025},{"name":"лук зеленый","unit":"кг","netto":0.025},{"name":"перец болгарский","unit":"кг","netto":0.05},{"name":"соус устричный","unit":"кг","netto":0.03},{"name":"имбирь","unit":"кг","netto":0.005},{"name":"кунжут","unit":"кг","netto":0.002},{"name":"масло подсолнечное","unit":"кг","netto":0.015},{"name":"лук красный","unit":"кг","netto":0.04}],"method":"Нежные ломтики телятины, обжаренные с овощами в устричном соусе. Украшается крученым зеленым луком, семенами кунжута, поливаем имбирным маслом.","yield":"0.285/0.150","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"РИС С ГОВЯДИНОЙ И КИМЧИ","ingredients":[{"name":"Кимчи","unit":"кг","netto":0.035},{"name":"Чесночные стрелки","unit":"кг","netto":0.015},{"name":"Сельдерей","unit":"кг","netto":0.035},{"name":"Яйца","unit":"кг","netto":1.0},{"name":"Зеленый лук","unit":"кг","netto":0.04},{"name":"лук карри","unit":"кг","netto":0.035},{"name":"Рис жасмин","unit":"кг","netto":0.18},{"name":"Говядина маринованая","unit":"кг","netto":0.09},{"name":"Соя темная","unit":"кг","netto":0.02},{"name":"Лук красный маринованый","unit":"кг","netto":0.01},{"name":"Тагараши","unit":"кг","netto":0.001}],"method":"Разогреваем вок, обжариваем куриное яйцо скрембл откидываем в полусферу, после обжариваем говядину добавляем сельдерей и чесночные стрелки закидываем рис жарим 1-2 минуты добавляем яйцо темную сою перемешиваем добавляем кимчи выкладываем в глубокую круглую тарелку посыпаем зеленым луком тагараши и красным маринованым луком","yield":"0.400","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"ЛАПША С МОРЕПРОДУКТАМИ","ingredients":[{"name":"Лапша вок","unit":"кг","netto":0.18},{"name":"Кальмары","unit":"кг","netto":0.05},{"name":"Креветки","unit":"кг","netto":0.05},{"name":"Соус Пад Тай","unit":"кг","netto":0.03},{"name":"Проросшие бобы","unit":"кг","netto":0.05},{"name":"Лук зеленый","unit":"кг","netto":0.02}],"method":"Обжариваем морепродукты добавляем вок лапшу все хорошо перемешиваем добавляем соус и 20 гр воды тушим 1 минуту выкладываем в глубокую тарелку и посыпаем зеленым луком.","yield":"0.315","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"РИС ПО-КАНТОНСКИ","ingredients":[{"name":"Рис жасмин","unit":"кг","netto":0.18},{"name":"Чесночные стрелки","unit":"кг","netto":0.015},{"name":"Проросшие бобы","unit":"кг","netto":0.03},{"name":"яйца","unit":"кг","netto":1.0},{"name":"Соус тройка","unit":"кг","netto":0.03},{"name":"шитаке маринованые","unit":"кг","netto":0.05},{"name":"соус лазджан","unit":"кг","netto":0.03},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"Глазировка","unit":"кг","netto":0.03},{"name":"Куриное бедро маринованое","unit":"кг","netto":0.13}],"method":"Раскаливаем вок обжариваем в скрембл яйцо убираем в сторону. Обжариваем чесночные стрелки, шитаке добавляем рис все хорошо обжариваем добавляем лазджан и соус тройка, добавляем яйца и проросшие бобы. Куриное бедро достаем из сувида режем вдоль на тонкие полоски смазываем глазировкой ставим под саламандр запекаем до хрустящей корочки смазываем еще раз выкладываем на рис посыпаем фурикаки и украшаем зеленым луком.","yield":"0.380","time":null,"station":"Вок","type":"блюдо"},{"section":"Лапша и Рис","name":"СИНГАПУРСКАЯ ЛАПША","ingredients":[{"name":"Лук красный","unit":"кг","netto":0.02},{"name":"Шпинат","unit":"кг","netto":0.02},{"name":"Яйца","unit":"шт","netto":1.0},{"name":"Лапша рисовая фунчоза","unit":"кг","netto":0.16},{"name":"Ростки бобов","unit":"кг","netto":0.02},{"name":"Соус кун-лу","unit":"кг","netto":0.04},{"name":"Лайм","unit":"кг","netto":0.02},{"name":"Бедро маринованое","unit":"кг","netto":0.08},{"name":"Соус соевый-чили","unit":"кг","netto":0.03},{"name":"Лук карри","unit":"кг","netto":0.02},{"name":"Крахмал кукурузный","unit":"кг","netto":0.005},{"name":"Микс овощей","unit":"кг","netto":0.015}],"method":"На воке обжариваем яйцо в скрембл и убираем в сторонку после куриное бедро панируем в крахмале обжариваем во фритюре. На вок сковородке обжариваем овощи, добавляем лапшу и обжаренное куриное бедро добавляем соус и обжаренное яйцо выкладываем в вок тарелку украшаем тонко нарезанным Дайконом, морковью и зеленым луком. Подаем с долькой лайма и соевым чили.","yield":null,"time":null,"station":"Вок","type":"блюдо"},{"section":"Десерты и Роллы","name":"МОТИ С АЛОЭ","ingredients":[{"name":"тесто для моти","unit":"кг","netto":0.03},{"name":"крем Алоэ","unit":"кг","netto":0.07},{"name":"джем алоэ","unit":"кг","netto":0.015}],"method":"Рисовое тесто тонко раскатываем и выкладываем крем круговыми движениями создав пространство для начинки, в нее выкладываем алоэ джем и сверху закрываем кремом. Тесто закрываем в пучок и отрываем лишнее тесто","yield":"0.115","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Десерты и Роллы","name":"МОТИ С ГОЛУБОЙ МАТЧЕЙ","ingredients":[{"name":"крем матча","unit":"кг","netto":0.07},{"name":"тесто для моти","unit":"кг","netto":0.03},{"name":"малиновый кюли","unit":"кг","netto":0.03}],"method":"Рисовое тесто тонко раскатываем и выкладываем крем круговыми движениями создав пространство для начинки, в нее выкладываем малиновое кюли и сверху закрываем кремом. Тесто закрываем в пучок и отрываем лишнее тесто","yield":"0.130","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Десерты и Роллы","name":"ФИЛАДЕЛЬФИЯ КЛАССИКА","ingredients":[{"name":"норри","unit":"кг","netto":0.003},{"name":"рис для суши","unit":"кг","netto":0.085},{"name":"авокадо","unit":"кг","netto":0.017},{"name":"огурцы","unit":"кг","netto":0.2},{"name":"лосось","unit":"кг","netto":0.06},{"name":"сыр творожный","unit":"кг","netto":0.03}],"method":"На нори выкладываем рис и переворачиваем всю основу и выкладываем начинку (авокадо, огурец, творожный сыр), сворачиваем ролл и сверху выкладываем нарезанный лосось (ширина рыбы примерно 3 пальца)","yield":"0.200","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"УГОРЬ ТУНЕЦ СПАЙСИ СОУС","ingredients":[{"name":"рис для суши","unit":"кг","netto":0.07},{"name":"водоросли нори","unit":"кг","netto":0.003},{"name":"сыр творожный","unit":"кг","netto":0.03},{"name":"тунец","unit":"кг","netto":0.02},{"name":"авокадо","unit":"кг","netto":0.015},{"name":"соус шрирача","unit":"кг","netto":0.005},{"name":"угорь","unit":"кг","netto":0.04},{"name":"соус унаги","unit":"кг","netto":0.02},{"name":"лук жареный","unit":"кг","netto":0.03},{"name":"лук зеленый","unit":"кг","netto":0.005},{"name":"тобико","unit":"кг","netto":0.005},{"name":"соус спайси","unit":"кг","netto":0.012}],"method":"На нори выкладываем рис и переворачиваем всю основу и выкладываем начинку (сыр творожный, шрирача, тунец, авокадо), сворачиваем ролл и обваливаем мелкими кусочками нори и разрезаем на 6 кусочков и выкладываем шапочки из замеса (угорь, спайси соус, тобика) и сверху поливаем унаги и украшаем жареным луком и крученным зеленым луком","yield":"0.185","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Десерты и Роллы","name":"КРАБ И УГОРЬ","ingredients":[{"name":"водоросли норри","unit":"кг","netto":0.002},{"name":"краб микс","unit":"кг","netto":0.025},{"name":"угорь","unit":"кг","netto":0.041},{"name":"соус унаги","unit":"кг","netto":0.005},{"name":"рис для суши","unit":"кг","netto":0.07},{"name":"авокадо","unit":"кг","netto":0.015},{"name":"лук зеленый","unit":"кг","netto":0.004},{"name":"приправа панко","unit":"кг","netto":0.005},{"name":"креметта","unit":"кг","netto":0.015},{"name":"тагараши","unit":"кг","netto":0.002}],"method":"На нори выкладываем рис и переворачиваем всю основу и выкладываем начинку (творожный сыр, авокадо, краб микс, стебель зеленого лука) сворачиваем ролл и выкладываем нарезанный угорь слайсом и разрезаем на 6 кусочков, поливаем унаги и украшаем тогараши, хрустиком и крученным зеленым луком","yield":"0.195","time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Десерты и Роллы","name":"ЗАПЕЧЕННЫЙ РОЛЛ КРАБ, ЛОСОСЬ, УГОРЬ","ingredients":[{"name":"лосось","unit":"кг","netto":0.03},{"name":"угорь","unit":"кг","netto":0.02},{"name":"краб микс","unit":"кг","netto":0.04},{"name":"соус унаги","unit":"кг","netto":0.005},{"name":"рис для суши","unit":"кг","netto":0.09},{"name":"норри","unit":"кг","netto":0.002},{"name":"кунжут","unit":"кг","netto":0.001}],"method":"На нори выкладываем рис и сверху сразу выкладываем начинку из (лосося и угря нарезанного брусками) сворачиваем и концы нори смачиваем водой, чтобы плотно закрыть ролл, разрезаем на 6 кусков и выкладываем шапочки (краб микс, спайси соус) запекаем все до румяной корочки, поливаем унаги и украшаем белым кунжутом","yield":"0.165","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ЗАПЕЧЕННЫЙ РОЛЛ УГОРЬ, ЛОСОСЬ, АВОКАДО","ingredients":[{"name":"лосось","unit":"кг","netto":0.02},{"name":"авокадо","unit":"кг","netto":0.015},{"name":"креметта","unit":"кг","netto":0.01},{"name":"норри","unit":"кг","netto":0.002},{"name":"угорь","unit":"кг","netto":0.04},{"name":"соус масага","unit":"кг","netto":0.04},{"name":"пармезан","unit":"кг","netto":0.005},{"name":"соус унаги","unit":"кг","netto":0.011},{"name":"кунжут","unit":"кг","netto":0.001},{"name":"рис для суши","unit":"кг","netto":0.09}],"method":"На нори выкладываем рис и сверху сразу выкладываем начинку из (творожный сыр, лосось, авокадо) сворачиваем и концы нори смачиваем водой, чтобы плотно закрыть ролл, разрезаем на 6 кусков и выкладываем шапочку (мелко нарезанного угря, спайси соуса и натертого пармезана) и запекаем все до румяной корочки и поливаем унаги и украшаем черным кунжутом","yield":"0.165","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ОТКРЫТЫЙ РОЛЛ КРЕВЕТКА","ingredients":[{"name":"соус спайси","unit":"кг","netto":0.02},{"name":"лук зеленый","unit":"кг","netto":0.002},{"name":"норри жаренные","unit":"кг","netto":0.001},{"name":"рис для суши","unit":"кг","netto":0.06},{"name":"икра тобико","unit":"кг","netto":0.002},{"name":"криветки отварные","unit":"кг","netto":0.02}],"method":"Берем нарезанный нори и создаем форму лодочки, выкладывая рис, и сверху аккуратно выкладываем шапочку (средне нарезанные отварные креветки, мелко нарезанный зеленый лук, обмешанные спайси соусом) и украшаем тобикой","yield":"0.090","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ОТКРЫТЫЙ РОЛЛ КРАБ","ingredients":[{"name":"крабовый микс","unit":"кг","netto":0.045},{"name":"рис для суши","unit":"кг","netto":0.06},{"name":"норри жаренные","unit":"кг","netto":0.001},{"name":"соус спайси","unit":"кг","netto":0.02}],"method":"Берем нарезанный нори и создаем форму лодочки выкладывая рис и сверху аккуратно выкладываем шапочку (крабмикс, спайси соус) и украшаем крученным зеленым луком","yield":"0.090","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ОТКРЫТЫЙ РОЛЛ С ЛОСОСЕМ","ingredients":[{"name":"лосось","unit":"кг","netto":0.045},{"name":"соус спайси","unit":"кг","netto":0.03},{"name":"рис для суши","unit":"кг","netto":0.045},{"name":"норри жаренные","unit":"кг","netto":0.002}],"method":"Берем нарезанный нори и создаем форму лодочки выкладывая рис и сверху аккуратно выкладываем шапочку (мелко нарезанный кубик лосося, замешанный со спайси соусом). Подается без украшения","yield":"0.090","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ОТКРЫТЫЙ РОЛЛ ТУНЕЦ","ingredients":[{"name":"тунец","unit":"кг","netto":0.03},{"name":"соус спайси","unit":"кг","netto":0.06},{"name":"рис для суши","unit":"кг","netto":0.045},{"name":"норри жаренные","unit":"кг","netto":0.002}],"method":"Берем нарезанный нори и создаем форму лодочки и выкладываем рис и сверху аккуратно выкладываем шапочку (мелко нарезанный кубик тунца, перемешанный со спайси соусом) и поливается соусом чимичури","yield":"0.090","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"РОЛЛ С ТУНЦОМ И КРЕВЕТКОЙ","ingredients":[{"name":"Рис для суши","unit":"кг","netto":0.08},{"name":"Норри","unit":"кг","netto":0.002},{"name":"Тунец","unit":"кг","netto":0.025},{"name":"Креветка отварная","unit":"кг","netto":0.025},{"name":"Спайси соус","unit":"кг","netto":0.02},{"name":"Огурцы на роллы","unit":"кг","netto":0.015},{"name":"Мука темпурная","unit":"кг","netto":0.01},{"name":"Кунжут черный","unit":"кг","netto":0.002},{"name":"Бонито","unit":"кг","netto":0.006},{"name":"Мисо майо","unit":"кг","netto":0.02},{"name":"Красная икра","unit":"кг","netto":0.006}],"method":"На нори выкладываем рис и переворачиваем, выкладываем замес из креветки, тунца и спайси соуса, добавляем огурцы и темпура сухари, заворачиваем ролл, обваливаем в черном кунжуте и стружке тунца, нарезаем на 6 частей, сверху поливаем соусом мисо майо и выкладываем сверху красную икру.","yield":"0.145","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"РОЛЛ С ЛОСОСЕМ И КРАБОМ","ingredients":[{"name":"Рис для суши","unit":"кг","netto":0.08},{"name":"Норри","unit":"кг","netto":0.002},{"name":"Лосось","unit":"кг","netto":0.025},{"name":"Креметта","unit":"кг","netto":0.02},{"name":"Микс краба","unit":"кг","netto":0.02},{"name":"Огурцы на роллы","unit":"кг","netto":0.02},{"name":"Темпурная мука","unit":"кг","netto":0.01},{"name":"Жаренный норри","unit":"кг","netto":0.002},{"name":"Кунжут","unit":"кг","netto":0.002},{"name":"Васаби майо","unit":"кг","netto":0.01},{"name":"Зеленый лук","unit":"кг","netto":0.005},{"name":"Тагараши","unit":"кг","netto":0.001}],"method":"На нори выкладываем рис и переворачиваем, выкладываем сыр, краб микс, огурцы, темпура сухари и свежий лосось, закручиваем ролл, обваливаем в белом кунжуте и в жаренном нори, разрезаем на 6 частей, сверху капля соуса из васаби юдзу, крученый лук и посыпаем специей шичими.","yield":"0.165","time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ОНИГИРИ С КОНСЕРВИРОВАННЫМ ТУНЦОМ","ingredients":[{"name":"рис суши пф","unit":"кг","netto":0.08},{"name":"нори лист","unit":"шт","netto":1.0},{"name":"тунец консервированный","unit":"кг","netto":0.03},{"name":"майонез японский","unit":"кг","netto":0.01},{"name":"шрирача соус","unit":"кг","netto":0.003},{"name":"сыр кремета","unit":"кг","netto":0.03},{"name":"авокадо пф","unit":"кг","netto":0.02},{"name":"жареный лук","unit":"кг","netto":0.004},{"name":"унаги соус пф","unit":"кг","netto":0.01},{"name":"белый кунжут","unit":"кг","netto":0.003}],"method":"На целом листе нори формируем квадрат из 40 гр риса, на нем выкладываем начинку: сыр кремета, жареный лук, замес из тунца, авокадо, формируем еще один квадрат из 40гр риса и закрываем начинку сверху, края нори смачиваем водой, заворачиваем начинку, разрезаем на 4 части, поливаем соусом унаги и посыпаем кунжутом.","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Десерты и Роллы","name":"ДЕСЕРТ С МАНГОВЫМ ФЛОАТ","ingredients":[{"name":"Крем маскарпоне","unit":"кг","netto":0.11},{"name":"Печенье Lotus","unit":"кг","netto":0.04},{"name":"Манго курт","unit":"кг","netto":0.08},{"name":"Зеленая матча","unit":"кг","netto":0.003}],"method":"На дно креманки ложим 20 гр манго курта после ломаем печенья на 4-5 кусочков ложим на манго курт, затем смазываем манго куртом и заливаем 55 грамм кремом маскарпоне, затем заливаем таким же способом второй слой из оставшихся продуктов, накрываем пленкой убираем на 10-12 часов в холодильник. Перед подачей посыпаем зеленой матчей.","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Десерты и Роллы","name":"МАНГО-КУРТ","ingredients":[{"name":"Яйцо (желток)","unit":"шт","netto":4.0},{"name":"Манго пюре","unit":"кг","netto":0.3},{"name":"Крахмал","unit":"кг","netto":0.005},{"name":"Выход","unit":"кг","netto":0.3}],"method":"Отделяем белки от желтков, в желтки добавляем крахмал хорошо перемешиваем, разогреваем манго пюре и заливаем в массу, ставим на плиту и выпариваем до загущения","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Десерты и Роллы","name":"КРЕМ МАСКАРПОНЕ","ingredients":[{"name":"Маскарпоне","unit":"кг","netto":0.5},{"name":"Сгущенка","unit":"кг","netto":0.15},{"name":"Сироп бузины","unit":"кг","netto":0.025},{"name":"Сливки","unit":"кг","netto":0.4},{"name":"Цедра лайма","unit":"кг","netto":0.005},{"name":"Желатиновая масса","unit":"кг","netto":0.035}],"method":"В дежу добавляем маскарпоне, сгущенное молоко и сироп бузины перемешиваем, затем добавляем сливки взбиваем до устойчивых пиков, натираем цедру лайма и добавляем желатиновую массу, перемешиваем лопаткой и убираем в холодильник","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"БАО КИДС","ingredients":[{"name":"Пампушка","unit":"шт","netto":1.0},{"name":"Куриная котлета п\\ф","unit":"кг","netto":0.05},{"name":"кетченез","unit":"кг","netto":0.02},{"name":"черри","unit":"кг","netto":0.015},{"name":"сыр чеддер","unit":"кг","netto":0.015},{"name":"картофельные попсы","unit":"кг","netto":0.08}],"method":"Пампушки делим пополам и греем на пару, куриную котлету панируем в муке яйце и сухарях обжариваем во фритюре 160С 8 минут до готовности смазываем булочку соусом кетчуп-майонез один к одному выкладываем помидоры черри и огурец нарезанный тонким слайсом сверху куриную котлету и сыр чеддер. Подаем с обжаренными картофельными попсами.","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"КУРИНЫЕ СТРИПСЫ","ingredients":[{"name":"Куриные стрипсы п\\ф","unit":"кг","netto":0.15},{"name":"мука-панировочная","unit":"кг","netto":0.05},{"name":"сырный соус","unit":"кг","netto":0.03},{"name":"соль","unit":"кг","netto":0.001}],"method":"Куриные стрипсы п\\ф панируем в панировочной муке после окунаем воду затем повторно в муку хорошо прижимаем руками обжариваем во фритюре 180С 6 минут после откидываем на салфетку в полусферу посыпаем мелкой солью подаем сырным соусом","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"КУРИНЫЕ КРЫЛЬЯ","ingredients":[{"name":"Куриные Крылья","unit":"кг","netto":0.2},{"name":"мука-панировочная","unit":"кг","netto":0.05},{"name":"сырный соус","unit":"кг","netto":0.03},{"name":"соль","unit":"кг","netto":0.001}],"method":"Куриные крылья п\\ф панируем в панировочной муке после окунаем воду затем повторно в муку хорошо прижимаем руками обжариваем во фритюре 180С 12 минут после откидываем на салфетку в полусферу посыпаем мелкой солью подаем сырным соусом","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"РОЛЛ С ОГУРЦОМ","ingredients":[{"name":"Кунжут белый пф","unit":"кг","netto":0.002},{"name":"Нори классический","unit":"кг","netto":0.003},{"name":"Рис суши пф","unit":"кг","netto":0.07},{"name":"Огурцы пф","unit":"кг","netto":0.025}],"method":"Норри выкладываем рис тонко нарезанный огурец кунжут","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Детское меню","name":"РОЛЛ С АВОКАДО","ingredients":[{"name":"Нори классический","unit":"кг","netto":0.003},{"name":"Рис суши п\\ф","unit":"кг","netto":0.07},{"name":"Авокадо пф","unit":"кг","netto":0.025},{"name":"Кунжут белый пф","unit":"кг","netto":0.002}],"method":"Норри выкладываем рис тонко нарезанный авокадо кунжут","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Детское меню","name":"ДАМПЛИНГИ С КУРИЦЕЙ","ingredients":[{"name":"Дамплинги с курицей 1шт","unit":"шт","netto":5.0},{"name":"соевый соус светлый","unit":"кг","netto":0.03}],"method":"Куриные дамплинги ставим готовиться на пар 11 минут подаем с соевым соусом","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"ЛАПША С КУРИЦЕЙ","ingredients":[{"name":"Масло подсолнечное","unit":"кг","netto":0.02},{"name":"тесто на лагман","unit":"кг","netto":0.18},{"name":"Морковь","unit":"кг","netto":0.03},{"name":"соус на лапшу","unit":"кг","netto":0.03},{"name":"куриное бедро","unit":"кг","netto":0.06}],"method":"На раскаленном воке обжариваем куриное бедро, овощи добавляем лапшу хорошо перемешиваем добавляем соус тушим 2 минуты выкладываем в круглую тарелку","yield":null,"time":null,"station":"Вок","type":"блюдо"},{"section":"Детское меню","name":"РИС С КУРИЦЕЙ","ingredients":[{"name":"Кукуруза","unit":"кг","netto":0.035},{"name":"горошек с\\м","unit":"кг","netto":0.035},{"name":"Рис жасмин","unit":"кг","netto":0.15},{"name":"соус на лапшу","unit":"кг","netto":0.03},{"name":"куриное бедро","unit":"кг","netto":0.06},{"name":"масло подсолнечное","unit":"кг","netto":0.03}],"method":"Куриное бедро обжариваем на вок сковороде добавляем горошек и кукурузу обжариваем добавляем рис и соус тройку тушим 2 минуты выкладываем на круглую тарелку","yield":null,"time":null,"station":"Вок","type":"блюдо"},{"section":"Детское меню","name":"КУРИНАЯ КОТЛЕТА (ЗАГОТОВКА)","ingredients":[{"name":"Куриное бедро","unit":"кг","netto":1.0},{"name":"Жир говяжий","unit":"кг","netto":0.2},{"name":"Лук репчатый","unit":"кг","netto":0.2},{"name":"Масло сливочное","unit":"кг","netto":0.1},{"name":"Куриная приправа","unit":"кг","netto":0.005},{"name":"Соль","unit":"кг","netto":0.005}],"method":"Куриное бедро перекручиваем вместе с жиром на 2 раза, репчатый лук обжариваем на сливочном масле до золотистого цвета до мягкого состояния даем остыть добавляем в фарш заправляем специями. Убираем в холодильник.","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"КУРИНЫЕ СТРИПСЫ (ЗАГОТОВКА)","ingredients":[{"name":"Куриное бедро","unit":"кг","netto":1.0},{"name":"кинза","unit":"кг","netto":0.02},{"name":"молоко","unit":"кг","netto":0.25},{"name":"карри приправа","unit":"кг","netto":0.01},{"name":"соль","unit":"кг","netto":0.005},{"name":"куриная приправа","unit":"кг","netto":0.003}],"method":"Куриное бедро зачищаем от жира и хрящей нарезаем на полоски шириной 1,5-2 см, добавляем специи, кинзу и молоко хорошо перемешиваем вакуумируем ставим дату приготовления и убираем в холодильник.","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Детское меню","name":"МУКА-ПАНИРОВОЧНАЯ (ЗАГОТОВКА)","ingredients":[{"name":"Мука","unit":"кг","netto":1.0},{"name":"разрыхлитель","unit":"кг","netto":0.012},{"name":"соль","unit":"кг","netto":0.01},{"name":"черный кунжут","unit":"кг","netto":0.015}],"method":"В полусферу добавляем все ингредиенты хорошо перемешиваем и убираем в сухое место","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Доставка роллы","name":"РОЛЛ КРЕВЕТКА-КОЧУДЖАН","ingredients":[{"name":"Креветка отварная п\\ф","unit":"кг","netto":0.02},{"name":"Кремета","unit":"кг","netto":0.02},{"name":"Огурец на ролл","unit":"кг","netto":0.015},{"name":"Зеленый лук","unit":"кг","netto":0.005},{"name":"Кунжут черный","unit":"кг","netto":0.003},{"name":"Кочуджан-майо","unit":"кг","netto":0.02},{"name":"Рис для суши","unit":"кг","netto":0.1},{"name":"Норри классический","unit":"кг","netto":0.002},{"name":"Норри жаренный","unit":"кг","netto":0.001}],"method":"Бланшированная креветка, кочуджан майо. На нори раскладываем рис, формируем, переворачиваем, выкладываем начинку: сыр кремета, креветки отварные, огурцы, зеленый лук стебель. Заворачиваем ролл, обваливаем в черном кунжуте, разрезаем на 8 частей, украшаем каплей кочуджан майо, жаренным нори.","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"РОЛЛ С УГРЕМ-ТАМАГО","ingredients":[{"name":"Кремета","unit":"кг","netto":0.02},{"name":"Угорь п\\ф","unit":"кг","netto":0.02},{"name":"Огурец на ролл","unit":"кг","netto":0.015},{"name":"Тамаго п\\ф","unit":"кг","netto":0.015},{"name":"Спайси соус","unit":"кг","netto":0.02},{"name":"Унаги соус","unit":"кг","netto":0.01},{"name":"Тагараши","unit":"кг","netto":0.001},{"name":"Рис для суши","unit":"кг","netto":0.1},{"name":"Норри классический","unit":"кг","netto":0.002}],"method":"На нори раскладываем рис, формируем, переворачиваем, выкладываем начинку: сыр кремета, угорь обрезь, огурцы, тамаго. Заворачиваем ролл, обваливаем в белом кунжуте, разрезаем на 8 частей, украшаем каплей спайси, поливаем унаги соусом, посыпаем шичими специей.","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"РОЛЛ ЛОСОСЬ, АЛОЭ МАЙО, ЮДЗУ","ingredients":[{"name":"Креметта","unit":"кг","netto":0.02},{"name":"Огурец на ролл","unit":"кг","netto":0.02},{"name":"Авокадо","unit":"кг","netto":0.02},{"name":"Лосось","unit":"кг","netto":0.04},{"name":"Алоэ майо","unit":"кг","netto":0.01},{"name":"Васаби-Майо","unit":"кг","netto":0.01},{"name":"Тагараши","unit":"кг","netto":0.001},{"name":"Жаренный лук","unit":"кг","netto":0.003},{"name":"Лук зеленый","unit":"кг","netto":0.003},{"name":"Нори жареный","unit":"кг","netto":0.001},{"name":"Рис для суши","unit":"кг","netto":0.1},{"name":"Норри классический","unit":"кг","netto":0.002}],"method":"На нори раскладываем рис, формируем, переворачиваем, выкладываем начинку: сыр кремета, огурцы, авокадо. Заворачиваем ролл, обваливаем в жаренном нори, разрезаем на 8 частей, ролл выкладываем начинкой вниз, сверху выкладываем тар-тар из лосося замешанный в алоэ майо, украшаем каплей васаби юдзу майо, посыпаем зеленым луком, жареным луком, шичими специей.","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"КАЛИФОРНИЯ","ingredients":[{"name":"Крабовый микс","unit":"кг","netto":0.04},{"name":"Огурцы на роллы","unit":"кг","netto":0.015},{"name":"Тамаго п\\ф","unit":"кг","netto":0.02},{"name":"Тобико","unit":"кг","netto":0.012},{"name":"Кунжут белый","unit":"кг","netto":0.003},{"name":"Рис для суши","unit":"кг","netto":0.1},{"name":"Нори классический","unit":"кг","netto":0.002}],"method":"На нори раскладываем рис, формируем, переворачиваем, выкладываем начинку: крабовый микс, огурцы, тамаго. Заворачиваем ролл, сверху украшаем икрой масаго, разрезаем на 8 частей, посыпаем белым кунжутом.","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"ТУНЕЦ, АВОКАДО, ЮДЗУ СОУС","ingredients":[{"name":"Тунец св","unit":"кг","netto":0.04},{"name":"Спайси соус","unit":"кг","netto":0.015},{"name":"Авокадо","unit":"кг","netto":0.02},{"name":"Лук зеленый","unit":"кг","netto":0.005},{"name":"Жаренный лук","unit":"кг","netto":0.003},{"name":"Норри жаренный","unit":"кг","netto":0.001},{"name":"Юдзу-майо","unit":"кг","netto":0.01},{"name":"Рис для суши","unit":"кг","netto":0.1},{"name":"Норри классический","unit":"кг","netto":0.002}],"method":"На нори раскладываем рис, формируем, переворачиваем, выкладываем начинку: тунец тар-тар замешанный в спайси соусе, авокадо, зеленый лук стебель, жаренный лук. Заворачиваем ролл, обваливаем в жаренном нори, поливаем юдзу майо, украшаем крученым луком, посыпаем белым кунжутом.","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"ХЭНД РОЛЛ С ОГУРЦОМ","ingredients":[{"name":"Кунжут белый","unit":"кг","netto":0.002},{"name":"Огурцы на роллы","unit":"кг","netto":0.02},{"name":"Рис для суши","unit":"кг","netto":0.03},{"name":"Норри жаренный","unit":"кг","netto":0.002}],"method":"На жаренный нори выкладываем рис, формируем, посыпаем белым кунжутом, выкладываем огурцы, заворачиваем, разрезаем на 2 части","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"ХЭНД РОЛЛ С КРАБОМ","ingredients":[{"name":"Кремета","unit":"кг","netto":0.01},{"name":"Огурцы на роллы","unit":"кг","netto":0.02},{"name":"Рис для суши","unit":"кг","netto":0.03},{"name":"Норри жаренный","unit":"кг","netto":0.002},{"name":"Крабовый микс","unit":"кг","netto":0.015},{"name":"Соус унаги","unit":"кг","netto":0.005}],"method":"На жаренный нори выкладываем рис, формируем, посыпаем белым кунжутом, выкладываем авокадо. Заворачиваем, разрезаем на 2 части","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Доставка роллы","name":"ХЭНД РОЛЛ С АВОКАДО","ingredients":[{"name":"Кунжут белый","unit":"кг","netto":0.002},{"name":"Авокадо","unit":"кг","netto":0.02},{"name":"Рис для суши","unit":"кг","netto":0.03},{"name":"Норри жаренный","unit":"кг","netto":0.002}],"method":"На жаренный нори выкладываем рис, формируем, выкладываем микс краба, сыр кремета, поливаем унаги. Заворачиваем, разрезаем на 2 части","yield":null,"time":null,"station":"Суши станция","type":"блюдо"},{"section":"Закуски к пиву","name":"КУРИЦА КАРААГЕ","ingredients":[{"name":"Куриное бедро","unit":"кг","netto":0.16},{"name":"Васаби-майо","unit":"кг","netto":0.01},{"name":"Тонкацу-майо","unit":"кг","netto":0.01},{"name":"Лук жареный","unit":"кг","netto":0.005},{"name":"Лук зеленый","unit":"кг","netto":0.005}],"method":"Куриное бедро маринуем, панируем в крахмале, обжариваем во фритюре до хрустящей корочки. Подаем с соусами васаби-майо и тонкацу-майо, украшаем жареным и зеленым луком.","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски к пиву","name":"КАРТОФЕЛЬНЫЕ ЧИПСЫ (ЗАГОТОВКА)","ingredients":[{"name":"Чипсы п\\ф","unit":"кг","netto":0.15},{"name":"Тагараши","unit":"кг","netto":0.003},{"name":"Фурикаке","unit":"кг","netto":0.003},{"name":"соль","unit":"кг","netto":0.003}],"method":"Заготовка для жарки","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"Закуски к пиву","name":"КАРТОФЕЛЬНЫЕ ЧИПСЫ","ingredients":[{"name":"Чипсы п\\ф","unit":"кг","netto":0.05},{"name":"лайм","unit":"кг","netto":0.02}],"method":"Обжариваем во фритюре до золотистой корочки, подаем с долькой лайма","yield":null,"time":null,"station":"Горячий цех","type":"блюдо"},{"section":"П.Ф Горячий цех","name":"БИТЫЕ ОГУРЦЫ","ingredients":[{"name":"Пф Огурец без семян","unit":"кг","netto":0.25},{"name":"Соус сладкий чили","unit":"кг","netto":0.08},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.005},{"name":"Пф Кинза свежая (-30%) (ALL)","unit":"кг","netto":0.01},{"name":"Соус Кимчи","unit":"кг","netto":0.015},{"name":"Пф Чеснок св (-22%) (ALL)","unit":"кг","netto":0.01},{"name":"Масло кунжутное","unit":"кг","netto":0.005}],"method":"Огурцы очистить от семян и отбить молотком и после разбить руками на равные куски, в полусфере смешать все соуса, раздавить чеснок и крупно нарвать кинзу замешать массу с огурцами, вакуумируем ставим дату приготовления и убираем в холодильник.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"БЕДРО МАРИНОВАНОЕ НА БАО","ingredients":[{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.5},{"name":"Соус Мирин","unit":"кг","netto":0.5},{"name":"Паста Криспи Чили","unit":"кг","netto":0.1},{"name":"Паста перечная Кучуджан","unit":"кг","netto":0.02},{"name":"Пф Куриное бедро (-18%)","unit":"кг","netto":2.8}],"method":"Куриное бедро зачищаем от лишнего жира и хрящей нарезаем на стейки весом 80 гр, добавляем все ингредиенты хорошо перемешиваем вакуумируем ставим дату приготовления и убираем в холодильник. Срок хранения 24 часа.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"СОУС ТОНКАЦУ-МАЙО","ingredients":[{"name":"Соус Тонкацу","unit":"кг","netto":0.045},{"name":"Японский майонез","unit":"кг","netto":0.09},{"name":"Специи тогараши","unit":"кг","netto":0.001}],"method":"В полусферу добавляем все ингредиенты венчиком смешиваем до однородного состояния перекладываем в кондитерские мешки. Ставим дату приготовления. Срок хранения 48 часов.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"СОУС МАЙОНЕЗ-КУЧУДЖАН","ingredients":[{"name":"Японский майонез","unit":"кг","netto":0.2},{"name":"Паста Кучуджан","unit":"кг","netto":0.03},{"name":"Соус шрирача","unit":"кг","netto":0.005},{"name":"Масло кунжутное","unit":"кг","netto":0.005}],"method":"В полусферу добавляем все ингредиенты венчиком смешиваем до однородного состояния перекладываем в кондитерские мешки. Ставим дату приготовления. Срок хранения 48 часов.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"ПАНИРОВКА","ingredients":[{"name":"Мука рисовая","unit":"кг","netto":0.5},{"name":"Крахмал кукурузный","unit":"кг","netto":0.25}],"method":"Перемешать 2 ингредиента и положить в герметичный контейнер","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"ПОСЫПКА НА ВЕШЕНКИ","ingredients":[{"name":"Водоросли Нори","unit":"кг","netto":0.05},{"name":"Курт копченый","unit":"кг","netto":0.1},{"name":"Специи тогараши","unit":"кг","netto":0.04}],"method":"Нори перемолоть в блендере и курт мелко раздробить и добавить в блендер и перемолоть все до мелкой крошки, добавить тогараши перемешать и убрать в контейнер","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"СОУС НА ДИМСАМЫ","ingredients":[{"name":"Пф Лук зеленый (-20%) (ALL)","unit":"кг","netto":0.01},{"name":"Масло кунжутное","unit":"кг","netto":0.005},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.1},{"name":"Пф Кинза свежая (-30%) (ALL)","unit":"кг","netto":0.005},{"name":"Пф Имбирь корень (-25%) (ALL)","unit":"кг","netto":0.01},{"name":"Уксус китайский ЮН","unit":"кг","netto":0.03},{"name":"Пф Перец Чили Красный","unit":"кг","netto":0.05}],"method":"Мелко нарезаем зелень, имбирь и красный чили, добавляем соуса хорошо перемешиваем. Герметично закрываем в гастроемкости ставим дату приготовления, убираем в холодильник. Срок хранения 48 часов","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"СОУС ЛАЗДЖАН-ДИМСАМ","ingredients":[{"name":"Пф Лазджан","unit":"кг","netto":0.06},{"name":"пф соус на димпсамы (ЛЮ)","unit":"кг","netto":0.085},{"name":"Пф Кинза свежая (-30%) (ALL)","unit":"кг","netto":0.015},{"name":"Пф Лук зеленый (-20%) (ALL)","unit":"кг","netto":0.01},{"name":"Приправа смесь 15 перцев","unit":"кг","netto":0.005},{"name":"Пф Масло чесночное LY","unit":"кг","netto":0.015}],"method":"Нарезаем мелко зелень добавляем специи и соединяем соуса хорошо перемешиваем ставим дату приготовления и убираем холодильник. Срок хранения 48 часов","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"СОУС НА БАКЛАЖАНЫ","ingredients":[{"name":"Соус сладкий чили","unit":"кг","netto":0.7},{"name":"Соус устричный","unit":"кг","netto":0.3}],"method":"Перемешать два ингредиента и перелить в соску","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"СОУС НА ЖАРЕНЫЕ ДАМПЛИНГИ","ingredients":[{"name":"Соус сладкий чили","unit":"кг","netto":0.35},{"name":"Паста Криспи Чили","unit":"кг","netto":0.15},{"name":"Соус устричный","unit":"кг","netto":0.15},{"name":"пф соус соевый для гостей (ЛЮ)2","unit":"кг","netto":0.15},{"name":"Уксус китайский ЮН","unit":"кг","netto":0.15},{"name":"Масло кунжутное","unit":"кг","netto":0.05},{"name":"Пф Лук зеленый (-20%) (ALL)","unit":"кг","netto":0.1}],"method":"В полусферу добавляем все соуса и нарезанный зеленый лук все хорошо перемешиваем венчиком до однородного состояния, переливаем в гастроемкость ставим дату приготовления и убираем в холодильник. Срок хранения 48 часов.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"БАЗА НА ТОМ ЯМ","ingredients":[{"name":"пф бульон рыбный NEW(ЛЮ)","unit":"кг","netto":5.5},{"name":"Паста том ям","unit":"кг","netto":0.5},{"name":"Кабачковая икра","unit":"кг","netto":0.375},{"name":"Молоко кокосовое","unit":"кг","netto":0.5},{"name":"Соус Рыбный","unit":"кг","netto":0.2},{"name":"Сливки не сладкие до 35%","unit":"кг","netto":0.3},{"name":"Сахар песок","unit":"кг","netto":0.1},{"name":"Листья лайма","unit":"кг","netto":0.005},{"name":"Усилитель вкуса (кристаллики)","unit":"кг","netto":0.005},{"name":"Приправа хондаши","unit":"кг","netto":0.005}],"method":"В горячий рыбный бульон добавляем все ингредиенты, ставим на плиту варим на медленном огне 20-30 минут, после снимаем с плиты, даем немного остыть и пробиваем погружным блендером, переливаем в контейнер, ставим дату приготовления и убираем в холодильник. Срок хранения 72 часа.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"БАЗА НА МИСО","ingredients":[{"name":"пф бульон водоросли (ЛЮ)2","unit":"кг","netto":4.4},{"name":"пф основа на мисо суп (ЛЮ)2","unit":"кг","netto":0.45},{"name":"Усилитель вкуса (кристаллики)","unit":"кг","netto":0.01},{"name":"Приправа хондаши","unit":"кг","netto":0.01}],"method":"В кипящий бульон добавляем все ингредиенты, варим на медленном огне 20-30 минут, убираем с плиты даем остыть, убираем в холодильник, ставим дату приготовления. Срок хранения 72 часа.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"ОСНОВА НА МИСО","ingredients":[{"name":"Паста мисо","unit":"кг","netto":2.0},{"name":"Усилитель вкуса (кристаллики)","unit":"кг","netto":0.02},{"name":"Приправа хондаши","unit":"кг","netto":0.02}],"method":"Все ингредиенты хорошо перемешиваем между собой до однородной массы.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"БУЛЬОН НА КИМЧИ","ingredients":[{"name":"Вода","unit":"л","netto":8.0},{"name":"Репчатый лук","unit":"кг","netto":0.15},{"name":"Шитаке сухой","unit":"кг","netto":0.06},{"name":"Зеленый лук","unit":"кг","netto":0.12},{"name":"Комбу","unit":"кг","netto":0.015},{"name":"Куриные каркасы","unit":"кг","netto":2.0},{"name":"Копченые окорочка","unit":"кг","netto":0.7},{"name":"Чеснок","unit":"кг","netto":0.02},{"name":"Кочуджан табаджан","unit":"кг","netto":0.3},{"name":"Мицукан для риса","unit":"кг","netto":0.2},{"name":"Кристаллики","unit":"кг","netto":0.01},{"name":"Соевый светлый","unit":"кг","netto":0.2},{"name":"Куриная приправа","unit":"кг","netto":0.01}],"method":"В кастрюлю закидываем куриные каркасы и копченые окорочка заливаем водой ставим на плиту на большой огонь доводим до кипения и варим на сильном огне 2 часа после добавляем репчатый лук, зеленый лук, комбу, чеснок и шитаке варим 30-40 минут процеживаем через сито. После добавляем оставшиеся ингредиенты доводим до кипения и до вкуса снимаем с плиты даем остыть.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"Бедро маринованное на коже","ingredients":[{"name":"Бедро на коже","unit":"кг","netto":0.8},{"name":"Соевый соус выпаренный","unit":"кг","netto":0.06},{"name":"краситель красный","unit":"кг","netto":0.001}],"method":"Куриное бедро зачищаем от хрящей и заливаем соус и пищевой краситель хорошо перемешиваем и вакуумируем каждое бедро по одному ставим в сувид 60 градусов 2 часа.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"Трюфельная-креметта","ingredients":[{"name":"Сливки","unit":"кг","netto":0.15},{"name":"Креметта","unit":"кг","netto":0.2},{"name":"Трюфельная паста","unit":"кг","netto":0.03},{"name":"Сахар","unit":"кг","netto":0.001},{"name":"Соль","unit":"кг","netto":0.001}],"method":"В полусфере смешиваем все ингредиенты венчиком замешиваем до кремового состояния перекладываем в кондитерский мешок и убираем в холодильник.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"Йогуртовая-заправка","ingredients":[{"name":"Йогурт","unit":"кг","netto":0.25},{"name":"Майонез","unit":"кг","netto":0.05},{"name":"Лимонная цедра","unit":"кг","netto":0.002},{"name":"Сок лимона","unit":"кг","netto":0.02},{"name":"Зернистая горчица","unit":"кг","netto":0.03},{"name":"Соль","unit":"кг","netto":0.002},{"name":"Сахар","unit":"кг","netto":0.002}],"method":"Все ингредиенты добавляем в полусферу перемешиваем венчиком ставим дату приготовления убираем в холодильник","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"ШПИНАТ П\\Ф","ingredients":[{"name":"Шпинат","unit":"кг","netto":0.1},{"name":"кристаллики","unit":"кг","netto":0.001},{"name":"соя светлая","unit":"кг","netto":0.015},{"name":"юн","unit":"кг","netto":0.005},{"name":"имбирное масло","unit":"кг","netto":0.005},{"name":"кунжутное масло","unit":"кг","netto":0.005},{"name":"Соль","unit":"кг","netto":0.001}],"method":"Шпинат бланшируем добавляем все ингредиенты хорошо перемешиваем ставим дату приготовления и убираем в холодильник","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"КАРРИ СОУС","ingredients":[{"name":"лук репчатый","unit":"кг","netto":0.2},{"name":"чеснок","unit":"кг","netto":0.03},{"name":"имбирь","unit":"кг","netto":0.02},{"name":"масло подсолнечное","unit":"кг","netto":0.06},{"name":"карри приправа","unit":"кг","netto":0.03},{"name":"перец чили","unit":"кг","netto":0.005},{"name":"мука","unit":"кг","netto":0.02},{"name":"молоко","unit":"кг","netto":0.3},{"name":"сахар","unit":"кг","netto":0.015},{"name":"соус рыбный","unit":"кг","netto":0.03},{"name":"соевый соус светлый","unit":"кг","netto":0.024},{"name":"сироп глюкозы","unit":"кг","netto":0.06}],"method":"Лук нарезаем мелким кубиком обжариваем в сотейнике на подсолнечном масле 5-7 минут на среднем огне пока лук не размякнет, добавляем чеснок, имбирь, чили красный ставим на медленный огонь томим еще 5 минут добавляем муку пассируем 3-5 минут, молоко, сахар, рыбный соус, сироп глюкозный и греем до кипения. Пробиваем блендером процеживаем через сито даем остыть убираем в бокс.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Горячий цех","name":"МОРКОВЧА","ingredients":[{"name":"Морковь","unit":"кг","netto":1.0},{"name":"чили хлопья","unit":"кг","netto":0.015},{"name":"кристаллики","unit":"кг","netto":0.005},{"name":"чеснок","unit":"кг","netto":0.01},{"name":"кориандр","unit":"кг","netto":0.005},{"name":"соль","unit":"кг","netto":0.01},{"name":"масло подсолнечное","unit":"кг","netto":0.1},{"name":"уксус 70%","unit":"кг","netto":0.01}],"method":"Морковку натираем на корейской терке перекладываем в полусферу натираем чеснок насыпаем специи подсолнечное масло раскаляем и заливаем поливая на специи и чеснок. Добавляем уксус все хорошо перемешиваем и убираем в холодильник.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Вок","name":"ГОВЯДИНА МАРИНАД","ingredients":[{"name":"Говядина ВС Экстра зачищенная","unit":"кг","netto":1.7},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.065},{"name":"Приправа дашидо","unit":"кг","netto":0.007},{"name":"Яйцо","unit":"шт","netto":1.0},{"name":"Сода пищевая","unit":"кг","netto":0.003},{"name":"Крахмал кукурузный","unit":"кг","netto":0.04}],"method":"Зачищенную говядину нарезаем на небольшие куски шириной 5 см, после нарезаем тонким слайсом 0,5 см против волокон. Маринуем и перекладываем в вакуумный пакет герметично вакуумируем и убираем в холодильник минимум на 5 часов.","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"КУРИНОЕ БЕДРО МАРИНАД","ingredients":[{"name":"Пф Куриное бедро без кожи (-20%)","unit":"кг","netto":0.24},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.05},{"name":"Пф Имбирь корень (-25%) (ALL)","unit":"кг","netto":0.02},{"name":"Пф Чеснок св (-22%) (ALL)","unit":"кг","netto":0.02},{"name":"Масло подсолнечное","unit":"кг","netto":0.01}],"method":"Куриное бедро зачищаем от лишнего жира и хрящей нарезаем на небольшие кубики 1х1 см и смешиваем с остальными ингредиентами хорошо перемешиваем перекладываем в вакуум пакет герметично вакуумируем и убираем в холодильник минимум на 3 часа.","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС КАЛЬБИ","ingredients":[{"name":"Соус Бульгоги","unit":"кг","netto":0.25},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.15},{"name":"Соус Кимчи","unit":"кг","netto":0.25},{"name":"Уксус китайский ЮН","unit":"кг","netto":0.05},{"name":"Масло кунжутное","unit":"кг","netto":0.05}],"method":"Хорошо перемешать все ингредиенты в удобном контейнере и перелить в герметичный контейнер и убрать в холодильник","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС ТРОЙКА","ingredients":[{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.27},{"name":"Соус устричный","unit":"кг","netto":0.3},{"name":"Соус соевый Китайский (темный)","unit":"кг","netto":0.03}],"method":"В полусферу наливаем соуса венчиком все хорошо перемешиваем до однородного состояния. Переливаем в гастроемкость ставим дату приготовления убираем в холодильник. Срок хранения соуса 72 часа.","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС НА СТЕКЛЯНУЮ ЛАПШУ","ingredients":[{"name":"Соус Бульгоги","unit":"кг","netto":0.15},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.03},{"name":"Соус соевый Китайский (темный)","unit":"кг","netto":0.01},{"name":"Соус устричный","unit":"кг","netto":0.03},{"name":"Масло кунжутное","unit":"кг","netto":0.03}],"method":"В полусферу наливаем соуса венчиком все хорошо перемешиваем до однородного состояния. Переливаем в гастроемкость ставим дату приготовления убираем в холодильник. Срок хранения соуса 72 часа.","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС ТЕРИЯКИ","ingredients":[{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.42},{"name":"Сахар песок","unit":"кг","netto":0.15},{"name":"Соус устричный","unit":"кг","netto":0.035},{"name":"Пф Чеснок св (-22%) (ALL)","unit":"кг","netto":0.024},{"name":"пф имбирь корень (-25%) ALL","unit":"кг","netto":0.024},{"name":"Крахмал кукурузный","unit":"кг","netto":0.025},{"name":"Вино Долины Грузии белое сухое","unit":"кг","netto":0.305}],"method":"В кастрюлю наливаем вино ставим на плиту даем выпариться алкоголю на медленном огне 1-1,5 часа. После добавляем оставшиеся ингредиенты и томим на медленном огне до мягкого состояния чеснока и имбиря, даем остыть процеживаем через сито, переливаем в гастроемкость. Срок хранения 72 часа.","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС НА ДРЕВЕСНЫЕ ГРИБЫ","ingredients":[{"name":"Паста Криспи Чили","unit":"кг","netto":0.2},{"name":"Паста Табаджан","unit":"кг","netto":0.06},{"name":"Масло кунжутное","unit":"кг","netto":0.004},{"name":"Соус устричный","unit":"кг","netto":0.06},{"name":"Соус соевый Китайский (1,72л)","unit":"кг","netto":0.2},{"name":"Соус соевый Китайский (темный)","unit":"кг","netto":0.04},{"name":"Уксус китайский ЮН","unit":"кг","netto":0.2}],"method":"Хорошо перемешать все ингредиенты в удобном контейнере и перелить в герметичный контейнер и убрать в холодильник","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС КУН-ЛУ","ingredients":[{"name":"Соевый соус светлый","unit":"кг","netto":0.02},{"name":"соус устричный","unit":"кг","netto":0.1},{"name":"соевый соус темный","unit":"кг","netto":0.025},{"name":"масло кунжутное","unit":"кг","netto":0.006},{"name":"рыбный соус","unit":"кг","netto":0.005},{"name":"приправа для курицы","unit":"кг","netto":0.004},{"name":"Вода","unit":"кг","netto":0.08}],"method":"В сотейнике смешиваем все ингредиенты хорошо прогреваем и убираем с плиты даем остыть переливаем в гастроемкость и убираем в холодильник","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Вок","name":"СОУС СОЕВЫЙ-ЧИЛИ","ingredients":[{"name":"Соевый соус светлый","unit":"кг","netto":0.07},{"name":"Чили красный","unit":"кг","netto":0.005},{"name":"Кинза","unit":"кг","netto":0.005}],"method":"Перец чили и кинзу нарезаем тонко и добавляем в соевый соус убираем в холодильник","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Суши","name":"ПРИПРАВА КИТАЙСКАЯ ПАНКО","ingredients":[{"name":"Масло сливочное","unit":"кг","netto":0.13},{"name":"Сухари панировочные Панко","unit":"кг","netto":0.27},{"name":"Усилитель вкуса (кристаллики)","unit":"кг","netto":0.022},{"name":"Перец чили острый хлопья","unit":"кг","netto":0.036},{"name":"Пф Чеснок св (-22%) (ALL)","unit":"кг","netto":0.051},{"name":"Масло подсолнечное рафинированное","unit":"кг","netto":0.035},{"name":"Соль","unit":"кг","netto":0.026}],"method":"Растапливаем сливочное масло и обжариваем чеснок с чили перцем и добавляем панко и обжариваем с добавлением остальных ингредиентов. Переложить в герметичный контейнер и убрать в гарманже","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"РИС ДЛЯ СУШИ ЗАПРАВЛЕННЫЙ","ingredients":[{"name":"Пф Рис для суши","unit":"кг","netto":2.15},{"name":"Пф Маринад для риса","unit":"кг","netto":0.45}],"method":"Добавляем маринад в горячий рис и хорошо перемешиваем пока рис немного не остынет и не впитает в себя маринад. После остывания закрыть в герметичный контейнер","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"ЗАПРАВКА НА РИС","ingredients":[{"name":"Уксус мицукан","unit":"кг","netto":2.0},{"name":"Водоросли Комбу","unit":"кг","netto":0.07},{"name":"Сахар песок","unit":"кг","netto":2.4},{"name":"Соль крупная","unit":"кг","netto":0.1}],"method":"Смешиваем все в одной кастрюле и перемешиваем до момента пока не растопится сахар. Не должен кипеть. После остывания перелить в герметичный контейнер","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"КРАБОВЫЙ МИКС","ingredients":[{"name":"Пф Соус Масага","unit":"кг","netto":0.025},{"name":"Пф Соус Спайси Саид","unit":"кг","netto":0.025},{"name":"Пф Краб снежный (-20%) ЛЮ","unit":"кг","netto":0.12}],"method":"Берем выжатый нарезанный краб и смешиваем с соусами и раскладываем по кондитерским мешкам","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"КРЕВЕТКА ТАР-ТАР","ingredients":[{"name":"Креветки 21*25 отварные","unit":"кг","netto":0.042},{"name":"Молоко кокосовое","unit":"кг","netto":0.005},{"name":"Майонез Японский","unit":"кг","netto":0.01},{"name":"Пф Лук зеленый (-20%) (ALL)","unit":"кг","netto":0.002}],"method":"Отварные креветки мелко нарезаем, добавляем японский майонез, кокосовое молоко и мелко нарезанный зеленый лук все хорошо перемешиваем. Ставим дату приготовления и убираем в холодильник. Срок хранения 12 часов.","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"СОУС МАСАГА","ingredients":[{"name":"Майонез","unit":"кг","netto":0.1},{"name":"Икра Тобико","unit":"кг","netto":0.01}],"method":"Смешать два ингредиента","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"СОУС СПАЙСИ","ingredients":[{"name":"Майонез","unit":"кг","netto":0.742},{"name":"Соус Шрирача","unit":"кг","netto":0.23},{"name":"Икра Тобико","unit":"кг","netto":0.05},{"name":"Масло чесночное (ЛЮ)","unit":"кг","netto":0.07},{"name":"Специи тогараши","unit":"кг","netto":0.015}],"method":"Смешать ингредиенты в контейнере и разложить по кондитерским мешкам","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Суши","name":"СОУС УНАГИ","ingredients":[{"name":"Соус соевый Киккоман","unit":"кг","netto":0.1},{"name":"Соус Мирин","unit":"кг","netto":0.1},{"name":"Вино CHOYA Sake (0,75л)","unit":"кг","netto":0.1},{"name":"Сахар песок","unit":"кг","netto":0.1},{"name":"Корица палочка","unit":"кг","netto":0.002},{"name":"Пф Имбирь корень (-25%)","unit":"кг","netto":0.01},{"name":"Пф Угорь (-35%)","unit":"кг","netto":0.035}],"method":"Смешать все ингредиенты и выпаривать до полугустого состояния, после остывания процедить и перелить в соску","yield":null,"time":null,"station":"Суши станция","type":"заготовка"},{"section":"П.Ф Десерты","name":"БАЗА СЕМИФРЕДО","ingredients":[{"name":"Сливки не сладкие до 35%","unit":"кг","netto":0.7},{"name":"Хлеб бородинский","unit":"кг","netto":0.06},{"name":"Яйцо куриное","unit":"шт","netto":12.0},{"name":"Сахар тростниковый","unit":"кг","netto":0.2}],"method":"Яйца с тростниковым сахаром взбить на водяной бане, отложить до остывания. Хлеб мелко нарезать и добавить часть сливок для размягчения, заблендерить хлеб до мелкой крошки. Остаток сливок взбить, добавить взбитые яйца с сахаром и перемолотый хлеб, все перемешать.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Десерты","name":"МИСО КАРАМЕЛЬ","ingredients":[{"name":"Сахар песок","unit":"кг","netto":0.3},{"name":"Паста мисо (темная)","unit":"кг","netto":0.1},{"name":"Сливки не сладкие до 35%","unit":"кг","netto":0.4},{"name":"Масло сливочное","unit":"кг","netto":0.1}],"method":"Сахар растопить и добавить мисо пасту и сливки, прогреть до однородного состояния, положить сливочное масло и растопить на мелком огне","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Десерты","name":"ТЕСТО НА МОТИ","ingredients":[{"name":"Сахар песок","unit":"кг","netto":0.09},{"name":"Крахмал кукурузный","unit":"кг","netto":0.1},{"name":"Мука рисовая","unit":"кг","netto":0.17},{"name":"Молоко до 3,2%","unit":"кг","netto":0.425},{"name":"Масло президент","unit":"кг","netto":0.035}],"method":"Сахар, крахмал, рисовая мука, молоко смешать в пластиковом контейнере с крышкой, поставить в микроволновку на средние волны на 5 мин, хорошо перемешать лопаткой, снова на 5 мин без крышки. Переложить на пергамент, растереть со сливочным маслом, накрыть пергаментом и дать остыть.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Десерты","name":"КРЕМ АЛОЭ ДЖЕМ","ingredients":[{"name":"Пф Сыр Ден чиз","unit":"кг","netto":0.2},{"name":"Молоко до 3,2%","unit":"кг","netto":0.075},{"name":"Шоколад белый плитка","unit":"кг","netto":0.1},{"name":"Пф Масса желатиновая","unit":"кг","netto":0.045},{"name":"Сливки не сладкие до 35%","unit":"кг","netto":0.305},{"name":"Джем алоэ","unit":"кг","netto":0.1}],"method":"Творожный сыр, молоко, шоколад, сливки, джем растопить на водяной бане до однородного состояния, добавить желатиновую массу, хорошо перемешать, застричковать и убрать в холодильник до застывания, затем разложить по кондитерским мешкам","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Десерты","name":"КРЕМ ГОЛУБАЯ МАТЧА","ingredients":[{"name":"Пф Сыр Ден чиз","unit":"кг","netto":0.2},{"name":"Молоко до 3,2%","unit":"кг","netto":0.075},{"name":"Шоколад белый плитка","unit":"кг","netto":0.12},{"name":"Пф Масса желатиновая","unit":"кг","netto":0.035},{"name":"Чай матча голубой","unit":"кг","netto":0.003},{"name":"Сливки не сладкие до 35%","unit":"кг","netto":0.305},{"name":"Сироп Бузина Sk bar","unit":"кг","netto":0.04}],"method":"Творожный сыр, молоко, шоколад, сливки, сироп бузины и голубую матчу растопить на водяной бане до однородного состояния, добавить желатиновую массу, перемешать, убрать в холодильник до застывания, разложить по кондитерским мешкам","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Десерты","name":"МАЛИНОВЫЙ КЮЛИ","ingredients":[{"name":"Малина с/м","unit":"кг","netto":1.0},{"name":"Сахар песок","unit":"кг","netto":0.2},{"name":"Сироп Бузина Sk bar","unit":"кг","netto":0.04},{"name":"Агар-агар","unit":"кг","netto":0.003}],"method":"Малину растопить в кастрюле, добавить сахар, хорошо прогреть, выпарить лишнюю влагу. Добавить сироп бузины и агар-агар, перелить в контейнер до застывания, разложить по кондитерским мешкам","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Мучной","name":"ТЕСТО НА БАО И ПАМПУШКИ","ingredients":[{"name":"Вода","unit":"кг","netto":0.9},{"name":"Мука в/с","unit":"кг","netto":2.0},{"name":"Сахар песок","unit":"кг","netto":0.03},{"name":"Дрожжи сухие","unit":"кг","netto":0.002},{"name":"Масло подсолнечное рафинированное","unit":"кг","netto":0.12},{"name":"Соль крупная","unit":"кг","netto":0.02}],"method":"Муку смешиваем с водой добавляем соль сахар дрожжи, закидываем в тестомес перемешиваем 7 минут добавляем масло и мешаем еще 3 минуты. Достаем, обминаем, даем отдохнуть 2-3 минуты. Раскатываем пласт, вырезаем по 60 гр кольцом диаметром 11 см, смазываем маслом, складываем в конверт, выкладываем в пароварку, даем расстояться 40 минут. Ставим на пар 25 минут.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Мучной","name":"ТЕСТО НА ДАМПЛИНГИ","ingredients":[{"name":"Мука в/с","unit":"кг","netto":0.6},{"name":"Крахмал топиоковый","unit":"кг","netto":0.06},{"name":"Вода","unit":"кг","netto":0.315}],"method":"Смешиваем муку с крахмалом и заливаем тонкой струйкой кипятком, тщательно перемешивая в тестомесе до однородного состояния. Вытаскиваем, даем отдохнуть 10-15 минут, обминаем руками, тесто готово к использованию.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Мучной","name":"ТЕСТО НА ЛАПШУ","ingredients":[{"name":"Мука в/с","unit":"кг","netto":5.0},{"name":"Соль крупная","unit":"кг","netto":0.1},{"name":"Яйцо куриное","unit":"шт","netto":7.0},{"name":"Масло подсолнечное рафинированное","unit":"кг","netto":0.5},{"name":"Вода","unit":"кг","netto":1.5}],"method":"В теплой воде растворить соль. К муке добавить раствор соленой воды, яйца, масло подсолнечное и замесить тесто. Дать отдохнуть, дважды подмять с перерывом 15 минут. Скатать в колбаску, разделить на части, растянуть в жгуты, скрутить спирально на смазанный маслом противень, дать отстояться 15-20 минут. Растянуть жгуты через пальцы в тонкую лапшу, накрутить на руки и растянуть, ударяя об стол — несколько раз для тонкости и ровности.","yield":null,"time":null,"station":"Вок","type":"заготовка"},{"section":"П.Ф Мучной","name":"БУЛЬОН ЛАКИ","ingredients":[{"name":"Пф Бульон куриный","unit":"кг","netto":0.2},{"name":"Желатин","unit":"кг","netto":0.02}],"method":"Куриный горячий бульон засыпаем желатин, интенсивно помешивая до полного растворения, переливаем в гастроемкость до полного застывания, закрываем крышкой и убираем в холодильник. Срок хранения 72 часа.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Мучной","name":"ФАРШ ГОВЯЖИЙ ТОФУ","ingredients":[{"name":"Говяжий фарш","unit":"кг","netto":0.3},{"name":"Пф Капуста пекинская (-33%) (ALL)","unit":"кг","netto":0.19},{"name":"Соус Кимчи","unit":"кг","netto":0.05},{"name":"Сыр Тофу","unit":"кг","netto":0.08},{"name":"Приправа дашидо","unit":"кг","netto":0.015},{"name":"Семена кунжутные","unit":"кг","netto":0.02},{"name":"Пф Лук зеленый (-20%) (ALL)","unit":"кг","netto":0.02},{"name":"Говяжий жир","unit":"кг","netto":0.05},{"name":"Масло кунжутное","unit":"кг","netto":0.005},{"name":"Масло подсолнечное рафинированное","unit":"кг","netto":0.025},{"name":"Крахмал кукурузный","unit":"кг","netto":0.015},{"name":"Пф Желатин куриный","unit":"кг","netto":0.1}],"method":"Пекинскую капусту нарезаем тонкой соломкой, мелко нарезаем зеленый лук, добавляем говяжий фарш и говяжий жир, заправляем специями, добавляем мелко нарезанный желатин. Сыр тофу мелко крошим, все хорошо перемешиваем. Обязательно обжариваем фарш и пробуем на вкус. Перекладываем в вакуум-пакеты, вакуумируем, убираем в холодильник. Срок хранения 48 часов.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Мучной","name":"ФАРШ НА ЖАРЕНЫЕ ДАМПЛИНГИ","ingredients":[{"name":"Говяжий жир","unit":"кг","netto":0.15},{"name":"Пф Лук красный LY","unit":"кг","netto":0.05},{"name":"Паста Криспи Чили","unit":"кг","netto":0.05},{"name":"Масло кунжутное","unit":"кг","netto":0.005},{"name":"Пф Кинза свежая (-30%) (ALL)","unit":"кг","netto":0.02},{"name":"Усилитель вкуса (кристаллики)","unit":"кг","netto":0.005},{"name":"Соль крупная","unit":"кг","netto":0.003},{"name":"Пф Фарш говяжий (5%)","unit":"кг","netto":0.5}],"method":"Мелким кубиком нарезаем красный лук, мелко рубим кинзу, добавляем в фарш, смешиваем с говяжим жиром. Добавляем криспи чили, кунжутное масло и специи. Обязательно обжариваем фарш и пробуем на вкус. Перекладываем в вакуум-пакеты, вакуумируем, убираем в холодильник. Срок хранения 48 часов.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"},{"section":"П.Ф Мучной","name":"ФАРШ КУРИНЫЙ С ФУНЧОЗОЙ","ingredients":[{"name":"Пф Кабачки св (-10%) (ALL)","unit":"кг","netto":0.115},{"name":"пф фунчоза стеклянная отварная (ЛЮ)","unit":"кг","netto":0.1},{"name":"Приправа для курицы","unit":"кг","netto":0.01},{"name":"Пф Имбирь корень (-25%) (ALL)","unit":"кг","netto":0.01},{"name":"Пф Лук зеленый (-20%) (ALL)","unit":"кг","netto":0.04},{"name":"Сахар песок","unit":"кг","netto":0.003},{"name":"Пф Куриное бедро (-18%)","unit":"кг","netto":0.6},{"name":"Говяжий жир","unit":"кг","netto":0.12},{"name":"Соус Бульгоги","unit":"кг","netto":0.1},{"name":"Пф Желатин куриный","unit":"кг","netto":0.1},{"name":"Приправа смесь 15 перцев","unit":"кг","netto":0.01}],"method":"Куриное бедро, говяжий жир и куриный желатин перекручиваем на мясорубке, кабачки натираем и отжимаем от лишней влаги, добавляем в фарш. Мелко нарезаем фунчозу, зеленый лук и имбирь, добавляем специи и соуса, все хорошо перемешиваем. Обязательно обжариваем фарш и пробуем на вкус. Перекладываем в вакуум-пакеты, вакуумируем, убираем в холодильник. Срок хранения 48 часов.","yield":null,"time":null,"station":"Горячий цех","type":"заготовка"}];
+const PRODUCT_SEED = [{"n":"Авокадо","u":"кг","a":"17043","t":"p"},{"n":"Агар-агар","u":"кг","a":"20786","t":"p"},{"n":"Анис звездочками","u":"кг","a":"29507","t":"p"},{"n":"Апельсин св","u":"кг","a":"16186","t":"p"},{"n":"Бадьян хаджо","u":"кг","a":"22861","t":"p"},{"n":"Базилик красный свежий","u":"кг","a":"30027","t":"p"},{"n":"Баклажаны","u":"кг","a":"22873","t":"p"},{"n":"Баранина мякоть не очищенная","u":"кг","a":"17717","t":"p"},{"n":"Бобовые ростки","u":"кг","a":"18787","t":"p"},{"n":"Бобы эдамаме","u":"кг","a":"29652","t":"p"},{"n":"Булочка БАО 90 гр","u":"кг","a":"391530211276","t":"pf"},{"n":"Бумага рисовая 22см","u":"кг","a":"28344","t":"p"},{"n":"Васаби порошок","u":"кг","a":"30194","t":"p"},{"n":"Вино CHOYA Sake (0,75л)","u":"л","a":"17925","t":"p"},{"n":"Вино Rebelle, Blanc (0,75л)","u":"л","a":"391530195469","t":"p"},{"n":"Вино Красное для кухни","u":"л","a":"17113","t":"p"},{"n":"Вино Тбилиси Долины Грузии белое сухое","u":"л","a":"16367","t":"p"},{"n":"Вишня с/м","u":"кг","a":"29504","t":"p"},{"n":"Водоросли Вакаме","u":"кг","a":"29428","t":"p"},{"n":"Водоросли Комбу","u":"кг","a":"13255","t":"p"},{"n":"Водоросли Нори","u":"кг","a":"22244","t":"p"},{"n":"Водоросли Нори соленые","u":"кг","a":"29553","t":"p"},{"n":"Вонголе","u":"кг","a":"10459","t":"p"},{"n":"Глюкоза","u":"кг","a":"29609","t":"p"},{"n":"Говядина ВС Экстра зачищенная","u":"кг","a":"385929","t":"p"},{"n":"Говядина мякоть голень","u":"кг","a":"19057","t":"p"},{"n":"Говядина мякоть незачищенная","u":"кг","a":"18346","t":"p"},{"n":"Говяжий жир","u":"кг","a":"22896","t":"p"},{"n":"Говяжий фарш","u":"кг","a":"11473","t":"p"},{"n":"Говяжьи кости (суп набор)","u":"кг","a":"11148","t":"p"},{"n":"Горох","u":"кг","a":"12084","t":"p"},{"n":"Горошек зеленый с/м","u":"кг","a":"17141","t":"p"},{"n":"Горчица дижон зернистая","u":"кг","a":"16602","t":"p"},{"n":"Гречка","u":"кг","a":"19948","t":"p"},{"n":"Грибы вешенки","u":"кг","a":"11828","t":"p"},{"n":"Грибы древесные","u":"кг","a":"11795","t":"p"},{"n":"Грибы шампиньоны","u":"кг","a":"18565","t":"p"},{"n":"Грибы шитаки сухие","u":"кг","a":"22835","t":"p"},{"n":"Дайкон маринованный","u":"кг","a":"39145687","t":"p"},{"n":"Дайкон редька белая","u":"кг","a":"18686","t":"p"},{"n":"Джем алоэ","u":"кг","a":"13406","t":"p"},{"n":"Дрожжи сухие","u":"кг","a":"29429","t":"p"},{"n":"Желатин","u":"кг","a":"29983","t":"p"},{"n":"Жир фритюрный","u":"л","a":"30190","t":"p"},{"n":"Икра красная","u":"кг","a":"30189","t":"p"},{"n":"Икра Тобико","u":"кг","a":"20049","t":"p"},{"n":"Имбирь корень","u":"кг","a":"19686","t":"p"},{"n":"Имбирь маринованный","u":"кг","a":"11938","t":"p"},{"n":"Йогурт","u":"кг","a":"29867","t":"p"},{"n":"Кабачки св","u":"кг","a":"10561","t":"p"},{"n":"Кабачковая икра","u":"кг","a":"29313","t":"p"},{"n":"Кальмары кольца с/м","u":"кг","a":"22888","t":"p"},{"n":"Кансуй японская добавка к тесту","u":"кг","a":"39153012188","t":"p"},{"n":"Капуста белокачанная","u":"кг","a":"11145","t":"p"},{"n":"Капуста корейская кимчи","u":"кг","a":"29627","t":"p"},{"n":"Капуста пекинская","u":"кг","a":"21050","t":"p"},{"n":"Кардамон","u":"кг","a":"13601","t":"p"},{"n":"Картофель св","u":"кг","a":"13759","t":"p"},{"n":"Картофель фри 8*12 с/м (лодочки)","u":"кг","a":"13673","t":"p"},{"n":"Картофель фри McCain CRISPERS 2*5","u":"кг","a":"39150298","t":"p"},{"n":"Кетчуп томатный Heinz","u":"кг","a":"16522","t":"p"},{"n":"Кинза свежая","u":"кг","a":"17610","t":"p"},{"n":"Кинза сухая","u":"кг","a":"22809","t":"p"},{"n":"Клубника с/м","u":"кг","a":"20390","t":"p"},{"n":"Кокосовая стружка","u":"кг","a":"31776","t":"p"},{"n":"Кориандр сухой","u":"кг","a":"30166","t":"p"},{"n":"Корица палочка","u":"кг","a":"17552","t":"p"},{"n":"Крабовые палочки","u":"кг","a":"29463","t":"p"},{"n":"Краситель пищевой","u":"кг","a":"29542","t":"p"},{"n":"Крахмал кукурузный","u":"кг","a":"29452","t":"p"},{"n":"Крахмал топиоковый","u":"кг","a":"20745","t":"p"},{"n":"Креветки корол. с/м б/г 21/25","u":"кг","a":"29566","t":"p"},{"n":"Крупа манная","u":"кг","a":"29466","t":"p"},{"n":"Кукуруза консервированная стафф бондюэль","u":"кг","a":"29601","t":"p"},{"n":"Кукуруза початок с/м","u":"кг","a":"16657","t":"p"},{"n":"Кумин (зира)","u":"кг","a":"16760","t":"p"},{"n":"Кунжут с кимчи","u":"кг","a":"39145257","t":"p"},{"n":"Куриная окорочка копченая","u":"кг","a":"381245","t":"p"},{"n":"Куриное бедро без кости и без кожи","u":"кг","a":"20831","t":"p"},{"n":"Куриное филе","u":"кг","a":"11140","t":"p"},{"n":"Куриные крылья","u":"кг","a":"18408","t":"p"},{"n":"Куриные окорочка","u":"кг","a":"19032","t":"p"},{"n":"Куриный каркас","u":"кг","a":"383942","t":"p"},{"n":"Куркума","u":"кг","a":"30047","t":"p"},{"n":"Курт копченый","u":"кг","a":"18044","t":"p"},{"n":"Лайм","u":"кг","a":"13957","t":"p"},{"n":"Лапша рисовая","u":"кг","a":"29804","t":"p"},{"n":"Лапша фунчоза","u":"кг","a":"22832","t":"p"},{"n":"Лапша фунчоза стеклянная","u":"кг","a":"30135","t":"p"},{"n":"Лемонграсс","u":"кг","a":"29776","t":"p"},{"n":"Лимон св","u":"кг","a":"13992","t":"p"},{"n":"Лист Салата","u":"кг","a":"16218","t":"p"},{"n":"Листья лайма","u":"кг","a":"13258","t":"p"},{"n":"Лук жареный","u":"кг","a":"29936","t":"p"},{"n":"Лук зеленый","u":"кг","a":"12007","t":"p"},{"n":"Лук красный","u":"кг","a":"18661","t":"p"},{"n":"Лук репчатый","u":"кг","a":"13895","t":"p"},{"n":"Лук шалот","u":"кг","a":"14086","t":"p"},{"n":"Майонез","u":"кг","a":"29597","t":"p"},{"n":"Майонез Японский","u":"кг","a":"29527","t":"p"},{"n":"Макароны стафф","u":"кг","a":"29404","t":"p"},{"n":"Малина с/м","u":"кг","a":"29823","t":"p"},{"n":"Масло кунжутное","u":"л","a":"17827","t":"p"},{"n":"Масло подсолнечное рафинированное","u":"л","a":"29694","t":"p"},{"n":"Масло президент","u":"кг","a":"17090","t":"p"},{"n":"Масло сливочное","u":"кг","a":"29483","t":"p"},{"n":"Масло трюфельное","u":"кг","a":"13244","t":"p"},{"n":"Мед горный разнотравье","u":"кг","a":"387163","t":"p"},{"n":"Мидии на полустворке","u":"кг","a":"386367","t":"p"},{"n":"Молоко до 3,2%","u":"л","a":"12581","t":"p"},{"n":"Молоко кокосовое","u":"л","a":"30015","t":"p"},{"n":"Молоко сгущеное","u":"кг","a":"29883","t":"p"},{"n":"Молоко соевое","u":"л","a":"21426","t":"p"},{"n":"Морковь св","u":"кг","a":"16534","t":"p"},{"n":"Мука в/с","u":"кг","a":"29726","t":"p"},{"n":"Мука рисовая","u":"кг","a":"30150","t":"p"},{"n":"Мука темпура","u":"кг","a":"16342","t":"p"},{"n":"Мясо краба","u":"кг","a":"20217","t":"p"},{"n":"Мята свежая","u":"кг","a":"16891","t":"p"},{"n":"Овсяные хлопья","u":"кг","a":"30145","t":"p"},{"n":"Огурцы св","u":"кг","a":"14831","t":"p"},{"n":"Орех арахис очищенный","u":"кг","a":"16190","t":"p"},{"n":"П/ф Лепешка слоеная","u":"кг","a":"391530207922","t":"pf"},{"n":"П/ф Мусс авокадо","u":"кг","a":"391530207923","t":"pf"},{"n":"П/ф Фреш Имбирный (-75%) (ALL)","u":"л","a":"10189","t":"pf"},{"n":"Паста карри","u":"кг","a":"18063","t":"p"},{"n":"Паста Криспи Чили","u":"кг","a":"16423","t":"p"},{"n":"Паста мисо","u":"кг","a":"30048","t":"p"},{"n":"Паста перечная Кучуджан","u":"кг","a":"30103","t":"p"},{"n":"Паста Табаджан","u":"кг","a":"29691","t":"p"},{"n":"Паста Тамариндовая","u":"кг","a":"39147578","t":"p"},{"n":"Паста тахини","u":"кг","a":"29706","t":"p"},{"n":"Паста том ям","u":"кг","a":"18631","t":"p"},{"n":"Паста трюфельная","u":"кг","a":"22800","t":"p"},{"n":"Пектин","u":"кг","a":"29459","t":"p"},{"n":"Перец белый молотый","u":"кг","a":"14241","t":"p"},{"n":"Перец болгарский светофор (ЗЕЛЕНЫЙ)","u":"кг","a":"13279","t":"p"},{"n":"Перец болгарский светофор (КРАСНЫЙ)","u":"кг","a":"17630","t":"p"},{"n":"Перец душистый","u":"кг","a":"12904","t":"p"},{"n":"Перец кр. стручковый острый сушеный","u":"кг","a":"22906","t":"p"},{"n":"Перец полу горький (зеленый)","u":"кг","a":"18636","t":"p"},{"n":"Перец сычуаньский","u":"кг","a":"20777","t":"p"},{"n":"Перец халапеньо консервированный","u":"кг","a":"29862","t":"p"},{"n":"Перец черный горошек","u":"кг","a":"16554","t":"p"},{"n":"Перец черный молотый","u":"кг","a":"14633","t":"p"},{"n":"Перец Чили Зеленый свежий","u":"кг","a":"18654","t":"p"},{"n":"Перец Чили Красный свежий","u":"кг","a":"11704","t":"p"},{"n":"Перец чили острый хлопья","u":"кг","a":"22890","t":"p"},{"n":"Перчик китайский с арахисом","u":"кг","a":"391530201328","t":"p"},{"n":"Печенье BISCOFF карамельное LOTUS","u":"шт","a":"378328","t":"p"},{"n":"Помидоры черри","u":"кг","a":"18894","t":"p"},{"n":"Приправа дашидо","u":"кг","a":"32427","t":"p"},{"n":"Приправа для курицы","u":"кг","a":"11579","t":"p"},{"n":"Приправа карри","u":"кг","a":"29395","t":"p"},{"n":"Приправа смесь 15 перцев","u":"кг","a":"14529","t":"p"},{"n":"Приправа Фурикаки","u":"кг","a":"39146065","t":"p"},{"n":"Приправа хондаши","u":"кг","a":"25135","t":"p"},{"n":"ПФ Авокадо очищенное (-45%) (ALL)","u":"кг","a":"20050","t":"pf"},{"n":"Пф Алоэ-майо","u":"кг","a":"391530210927","t":"pf"},{"n":"пф база на мисо суп (ЛЮ)","u":"кг","a":"381642","t":"pf"},{"n":"Пф База на Рамен","u":"кг","a":"391530215149","t":"pf"},{"n":"Пф База на тирамису","u":"кг","a":"39153021230869","t":"pf"},{"n":"Пф База семифредо","u":"кг","a":"391530201918","t":"pf"},{"n":"Пф База том ям New","u":"кг","a":"39153019615","t":"pf"},{"n":"Пф Базилик зеленый листья (-50%) (ALL)","u":"кг","a":"20865","t":"pf"},{"n":"ПФ Базилик зеленый литья -50% ALL","u":"кг","a":"10343","t":"pf"},{"n":"Пф Базилик Зеленый свежий (-25%) (ALL)","u":"кг","a":"10636","t":"pf"},{"n":"пф базилик красный свежий (-20%) (ALL)","u":"кг","a":"39147001","t":"pf"},{"n":"Пф Базилик красный свежий листья (-50%) (ALL)","u":"кг","a":"21047","t":"pf"},{"n":"Пф Баклажаны (-10%) (ALL)","u":"кг","a":"18014","t":"pf"},{"n":"Пф Бао дзы 1шт","u":"шт","a":"391530212602","t":"pf"},{"n":"Пф Бедро куриное маринованное","u":"кг","a":"389224","t":"pf"},{"n":"Пф бедро маринованное на коже","u":"кг","a":"391530210970","t":"pf"},{"n":"Пф Бедро маринованное с кожей","u":"кг","a":"391530201913","t":"pf"},{"n":"Пф Бедро маринованное Саид","u":"кг","a":"39153018154","t":"pf"},{"n":"Пф Битые огурцы","u":"кг","a":"389234","t":"pf"},{"n":"Пф Бобовые ростки (-17%)","u":"кг","a":"39148548","t":"pf"},{"n":"Пф Булочка БАО","u":"кг","a":"389226","t":"pf"},{"n":"пф бульон водоросли (ЛЮ)2","u":"кг","a":"23658","t":"pf"},{"n":"Пф Бульон говяжий из голени","u":"кг","a":"39153019694","t":"pf"},{"n":"Пф Бульон Даши","u":"кг","a":"391530201919","t":"pf"},{"n":"Пф Бульон копченый","u":"кг","a":"39153014838","t":"pf"},{"n":"Пф Бульон на кимчи","u":"кг","a":"391530210969","t":"pf"},{"n":"Пф Бульон на Рамен","u":"л","a":"391530215148","t":"pf"},{"n":"Пф Бульон на Фобо","u":"л","a":"391530214245","t":"pf"},{"n":"пф бульон рыбный NEW(ЛЮ)","u":"л","a":"386236","t":"pf"},{"n":"Пф Бульон том ям LY","u":"кг","a":"39153012198","t":"pf"},{"n":"Пф Бульон Фо-бо","u":"кг","a":"39146433","t":"pf"},{"n":"пф васаби пюре (ЛЮ)","u":"кг","a":"13159","t":"pf"},{"n":"Пф Васаби шисо дресинг","u":"кг","a":"391530216237","t":"pf"},{"n":"Пф Вешенки (-27%)","u":"кг","a":"39153018471","t":"pf"},{"n":"пф вонголе (-35%) ALL","u":"кг","a":"33320","t":"pf"},{"n":"ПФ вонголе (45%)","u":"кг","a":"391530215066","t":"pf"},{"n":"Пф Вонтоны говядина-джусай 1","u":"шт","a":"391530213101","t":"pf"},{"n":"Пф Вонтоны с креветками (1шт)","u":"шт","a":"39153017947","t":"pf"},{"n":"Пф Вонтоны с креветкой 1шт LY","u":"шт","a":"39153012429","t":"pf"},{"n":"Пф Ганаш шоколадный","u":"кг","a":"39153021230870","t":"pf"},{"n":"Пф Гедзе с курицей 1","u":"шт","a":"39153021229352","t":"pf"},{"n":"Пф Говядина голень","u":"кг","a":"39153019693","t":"pf"},{"n":"Пф Говядина марин (ЛЮ)","u":"кг","a":"381643","t":"pf"},{"n":"Пф Говядина марин.бульгоги","u":"кг","a":"391530215755","t":"pf"},{"n":"Пф Говядина маринованная на салат","u":"кг","a":"391530216703","t":"pf"},{"n":"Пф Говядина отварная NEW","u":"кг","a":"391530214248","t":"pf"},{"n":"Пф Голень отварная","u":"кг","a":"39153019695","t":"pf"},{"n":"Пф Голень томленая","u":"кг","a":"391530198413","t":"pf"},{"n":"Пф Грибы вешенки (-15%) (ALL)","u":"кг","a":"12041","t":"pf"},{"n":"ПФ Грибы древесные вымоченные (L)","u":"кг","a":"20134","t":"pf"},{"n":"Пф Грибы шампиньоны (-10%) (ALL)","u":"кг","a":"18191","t":"pf"},{"n":"Пф Дайкон кошеу","u":"кг","a":"391530216239","t":"pf"},{"n":"Пф Дамплинг с говядиной и тофу 1шт","u":"шт","a":"391530195356","t":"pf"},{"n":"Пф Дамплинги из говядина на пару 1шт","u":"шт","a":"391530212599","t":"pf"},{"n":"Пф Дамплинги креветки -джусай","u":"шт","a":"391530215068","t":"pf"},{"n":"Пф Дамплинги с говядиной LY 1шт","u":"шт","a":"39153017086","t":"pf"},{"n":"Пф Дамплинги с говядиной мини -1шт","u":"шт","a":"391530202791","t":"pf"},{"n":"Пф Дамплинги с креветками и шитаке","u":"шт","a":"391530210925","t":"pf"},{"n":"Пф Дамплинги с курицей и фунчезой 1шт","u":"шт","a":"391530195357","t":"pf"},{"n":"Пф Дрессинг васаби понзу","u":"кг","a":"391530209234","t":"pf"},{"n":"Пф Дрессинг тайский","u":"кг","a":"391530216705","t":"pf"},{"n":"Пф Желатин куриный","u":"кг","a":"391530195352","t":"pf"},{"n":"Пф Заправка на зеленый салат","u":"кг","a":"391530216439","t":"pf"},{"n":"ПФ Заправка на окрошку","u":"кг","a":"39153017397","t":"pf"},{"n":"Пф Заправка ореховая","u":"кг","a":"391530211673","t":"pf"},{"n":"Пф Заправка соевая","u":"кг","a":"391530210339","t":"pf"},{"n":"пф икра тобика (-7%)ЛЮ","u":"кг","a":"24278","t":"pf"},{"n":"Пф Имбирь корень (-25%) (ALL)","u":"кг","a":"11878","t":"pf"},{"n":"пф имбирь корень (-25%) ALL","u":"кг","a":"20806","t":"pf"},{"n":"Пф Кабачки св (-10%) (ALL)","u":"кг","a":"20423","t":"pf"},{"n":"Пф Кальмары кольца","u":"кг","a":"3912398","t":"pf"},{"n":"Пф Капуста белокачанная (-25%) (ALL)","u":"кг","a":"13402","t":"pf"},{"n":"Пф капуста кимчи (-15%)","u":"кг","a":"3913363","t":"pf"},{"n":"Пф Капуста пекинская (-33%) (ALL)","u":"кг","a":"14291","t":"pf"},{"n":"ПФ Капуста с цыпленком(О)","u":"порц","a":"391530214531","t":"pf"},{"n":"Пф Карри зеленый","u":"кг","a":"391530216725","t":"pf"},{"n":"Пф Картофель (-30%) (ALL)","u":"кг","a":"13433","t":"pf"},{"n":"пф ким чи выжатая (-30%) ЛЮ","u":"кг","a":"39153012080","t":"pf"},{"n":"пф ким чи выжатая (-33%) ЛЮ","u":"кг","a":"27815","t":"pf"},{"n":"Пф Кимчи new","u":"кг","a":"39153010063","t":"pf"},{"n":"пф кинза листья (-60%) (ALL)","u":"кг","a":"384285","t":"pf"},{"n":"Пф Кинза свежая (-30%) (ALL)","u":"кг","a":"20940","t":"pf"},{"n":"ПФ Кляр темпурный (ЛЮ)","u":"кг","a":"10882","t":"pf"},{"n":"Пф Котлета куриная","u":"кг","a":"391530212385","t":"pf"},{"n":"Пф Котлета на бургер","u":"кг","a":"39153013549","t":"pf"},{"n":"Пф Краб снежный (-20%) ЛЮ","u":"кг","a":"20296","t":"pf"},{"n":"Пф Крабовый микс","u":"кг","a":"39153015268","t":"pf"},{"n":"Пф Креветка Тар-тар","u":"кг","a":"391530197559","t":"pf"},{"n":"пф креветки 21*25 отварные на суши (ЛЮ)2","u":"кг","a":"25241","t":"pf"},{"n":"ПФ Креветки 21*25 очищеные (-21%) (ЛЮ)","u":"кг","a":"391530203733","t":"pf"},{"n":"ПФ Креветки 21*25 очищеные (-23%) (ЛЮ)","u":"кг","a":"391530203737","t":"pf"},{"n":"Пф Крем алоэ","u":"кг","a":"391530202076","t":"pf"},{"n":"Пф Крем васаби","u":"кг","a":"39153017945","t":"pf"},{"n":"Пф Крем из маскарпоне","u":"кг","a":"391530216436","t":"pf"},{"n":"Пф Крем клубничный","u":"кг","a":"39153021227453","t":"pf"},{"n":"Пф Крем матча","u":"кг","a":"391530202075","t":"pf"},{"n":"Пф Крем на пончики","u":"кг","a":"391530214472","t":"pf"},{"n":"ПФ Крем павлова КФТ","u":"кг","a":"39145395","t":"pf"},{"n":"Пф Крем с финиками","u":"кг","a":"391530200266","t":"pf"},{"n":"Пф Крем тирамису","u":"кг","a":"39153021230871","t":"pf"},{"n":"Пф Креметте с трюфелем","u":"кг","a":"391530210971","t":"pf"},{"n":"ПФ Крылья зач. (-21%)","u":"кг","a":"39151107","t":"pf"},{"n":"Пф Крылья куриные маринованные","u":"кг","a":"39153014823","t":"pf"},{"n":"ПФ куринные крылья Светлана -18,6%","u":"кг","a":"388119","t":"pf"},{"n":"Пф Куриное бедро (-18%)","u":"кг","a":"3915300541","t":"pf"},{"n":"Пф Куриное бедро без кожи (-15%)","u":"кг","a":"39148736","t":"pf"},{"n":"Пф Куриное филе (-15%) (ALL)","u":"кг","a":"20711","t":"pf"},{"n":"ПФ куриное филе Атырау","u":"кг","a":"39153021227320","t":"pf"},{"n":"Пф Куриное филе маринованное","u":"кг","a":"39153021229569","t":"pf"},{"n":"Пф Куриные крылья (-15%) (ALL)","u":"кг","a":"20214","t":"pf"},{"n":"Пф Куриные крылья (7%) (СС)","u":"кг","a":"39153021229490","t":"pf"},{"n":"Пф Куриные крылья маринованные","u":"кг","a":"391530198892","t":"pf"},{"n":"Пф Куриные стрипсы","u":"кг","a":"391530212384","t":"pf"},{"n":"Пф Курица маринованная Саид","u":"кг","a":"39153019613","t":"pf"},{"n":"Пф Лазджан","u":"кг","a":"39153014845","t":"pf"},{"n":"Пф Лазджан майо","u":"кг","a":"391530203627","t":"pf"},{"n":"Пф Лайм-СОК (-60%) (ALL)","u":"л","a":"27733","t":"pf"},{"n":"Пф Лапша на утку","u":"кг","a":"391530199381","t":"pf"},{"n":"Пф Лапша рисовая отварная (ЛЮ)","u":"кг","a":"380055","t":"pf"},{"n":"Пф Лук зеленый (-20%) (ALL)","u":"кг","a":"12214","t":"pf"},{"n":"Пф Лук карамель","u":"кг","a":"391530213099","t":"pf"},{"n":"Пф Лук карри","u":"кг","a":"39153017983","t":"pf"},{"n":"ПФ лук красный (-20%) (ALL)","u":"кг","a":"15037","t":"pf"},{"n":"Пф Лук красный (зачистка LY)","u":"кг","a":"390994","t":"pf"},{"n":"Пф Лук маринованный красный new","u":"кг","a":"39153019687","t":"pf"},{"n":"Пф Лук репчатый (-20%) (ALL)","u":"кг","a":"18122","t":"pf"},{"n":"Пф Луковая лепешка","u":"шт","a":"39153021229564","t":"pf"},{"n":"Пф Майнез трюфельный","u":"кг","a":"391530209236","t":"pf"},{"n":"Пф Майонез Кочуджан","u":"кг","a":"389236","t":"pf"},{"n":"ПФ мак AR","u":"кг","a":"39151600","t":"pf"},{"n":"Пф Малиновое кюли","u":"кг","a":"391530202074","t":"pf"},{"n":"Пф Манго курт","u":"кг","a":"391530216437","t":"pf"},{"n":"Пф Маринад для огурцов","u":"кг","a":"39153017976","t":"pf"},{"n":"Пф Маринад для риса Саид","u":"кг","a":"39153015266","t":"pf"},{"n":"Пф Маринад на овощи","u":"кг","a":"3912512","t":"pf"},{"n":"ПФ маринованные кабачки (Р)","u":"кг","a":"39153021231833","t":"pf"},{"n":"Пф Маринованные огурцы новые","u":"кг","a":"39153019688","t":"pf"},{"n":"Пф Маринованные яйца аджимата","u":"шт","a":"390993","t":"pf"},{"n":"Пф Масло мисо","u":"кг","a":"391530200391","t":"pf"},{"n":"Пф Масло пряное","u":"кг","a":"39153012372","t":"pf"},{"n":"Пф Масло сычуаньское","u":"кг","a":"391530200943","t":"pf"},{"n":"Пф Масло чесночное LY","u":"кг","a":"39153011726","t":"pf"},{"n":"Пф Масса желатиновая","u":"кг","a":"39153015379","t":"pf"},{"n":"Пф Мидии на полустворке","u":"кг","a":"39153021230169","t":"pf"},{"n":"Пф Микс гарнир","u":"кг","a":"391530216729","t":"pf"},{"n":"ПФ Морковный фрешь -85% JS","u":"л","a":"39149290","t":"pf"},{"n":"Пф Морковь отварная (-26%) (ALL)","u":"кг","a":"18397","t":"pf"},{"n":"Пф Морковь св (-25%) (ALL)","u":"кг","a":"12920","t":"pf"},{"n":"ПФ морковь св -25% ALL","u":"кг","a":"10643","t":"pf"},{"n":"Пф Мука панировочная","u":"кг","a":"39153021228872","t":"pf"},{"n":"Пф Мята свежая (-55%) (ALL)","u":"кг","a":"391530211424","t":"pf"},{"n":"Пф Мята свежая (-7%) (ALL)","u":"кг","a":"11225","t":"pf"},{"n":"Пф Начинка из тунца","u":"кг","a":"39153021230867","t":"pf"},{"n":"Пф Начинка на бао дзы","u":"кг","a":"391530212600","t":"pf"},{"n":"Пф Начинка на гедзе","u":"кг","a":"39153021229351","t":"pf"},{"n":"Пф Начинка на сянбин","u":"кг","a":"391530216727","t":"pf"},{"n":"пф овощи соломкой (ЛЮ)","u":"кг","a":"12927","t":"pf"},{"n":"Пф Огурец без семян","u":"кг","a":"389233","t":"pf"},{"n":"Пф Огурцы без кожуры (-25%) (ALL)","u":"кг","a":"20116","t":"pf"},{"n":"Пф Огурцы без семян (-46%) (ALL)","u":"кг","a":"39153013091","t":"pf"},{"n":"Пф Огурцы маринованные шисо-васаби","u":"кг","a":"391530209235","t":"pf"},{"n":"пф огурцы на суши (-50%) (ЛЮ)2","u":"кг","a":"23061","t":"pf"},{"n":"ПФ Огурцы св (-12%)","u":"кг","a":"15190","t":"pf"},{"n":"Пф Огурцы св (-12%) (ALL)","u":"кг","a":"20743","t":"pf"},{"n":"пф огурцы св без кожуры (-35%) ALL","u":"кг","a":"11965","t":"pf"},{"n":"Пф Омлет тамаго","u":"кг","a":"391530214188","t":"pf"},{"n":"пф основа на мисо суп (ЛЮ)2","u":"кг","a":"26160","t":"pf"},{"n":"Пф Панировка для крыльев","u":"кг","a":"39153014827","t":"pf"},{"n":"ПФ Пельмени","u":"шт","a":"39153013826","t":"pf"},{"n":"Пф Пельмени китайские","u":"шт","a":"39153021229611","t":"pf"},{"n":"Пф Перец болгарск.светофор(3 вида)(-25%) (ALL)","u":"кг","a":"17196","t":"pf"},{"n":"Пф Перец болгарск.светофор(ЖЕЛТЫЙ)(-25%) (ALL)","u":"кг","a":"13101","t":"pf"},{"n":"Пф Перец болгарск.светофор(ЗЕЛЕНЫЙ)(-25%) (ALL)","u":"кг","a":"14794","t":"pf"},{"n":"Пф Перец болгарск.светофор(КРАСНЫЙ)(-25%) (ALL)","u":"кг","a":"13125","t":"pf"},{"n":"пф перец болгарский светоф. 3 вида (-25%) ALL","u":"кг","a":"20317","t":"pf"},{"n":"Пф Перец болгарский светофор (-20%) (ALL)","u":"кг","a":"21286","t":"pf"},{"n":"пф перец полугоркий (зеленый) (-25%) (В)","u":"кг","a":"29799","t":"pf"},{"n":"Пф Перец Чили Зеленый свежий (-16%) (ALL)","u":"кг","a":"11544","t":"pf"},{"n":"Пф перец чили зленый (-50%)ALL","u":"кг","a":"3913892","t":"pf"},{"n":"Пф Перец Чили Красный свежий (-16%) (ALL)","u":"кг","a":"19139","t":"pf"},{"n":"Пф Помадка","u":"кг","a":"391530212143","t":"pf"},{"n":"пф помидоры черри (-5%) (ALL)","u":"кг","a":"19911","t":"pf"},{"n":"Пф Посыпка на картофель фри","u":"кг","a":"391044","t":"pf"},{"n":"ПФ Приправа панко китайский (ЛЮ)","u":"кг","a":"15315","t":"pf"},{"n":"Пф Пропитка на тирамису","u":"кг","a":"39153021230868","t":"pf"},{"n":"ПФ Риет (Боч)","u":"кг","a":"388285","t":"pf"},{"n":"Пф Рис для суши с маринадом Саид","u":"кг","a":"39153015357","t":"pf"},{"n":"Пф Рис для суши Саид","u":"кг","a":"39153015265","t":"pf"},{"n":"Пф Рис жасмин","u":"кг","a":"390985","t":"pf"},{"n":"Пф Рыба филе семга на шкуре с/м (-7%) (ALL)","u":"кг","a":"21029","t":"pf"},{"n":"Пф Салат Микс (-5%) (ALL)","u":"кг","a":"17665","t":"pf"},{"n":"Пф Салат микс LY","u":"кг","a":"391530216704","t":"pf"},{"n":"Пф Сельдерей стебель (-15%) (ALL)","u":"кг","a":"18544","t":"pf"},{"n":"Пф Семга маринованная","u":"кг","a":"391530202581","t":"pf"},{"n":"пф семга просоленная (ЛЮ)","u":"кг","a":"380943","t":"pf"},{"n":"пф семга филе без кожи (-11%) ЛЮ","u":"кг","a":"386446","t":"pf"},{"n":"пф семга филе без кожи (-12%) ЛЮ","u":"кг","a":"39153012786","t":"pf"},{"n":"ПФ Смесь для риса суши (ЛЮ)","u":"л","a":"18794","t":"pf"},{"n":"Пф Смесь на гедзе","u":"кг","a":"39153021229610","t":"pf"},{"n":"Пф Соус биск","u":"кг","a":"391530199762","t":"pf"},{"n":"Пф Соус из тамаринда","u":"кг","a":"391530216728","t":"pf"},{"n":"Пф Соус йогуртовый","u":"кг","a":"391530213097","t":"pf"},{"n":"пф соус к стекляной лапше (ЛЮ)","u":"кг","a":"11336","t":"pf"},{"n":"пф соус кальби (ЛЮ)","u":"кг","a":"12883","t":"pf"},{"n":"Пф Соус карри","u":"кг","a":"39153018740","t":"pf"},{"n":"Пф Соус Кун Лу","u":"кг","a":"39153009584","t":"pf"},{"n":"Пф Соус лазджан-димсам","u":"кг","a":"391530195611","t":"pf"},{"n":"Пф Соус Масага","u":"кг","a":"39153015269","t":"pf"},{"n":"Пф Соус Мисо майонез","u":"кг","a":"391530210972","t":"pf"},{"n":"Пф Соус на баклажаны","u":"кг","a":"391530197001","t":"pf"},{"n":"ПФ Соус на дамплинги из говядина LY","u":"кг","a":"12168","t":"pf"},{"n":"пф соус на димпсамы (ЛЮ)","u":"кг","a":"385209","t":"pf"},{"n":"пф соус на древесные грибы (ЛЮ)","u":"кг","a":"381645","t":"pf"},{"n":"Пф Соус на креветки","u":"кг","a":"391530208977","t":"pf"},{"n":"Пф Соус на крылья","u":"кг","a":"391530205982","t":"pf"},{"n":"ПФ Соус на лапшу 3 (ЛЮ)","u":"кг","a":"381644","t":"pf"},{"n":"Пф Соус на Пад Тай","u":"кг","a":"391530198897","t":"pf"},{"n":"пф соус на хрус баклажаны (ЛЮ)","u":"кг","a":"11218","t":"pf"},{"n":"Пф Соус остро-сладкий","u":"кг","a":"391530201915","t":"pf"},{"n":"Пф Соус Понзу LY","u":"кг","a":"391530202647","t":"pf"},{"n":"ПФ Соус Саке (ЛЮ)","u":"кг","a":"13651","t":"pf"},{"n":"Пф Соус Самбал","u":"кг","a":"39153021228460","t":"pf"},{"n":"пф соус соевый для гостей (ЛЮ)2","u":"кг","a":"24356","t":"pf"},{"n":"Пф Соус Спайси Саид","u":"кг","a":"39153015270","t":"pf"},{"n":"пф соус унаги (ЛЮ)2","u":"кг","a":"23277","t":"pf"},{"n":"Пф Соус Чили","u":"кг","a":"391530201351","t":"pf"},{"n":"Пф Страчателла","u":"кг","a":"391530215756","t":"pf"},{"n":"Пф Сыр Грана Падано (-18%) (ALL)","u":"кг","a":"10757","t":"pf"},{"n":"ПФ сыр греческий Светлана","u":"кг","a":"389464","t":"pf"},{"n":"Пф Сыр Ден чиз","u":"кг","a":"3912463","t":"pf"},{"n":"ПФ Тесто для лагмана отварное (ЛЮ)","u":"кг","a":"18439","t":"pf"},{"n":"Пф Тесто моти New","u":"кг","a":"39153015384","t":"pf"},{"n":"Пф Тесто на бао","u":"кг","a":"39153017173","t":"pf"},{"n":"Пф Тесто на бао дзы","u":"кг","a":"391530212601","t":"pf"},{"n":"Пф Тесто на вонтоны","u":"кг","a":"39153014843","t":"pf"},{"n":"пф тесто на димсамы (ЛЮ)","u":"кг","a":"385207","t":"pf"},{"n":"Пф Тесто на лапшу","u":"кг","a":"39153014840","t":"pf"},{"n":"ПФ Тесто на лапшу и дамплинг (ЛЮ)","u":"кг","a":"12513","t":"pf"},{"n":"Пф Тесто на пельмени","u":"кг","a":"39153021229567","t":"pf"},{"n":"Пф Тесто на пончики","u":"кг","a":"391530214471","t":"pf"},{"n":"Пф Тесто на сямбин","u":"кг","a":"391530216726","t":"pf"},{"n":"Пф Тирамису","u":"кг","a":"39153021230872","t":"pf"},{"n":"пф томатный конкасе Саид","u":"кг","a":"39151186","t":"pf"},{"n":"пф тоннато соус Саид","u":"кг","a":"39151185","t":"pf"},{"n":"Пф Тунец (-10%)","u":"кг","a":"39153018060","t":"pf"},{"n":"пф угорь (-23%) ЛЮ","u":"кг","a":"22693","t":"pf"},{"n":"Пф Угорь (-35%)","u":"кг","a":"391530199287","t":"pf"},{"n":"Пф Угорь (-40%)","u":"кг","a":"391530201492","t":"pf"},{"n":"Пф Фарш говядина-джусай","u":"кг","a":"391530213100","t":"pf"},{"n":"Пф Фарш говяжий (5%)","u":"кг","a":"39146417","t":"pf"},{"n":"Пф Фарш говяжий тофу","u":"кг","a":"391530195353","t":"pf"},{"n":"Пф Фарш из утки","u":"кг","a":"391530202378","t":"pf"},{"n":"Пф Фарш креветка LY","u":"кг","a":"3914393","t":"pf"},{"n":"Пф Фарш креветочный LY new","u":"кг","a":"39153017942","t":"pf"},{"n":"Пф Фарш куриный с фунчезой","u":"кг","a":"391530195354","t":"pf"},{"n":"Пф Фарш луковый на лепешку","u":"кг","a":"39153021229563","t":"pf"},{"n":"Пф Фарш на вонтоны","u":"кг","a":"39153014837","t":"pf"},{"n":"Пф фарш на дамплинги из говядины","u":"кг","a":"39153017085","t":"pf"},{"n":"Пф Фарш на пельмени","u":"кг","a":"39153021229566","t":"pf"},{"n":"Пф Фарш на сянбин говядина","u":"кг","a":"39153021228489","t":"pf"},{"n":"Пф Фарш с креветками и имбирем","u":"кг","a":"391530208976","t":"pf"},{"n":"пф фасоль стручковый св (-2%) ALL","u":"кг","a":"3912223","t":"pf"},{"n":"пф фунчеза стеклянная отварная (ЛЮ)","u":"кг","a":"12205","t":"pf"},{"n":"пф черри жареные","u":"кг","a":"3915296901","t":"pf"},{"n":"Пф Чеснок св (-22%) (ALL)","u":"кг","a":"19572","t":"pf"},{"n":"Пф Чизкейк","u":"порц","a":"391530207921","t":"pf"},{"n":"ПФ Чипсы картофельные (ЛЮ)","u":"кг","a":"19797","t":"pf"},{"n":"Пф Чукка","u":"кг","a":"3913825","t":"pf"},{"n":"Пф Шиитаки маринованные","u":"кг","a":"391530200076","t":"pf"},{"n":"Пф Шпинат (-40%) (ALL)","u":"кг","a":"18775","t":"pf"},{"n":"Пф Шпинат маринованный","u":"кг","a":"391530213098","t":"pf"},{"n":"ПФ шпинат св (5%) Атырау","u":"кг","a":"391530204911","t":"pf"},{"n":"ПФ Шпинат св -46% ALL","u":"кг","a":"10092","t":"pf"},{"n":"Пф Щечки","u":"кг","a":"391530203626","t":"pf"},{"n":"Пюре манго (Mango puree)","u":"кг","a":"22833","t":"p"},{"n":"Пюре маракуйя","u":"кг","a":"29693","t":"p"},{"n":"Разрыхлитель для теста","u":"кг","a":"13334","t":"p"},{"n":"Рис для суши","u":"кг","a":"30007","t":"p"},{"n":"Рис жасмин","u":"кг","a":"30279","t":"p"},{"n":"Рыба голова семги","u":"кг","a":"19742","t":"p"},{"n":"Рыба семга тушка охл","u":"кг","a":"24686","t":"p"},{"n":"Рыба сибас с/м","u":"шт","a":"22806","t":"p"},{"n":"Рыба филе семга на шкуре с/м","u":"кг","a":"22807","t":"p"},{"n":"Салат Микс","u":"кг","a":"13552","t":"p"},{"n":"Салат чукка","u":"кг","a":"29445","t":"p"},{"n":"Сахар песок","u":"кг","a":"30182","t":"p"},{"n":"Сахар тростниковый","u":"кг","a":"13710","t":"p"},{"n":"Сельдерей стебель","u":"кг","a":"21002","t":"p"},{"n":"Семена кунжутные","u":"кг","a":"12479","t":"p"},{"n":"Сироп Бузина Sk bar","u":"л","a":"380784","t":"p"},{"n":"Сироп Глюкозный","u":"л","a":"39152387","t":"p"},{"n":"Сливки взбитые в баллонах","u":"кг","a":"16795","t":"p"},{"n":"Сливки не сладкие до 35%","u":"л","a":"30149","t":"p"},{"n":"Сливки растительные","u":"л","a":"29309","t":"p"},{"n":"Сода пищевая","u":"кг","a":"30122","t":"p"},{"n":"Сок юдзу","u":"л","a":"25144","t":"p"},{"n":"Соль крупная","u":"кг","a":"11892","t":"p"},{"n":"Соль морская","u":"кг","a":"14016","t":"p"},{"n":"Соус QP юдзу","u":"л","a":"31569","t":"p"},{"n":"Соус Бульгоги","u":"кг","a":"30185","t":"p"},{"n":"Соус ворчестер","u":"л","a":"11236","t":"p"},{"n":"Соус Кимчи","u":"л","a":"29513","t":"p"},{"n":"Соус кисло-сладкий AROY-D","u":"кг","a":"39153018175","t":"p"},{"n":"Соус кунжутный","u":"л","a":"25744","t":"p"},{"n":"Соус Мирин","u":"л","a":"30114","t":"p"},{"n":"Соус Рыбный","u":"л","a":"29645","t":"p"},{"n":"Соус сладкий чили","u":"кг","a":"25798","t":"p"},{"n":"Соус соевый Киккоман","u":"л","a":"22887","t":"p"},{"n":"Соус соевый Китайский (1,72л)","u":"л","a":"30070","t":"p"},{"n":"Соус Соевый сладкий","u":"кг","a":"391530202286","t":"p"},{"n":"Соус сырный","u":"л","a":"29508","t":"p"},{"n":"Соус терияки","u":"л","a":"30066","t":"p"},{"n":"Соус Тонкацу","u":"кг","a":"29458","t":"p"},{"n":"Соус устричный","u":"л","a":"29547","t":"p"},{"n":"Соус Хой Син","u":"л","a":"29833","t":"p"},{"n":"Соус шисо","u":"кг","a":"31157","t":"p"},{"n":"Соус Шрирача","u":"кг","a":"30200","t":"p"},{"n":"Специи тогараши","u":"кг","a":"11228","t":"p"},{"n":"Стружка тунца","u":"кг","a":"12542","t":"p"},{"n":"Сухари панировочные Панко","u":"кг","a":"30125","t":"p"},{"n":"Сыр Грана Падано","u":"кг","a":"14212","t":"p"},{"n":"Сыр Маскарпоне","u":"кг","a":"29963","t":"p"},{"n":"Сыр Сулугуни","u":"кг","a":"12356","t":"p"},{"n":"Сыр творожный DenCheese","u":"кг","a":"30242","t":"p"},{"n":"Сыр Тофу","u":"кг","a":"11223","t":"p"},{"n":"Сыр Чеддер слайсы хохланд","u":"кг","a":"387162","t":"p"},{"n":"Томатная паста","u":"кг","a":"29414","t":"p"},{"n":"Тунец консервированный","u":"кг","a":"29520","t":"p"},{"n":"Тунец с/м","u":"кг","a":"13270","t":"p"},{"n":"Угорь жареный \"унаги\"","u":"кг","a":"11915","t":"p"},{"n":"Уксус китайский ЮН","u":"л","a":"18617","t":"p"},{"n":"Уксус красный винный","u":"л","a":"30161","t":"p"},{"n":"Уксус мицукан","u":"л","a":"12483","t":"p"},{"n":"Уксусная кислота 70%","u":"л","a":"16135","t":"p"},{"n":"Усилитель вкуса (кристаллики)","u":"кг","a":"18488","t":"p"},{"n":"Утка окорочка","u":"кг","a":"17115","t":"p"},{"n":"Фарш креветки шитаке","u":"кг","a":"391530210924","t":"pf"},{"n":"Фасоль стручковая св","u":"кг","a":"17733","t":"p"},{"n":"Хлеб бородинский","u":"кг","a":"17393","t":"p"},{"n":"Циновка (коврик для суши)","u":"шт","a":"377735","t":"p"},{"n":"Чай зеленый матча","u":"кг","a":"29733","t":"p"},{"n":"Чай матча голубой","u":"кг","a":"16525","t":"p"},{"n":"Чеснок св","u":"кг","a":"19419","t":"p"},{"n":"Чеснок св очищенный","u":"кг","a":"23226","t":"p"},{"n":"Чесночные стрелки","u":"кг","a":"13574","t":"p"},{"n":"Шоколад белый плитка","u":"кг","a":"16337","t":"p"},{"n":"Шпинат св.","u":"кг","a":"29683","t":"p"},{"n":"Эконом (для чистки овощей)","u":"шт","a":"19665","t":"p"},{"n":"Яйцо куриное","u":"шт","a":"18013","t":"p"}];
+// ---------- СЕРВЕР (Google Таблица через Apps Script) ----------
+const API_URL = 'https://script.google.com/macros/s/AKfycbxj4TAtOy6x_6TBDqT_brJi27ochNtCfD4BjdJV-yYNTflKVGw_ga4jHkcNrzThqUlf/exec';
+async function apiGet(action){
+  const r = await fetch(API_URL + '?action=' + encodeURIComponent(action) + '&t=' + Date.now());
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error || 'Ошибка сервера');
+  return j;
+}
+async function apiPost(payload){
+  const r = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+  const j = await r.json();
+  if(!j.ok){ const e = new Error(j.error || 'Ошибка сервера'); e.auth = (j.auth===false); throw e; }
+  return j;
+}
+function getAdminCode(){ try{ return (JSON.parse(localStorage.getItem('cookUser')||'null')||{}).code || ''; }catch(e){ return ''; } }
+function handleAdminErr(e){
+  if(e && e.auth){
+    alert('Код администратора изменился или неверный. Войдите заново.');
+    try{ localStorage.removeItem('cookUser'); }catch(_){}
+    location.reload();
+    return;
+  }
+  alert('Не удалось сохранить: ' + (e && e.message ? e.message : 'нет связи'));
+}
+
+let DISHES = DISHES_SEED;
+try{
+  const cached = JSON.parse(localStorage.getItem('dishesCache')||'null');
+  if(Array.isArray(cached) && cached.length) DISHES = cached;
+}catch(e){}
+const STATIONS = ['Все станции','Вок','Горячий цех','Суши станция'];
+const TYPES = ['Всё','Блюда','Заготовки'];
+
+function fmtQty(unit, value){
+  if(unit==='кг') return Math.round(value*1000) + ' г';
+  if(unit==='л') return Math.round(value*1000) + ' мл';
+  return (Number.isInteger(value)?value:value) + ' ' + unit;
+}
+function esc(s){ const d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; }
+
+// ---------- TABS ----------
+let quizInProgress = false;
+document.getElementById('tabStudy').onclick = ()=>{
+  if(quizInProgress){ alert('Сначала закончите тест — во время теста заглядывать в «Изучение» нельзя.'); return; }
+  document.getElementById('tabStudy').classList.add('active');
+  document.getElementById('tabQuiz').classList.remove('active');
+  document.getElementById('tabResults').classList.remove('active');
+  document.getElementById('studyScreen').style.display='block';
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('resultsScreen').style.display='none';
+};
+document.getElementById('tabQuiz').onclick = ()=>{
+  document.getElementById('tabQuiz').classList.add('active');
+  document.getElementById('tabStudy').classList.remove('active');
+  document.getElementById('tabResults').classList.remove('active');
+  document.getElementById('studyScreen').style.display='none';
+  document.getElementById('quizScreen').style.display='block';
+  document.getElementById('resultsScreen').style.display='none';
+};
+document.getElementById('tabResults').onclick = ()=>{
+  if(quizInProgress){ alert('Сначала закончите тест.'); return; }
+  document.getElementById('tabResults').classList.add('active');
+  document.getElementById('tabStudy').classList.remove('active');
+  document.getElementById('tabQuiz').classList.remove('active');
+  document.getElementById('studyScreen').style.display='none';
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('resultsScreen').style.display='block';
+  loadResults();
+};
+
+// ---------- STUDY ----------
+function renderStationPills(containerId, current, onPick){
+  const el = document.getElementById(containerId);
+  el.innerHTML = STATIONS.map(s=>`<button class="pill ${s===current?'active':''}" data-s="${esc(s)}">${esc(s)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>onPick(b.dataset.s));
+}
+function renderTypePills(containerId, current, onPick){
+  const el = document.getElementById(containerId);
+  el.innerHTML = TYPES.map(t=>`<button class="pill ${t===current?'active':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>onPick(b.dataset.t));
+}
+function matchesType(d, typeFilter){
+  if(typeFilter==='Всё') return true;
+  if(typeFilter==='Блюда') return d.type==='блюдо';
+  if(typeFilter==='Заготовки') return d.type==='заготовка';
+  return true;
+}
+let studyStation = 'Все станции';
+let studyType = 'Всё';
+function renderStudyPills(){
+  renderStationPills('stationPillsStudy', studyStation, (s)=>{ studyStation=s; renderStudyPills(); renderDishList(); });
+  renderTypePills('typePillsStudy', studyType, (t)=>{ studyType=t; renderStudyPills(); renderDishList(); });
+}
+function renderDishList(){
+  const el = document.getElementById('dishList');
+  const list = DISHES.filter(d => (studyStation==='Все станции' || d.station===studyStation) && matchesType(d, studyType));
+  el.innerHTML = '';
+  list.forEach((d,i)=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="name">${d.type==='заготовка'?'<span class="badge">заготовка</span>':''}${esc(d.name)}</div>
+      <div class="meta">${esc(d.station)}${d.time?' · '+esc(d.time):''}${d.yield?' · выход '+esc(d.yield)+' кг':''}</div>
+      <div class="detail" id="det${i}"></div>`;
+    card.onclick = ()=>{
+      const det = card.querySelector('.detail');
+      const isOpen = det.classList.contains('open');
+      document.querySelectorAll('.detail.open').forEach(x=>x.classList.remove('open'));
+      if(!isOpen){
+        det.innerHTML = d.ingredients.map(ing=>`<div class="ing-row"><span>${esc(ing.name)}</span><span><b>${fmtQty(ing.unit, ing.netto)}</b></span></div>`).join('')
+          + (d.method ? `<div class="method">${esc(d.method)}</div>` : '');
+        det.classList.add('open');
+      }
+    };
+    el.appendChild(card);
+  });
+}
+renderStudyPills();
+renderDishList();
+
+// ---------- QUIZ ----------
+let quizStation = 'Все станции';
+let quizType = 'Всё';
+let quizCount = 10;
+let quizDifficulty = 'Базовый';
+function renderQuizStationPills(){
+  renderStationPills('stationPillsQuiz', quizStation, (s)=>{ quizStation=s; renderQuizStationPills(); });
+  renderTypePills('typePillsQuiz', quizType, (t)=>{ quizType=t; renderQuizStationPills(); });
+  renderDifficultyPills();
+}
+renderQuizStationPills();
+
+function renderDifficultyPills(){
+  const opts = ['Базовый','Продвинутый'];
+  const el = document.getElementById('difficultyPills');
+  el.innerHTML = opts.map(o=>`<button class="pill ${o===quizDifficulty?'active':''}" data-d="${o}">${o}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{ quizDifficulty=b.dataset.d; renderDifficultyPills(); });
+}
+
+function renderCountPills(){
+  const counts = [5,10,15,20];
+  const el = document.getElementById('countPills');
+  el.innerHTML = counts.map(c=>`<button class="pill ${c===quizCount?'active':''}" data-c="${c}">${c}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{ quizCount=parseInt(b.dataset.c); renderCountPills(); });
+}
+renderCountPills();
+
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizWrongList = [];
+let quizTimer = null;
+let quizTimeLeft = 0;
+const QUESTION_SECONDS = 15;
+const PASS_THRESHOLD = 0.8;
+
+function buildQuestionPool(){
+  const pool = [];
+  const list = DISHES.filter(d => (quizStation==='Все станции' || d.station===quizStation) && matchesType(d, quizType));
+  list.forEach(d=>{
+    // "Базовый" = только первый (главный) ингредиент каждого блюда/заготовки,
+    // "Продвинутый" = все ингредиенты, включая соусы и специи
+    const ings = quizDifficulty==='Базовый' ? d.ingredients.slice(0,1) : d.ingredients;
+    ings.forEach(ing=>{
+      pool.push({dish:d.name, station:d.station, ingredient:ing.name, unit:ing.unit, netto:ing.netto});
+    });
+  });
+  return pool;
+}
+
+function pickDistractors(correct, unit, allPool, n){
+  const candidates = allPool.filter(x=>x.unit===unit && x.netto!==correct);
+  const uniqueVals = [...new Set(candidates.map(x=>x.netto))];
+  // prefer values close in magnitude to the correct one (0.3x–3x range) so options
+  // stay plausible and don't create "noise" from wildly different scales
+  const close = uniqueVals.filter(v => v >= correct*0.3 && v <= correct*3);
+  const far = uniqueVals.filter(v => v < correct*0.3 || v > correct*3);
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    return arr;
+  }
+  shuffle(close); shuffle(far);
+  const picked = close.slice(0, n);
+  if(picked.length < n) picked.push(...far.slice(0, n-picked.length));
+  return picked;
+}
+
+document.getElementById('startQuizBtn').onclick = ()=>{
+  const pool = buildQuestionPool();
+  if(pool.length < 4){ alert('Недостаточно данных для теста в этой станции.'); return; }
+  const shuffled = pool.slice();
+  for(let i=shuffled.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]; }
+  quizQuestions = shuffled.slice(0, Math.min(quizCount, shuffled.length));
+  quizIndex = 0; quizScore = 0; quizWrongList = [];
+  quizInProgress = true;
+  document.getElementById('tabStudy').style.opacity='0.5';
+  document.getElementById('quizSetup').style.display='none';
+  document.getElementById('quizResult').style.display='none';
+  document.getElementById('quizPlay').style.display='block';
+  renderQuestion();
+};
+
+function renderQuestion(){
+  const q = quizQuestions[quizIndex];
+  const pool = buildQuestionPool();
+  const distractors = pickDistractors(q.netto, q.unit, pool, 3);
+  let options = [q.netto, ...distractors];
+  if(options.length < 4){
+    // pad with synthetic distractors if not enough real data
+    while(options.length<4){ options.push(q.netto * (1 + (options.length*0.3+0.2))); }
+  }
+  for(let i=options.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [options[i],options[j]]=[options[j],options[i]]; }
+
+  const el = document.getElementById('quizPlay');
+  el.innerHTML = `<div class="progress">Вопрос ${quizIndex+1} из ${quizQuestions.length} · счёт: ${quizScore} · <span id="timerLabel">${QUESTION_SECONDS}</span> сек</div>
+    <div class="qcard">
+      <div class="dish">${esc(q.dish)} (${esc(q.station)})</div>
+      <div class="question">Сколько нужно «${esc(q.ingredient)}»?</div>
+      <div id="optsWrap"></div>
+    </div>`;
+  const wrap = document.getElementById('optsWrap');
+
+  function stopTimer(){ if(quizTimer){ clearInterval(quizTimer); quizTimer=null; } }
+
+  function answer(val, timedOut){
+    stopTimer();
+    wrap.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+    const isCorrect = !timedOut && Math.abs(val - q.netto) < 1e-9;
+    if(isCorrect){ quizScore++; }
+    else {
+      quizWrongList.push({q, given: timedOut ? null : val});
+    }
+    [...wrap.children].forEach(o=>{
+      if(o.dataset.v && Math.abs(parseFloat(o.dataset.v)-q.netto)<1e-9) o.classList.add('correct');
+      else if(o.dataset.v && !timedOut && Math.abs(parseFloat(o.dataset.v)-val)<1e-9 && !isCorrect) o.classList.add('wrong');
+    });
+    setTimeout(()=>{
+      quizIndex++;
+      if(quizIndex < quizQuestions.length) renderQuestion();
+      else renderResult();
+    }, isCorrect ? 600 : 1400);
+  }
+
+  options.forEach(val=>{
+    const btn = document.createElement('button');
+    btn.className='opt';
+    btn.textContent = fmtQty(q.unit, val);
+    btn.dataset.v = val;
+    btn.onclick = ()=> answer(val, false);
+    wrap.appendChild(btn);
+  });
+
+  quizTimeLeft = QUESTION_SECONDS;
+  quizTimer = setInterval(()=>{
+    quizTimeLeft--;
+    const lbl = document.getElementById('timerLabel');
+    if(lbl) lbl.textContent = quizTimeLeft;
+    if(quizTimeLeft <= 0){
+      answer(null, true);
+    }
+  }, 1000);
+}
+
+function renderResult(){
+  quizInProgress = false;
+  document.getElementById('tabStudy').style.opacity='1';
+  document.getElementById('quizPlay').style.display='none';
+  const el = document.getElementById('quizResult');
+  el.style.display='block';
+  const pct = Math.round(100*quizScore/quizQuestions.length);
+  const passed = (quizScore/quizQuestions.length) >= PASS_THRESHOLD;
+  let wrongHtml = '';
+  if(quizWrongList.length){
+    wrongHtml = '<div style="text-align:left; margin-top:20px;"><div style="font-weight:700; margin-bottom:8px;">Разбор ошибок:</div>' +
+      quizWrongList.map(w=>`<div class="ing-row"><span>${esc(w.q.dish)} — ${esc(w.q.ingredient)}${w.given===null?' (время вышло)':''}</span><span>верно: <b>${fmtQty(w.q.unit,w.q.netto)}</b></span></div>`).join('') +
+      '</div>';
+  }
+  el.innerHTML = `<div class="result">
+      <div class="score">${quizScore}/${quizQuestions.length}</div>
+      <div class="label">${pct}% правильных ответов</div>
+      <div class="label" style="margin-top:8px; font-weight:700; color:${passed?'#2e7d32':'#c62828'};">${passed?'✅ Сдал':'❌ Нужно пересдать (нужно 80%+)'}</div>
+    </div>
+    ${wrongHtml}
+    <button class="ghost-btn" id="retryBtn" style="margin-top:20px;">Пройти ещё раз</button>`;
+  document.getElementById('retryBtn').onclick = ()=>{
+    document.getElementById('quizResult').style.display='none';
+    document.getElementById('quizSetup').style.display='block';
+  };
+  saveQuizResult({score:quizScore, total:quizQuestions.length, pct, passed});
+}
+
+async function saveQuizResult(result){
+  try{
+    const user = JSON.parse(localStorage.getItem('cookUser')||'null');
+    if(!user) return;
+    await apiPost({action:'saveResult', result:{
+      name: user.name, restaurant: user.restaurant, station: user.station,
+      difficulty: quizDifficulty, quizType: quizType,
+      score: result.score, total: result.total, pct: result.pct, passed: result.passed
+    }});
+  }catch(e){ console.error('save result failed', e); }
+}
+
+let resultsStationFilter = 'Все станции';
+
+async function loadResults(){
+  const el = document.getElementById('resultsList');
+  el.innerHTML = '<div class="empty">Загрузка…</div>';
+  const pillsEl = document.getElementById('resultsStationPills');
+  pillsEl.innerHTML = STATIONS.map(s=>`<button class="pill ${s===resultsStationFilter?'active':''}" data-s="${esc(s)}">${esc(s)}</button>`).join('');
+  pillsEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{ resultsStationFilter=b.dataset.s; loadResults(); });
+
+  try{
+    const j = await apiGet('results');
+    let docs = j.results || [];
+    if(resultsStationFilter!=='Все станции') docs = docs.filter(r=>r.station===resultsStationFilter);
+    if(docs.length===0){ el.innerHTML = '<div class="empty">Пока нет результатов.</div>'; return; }
+    el.innerHTML = docs.map(r=>{
+      const date = r.ts ? new Date(r.ts).toLocaleString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+      return `<div class="card row">
+        <div>
+          <div class="name">${esc(r.name)} <span class="badge">${esc(r.restaurant)}</span></div>
+          <div class="meta">${esc(r.station)} · ${esc(r.difficulty||'')} · ${date}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:700; color:${r.passed?'#2e7d32':'#c62828'};">${r.score}/${r.total}</div>
+          <div class="meta">${r.pct}%</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    console.error(e);
+    el.innerHTML = '<div class="empty">Не удалось загрузить результаты.</div>';
+  }
+}
+
+// ---------- DB / DISHES LOADING ----------
+let SERVER_DISH_COUNT = null;
+async function loadDishesFromDb(){
+  try{
+    const j = await apiGet('dishes');
+    const list = j.dishes || [];
+    SERVER_DISH_COUNT = list.length;
+    if(list.length===0) return; // таблица пустая — показываем стартовые тех.карты
+    DISHES = list;
+    try{ localStorage.setItem('dishesCache', JSON.stringify(list)); }catch(e){}
+    renderDishList();
+  }catch(e){ console.error('load dishes failed', e); }
+}
+// первый запуск: переносим стартовые тех.карты в пустую таблицу (делает админ при входе)
+async function importSeedIfEmpty(){
+  if(SERVER_DISH_COUNT!==0) return;
+  try{
+    const j = await apiPost({action:'importSeed', code:getAdminCode(), dishes:DISHES_SEED});
+    if(j.imported){ SERVER_DISH_COUNT = j.imported; await loadDishesFromDb(); }
+  }catch(e){ console.error('import seed failed', e); }
+}
+loadDishesFromDb();
+
+// ---------- ENTRY (простой вход + отдельная дверь для админа) ----------
+(function(){
+  const entryPillsEl = document.getElementById('entryStationPills');
+  ['Вок','Горячий цех','Суши станция'].forEach(s=>{
+    const b = document.createElement('button');
+    b.className='pill'; b.textContent=s; b.dataset.s=s;
+    b.onclick = ()=>{
+      entryPillsEl.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      entryPillsEl.dataset.selected = s;
+    };
+    entryPillsEl.appendChild(b);
+  });
+
+  const modePillsEl = document.getElementById('entryModePills');
+  [['📖 Обучение','study'],['📝 Тест','quiz']].forEach(([label,val])=>{
+    const b = document.createElement('button');
+    b.className='pill'; b.textContent=label; b.dataset.m=val;
+    b.onclick = ()=>{
+      modePillsEl.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      modePillsEl.dataset.selected = val;
+    };
+    modePillsEl.appendChild(b);
+  });
+
+  function showMainApp(user){
+    document.getElementById('entryScreen').style.display='none';
+    document.getElementById('mainApp').style.display='block';
+    document.getElementById('userInfoLine').textContent = `${user.name} · ${user.restaurant} · ${user.station}`;
+    studyStation = user.station; quizStation = user.station;
+    renderStudyPills(); renderDishList();
+    renderQuizStationPills();
+    if(user.mode==='quiz'){ document.getElementById('tabQuiz').click(); }
+    else { document.getElementById('tabStudy').click(); }
+  }
+
+  function showAdmin(){
+    document.getElementById('entryScreen').style.display='none';
+    document.getElementById('adminLoginScreen').style.display='none';
+    document.getElementById('adminScreen').style.display='block';
+    loadAdminDishes();
+  }
+
+  const saved = JSON.parse(localStorage.getItem('cookUser')||'null');
+  if(saved){
+    if(saved.admin){ if(saved.code){ showAdmin(); } else { localStorage.removeItem('cookUser'); } }
+    else { showMainApp(saved); }
+  }
+
+  document.getElementById('entryStartBtn').onclick = ()=>{
+    const name = document.getElementById('entryName').value.trim();
+    const restaurant = document.getElementById('entryRest').value;
+    const station = entryPillsEl.dataset.selected;
+    const mode = modePillsEl.dataset.selected;
+    const msg = document.getElementById('entryMsg'); msg.textContent='';
+    if(!name){ msg.textContent='Введите имя.'; return; }
+    if(!station){ msg.textContent='Выберите станцию.'; return; }
+    if(!mode){ msg.textContent='Выберите «Обучение» или «Тест».'; return; }
+    const user = {name, restaurant, station, mode};
+    localStorage.setItem('cookUser', JSON.stringify(user));
+    showMainApp(user);
+  };
+
+  document.getElementById('changeUserBtn').onclick = ()=>{
+    quizInProgress = false;
+    document.getElementById('tabStudy').style.opacity='1';
+    localStorage.removeItem('cookUser');
+    document.getElementById('mainApp').style.display='none';
+    document.getElementById('entryScreen').style.display='block';
+  };
+
+  document.getElementById('showAdminLoginBtn').onclick = ()=>{
+    document.getElementById('entryScreen').style.display='none';
+    document.getElementById('adminLoginScreen').style.display='block';
+  };
+  document.getElementById('backToEntryBtn').onclick = ()=>{
+    document.getElementById('adminLoginScreen').style.display='none';
+    document.getElementById('entryScreen').style.display='block';
+  };
+  document.getElementById('adminCodeBtn').onclick = async ()=>{
+    const btn = document.getElementById('adminCodeBtn');
+    const code = document.getElementById('adminCodeInput').value.trim();
+    const msg = document.getElementById('adminCodeMsg'); msg.textContent='';
+    if(!code){ msg.textContent = 'Введите код.'; return; }
+    btn.disabled = true; btn.textContent = 'Проверяю…';
+    try{
+      await apiPost({action:'checkAdmin', code});
+      localStorage.setItem('cookUser', JSON.stringify({admin:true, code}));
+      showAdmin();
+    }catch(e){
+      msg.textContent = (e && e.message==='Неверный код.') ? 'Неверный код.' : 'Нет связи с сервером, попробуйте ещё раз.';
+    }finally{ btn.disabled = false; btn.textContent = 'Войти'; }
+  };
+  document.getElementById('adminLogoutBtn').onclick = ()=>{
+    localStorage.removeItem('cookUser');
+    document.getElementById('adminScreen').style.display='none';
+    document.getElementById('entryScreen').style.display='block';
+  };
+})();
+
+// ---------- ADMIN: DISHES (тех.карты) ----------
+let adminDishStationFilter = 'Все станции';
+document.getElementById('addDishBtn').onclick = ()=> openDishEditor(null);
+
+async function loadAdminDishes(){
+  await loadDishesFromDb();
+  await importSeedIfEmpty();
+  await loadExtraProducts();
+  const pillsEl = document.getElementById('adminDishStationPills');
+  pillsEl.innerHTML = STATIONS.map(s=>`<button class="pill ${s===adminDishStationFilter?'active':''}" data-s="${esc(s)}">${esc(s)}</button>`).join('');
+  pillsEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{ adminDishStationFilter=b.dataset.s; loadAdminDishes(); });
+
+  const el = document.getElementById('adminDishList');
+  const list = DISHES.filter(d => adminDishStationFilter==='Все станции' || d.station===adminDishStationFilter);
+  el.innerHTML = '';
+  list.forEach(d=>{
+    const row = document.createElement('div');
+    row.className = 'card row';
+    row.innerHTML = `<div>
+        <div class="name">${d.type==='заготовка'?'<span class="badge">заготовка</span>':''}${esc(d.name)}</div>
+        <div class="meta">${esc(d.station)} · ${d.ingredients.length} ингредиентов</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="ghost-btn" data-edit style="width:auto; padding:8px 12px;">Изменить</button>
+      </div>`;
+    row.querySelector('[data-edit]').onclick = ()=>openDishEditor(d);
+    el.appendChild(row);
+  });
+}
+
+// ---------- КАТАЛОГ ПРОДУКТОВ / ПОЛУФАБРИКАТОВ (выбор из списка) ----------
+let EXTRA_PRODUCTS = [];
+async function loadExtraProducts(){
+  try{
+    const j = await apiGet('products');
+    EXTRA_PRODUCTS = j.products || [];
+  }catch(e){ console.error('load extra products failed', e); }
+}
+function getAllProducts(){
+  const out = PRODUCT_SEED.map(p=>({name:p.n, unit:p.u, article:p.a||'', kind:p.t}));
+  const seen = new Set(out.map(p=>p.name.toLowerCase()+'|'+p.unit));
+  EXTRA_PRODUCTS.forEach(p=>{
+    if(!p.name) return;
+    const k = p.name.toLowerCase()+'|'+p.unit;
+    if(seen.has(k)) return;
+    seen.add(k);
+    out.push({name:p.name, unit:p.unit, article:p.article||'', kind:p.kind||'p', custom:true});
+  });
+  return out.sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+}
+
+function openProductPicker(onPick){
+  const root = document.getElementById('pickerRoot');
+  const all = getAllProducts();
+  let query = '', kind = 'all';
+  const KINDS = [['all','Все'],['p','Продукты'],['pf','Полуфабрикаты']];
+  const LIMIT = 80;
+
+  root.innerHTML = `<div class="picker-bg"><div class="picker">
+    <div class="picker-head"><div class="picker-title">Выбор продукта</div><button type="button" class="linkbtn" id="pkClose">Закрыть</button></div>
+    <input type="text" id="pkSearch" placeholder="Поиск: название или артикул" autocomplete="off">
+    <div class="pillrow" id="pkKinds" style="margin:10px 0 4px;"></div>
+    <div class="picker-list" id="pkList"></div>
+    <button type="button" class="primary-btn" id="pkNew" style="margin-top:10px;">+ Добавить новый продукт</button>
+  </div></div>`;
+
+  function renderKinds(){
+    const el = root.querySelector('#pkKinds');
+    el.innerHTML = KINDS.map(([k,l])=>`<button type="button" class="pill ${k===kind?'active':''}" data-k="${k}">${l}</button>`).join('');
+    el.querySelectorAll('button').forEach(b=>b.onclick=()=>{ kind=b.dataset.k; renderKinds(); renderList(); });
+  }
+  function renderList(){
+    const q = query.trim().toLowerCase();
+    let list = all.filter(p=>(kind==='all' || p.kind===kind) && (!q || p.name.toLowerCase().includes(q) || (p.article||'').includes(q)));
+    const total = list.length;
+    const shown = list.slice(0, LIMIT);
+    const el = root.querySelector('#pkList');
+    if(total===0){
+      el.innerHTML = '<div class="pk-hint">Ничего не найдено. Нажмите «+ Добавить новый продукт» внизу.</div>';
+      return;
+    }
+    el.innerHTML = shown.map((p,i)=>`<button type="button" class="pk-item" data-i="${i}">
+        <div class="pk-name">${esc(p.name)}</div>
+        <div class="pk-tags"><span class="badge">${esc(p.unit)}</span>${p.article?`<span class="badge">№${esc(p.article)}</span>`:''}${p.kind==='pf'?'<span class="badge">полуфабрикат</span>':''}${p.custom?'<span class="badge">добавлен вручную</span>':''}</div>
+      </button>`).join('') + (total>LIMIT?`<div class="pk-hint">Показано ${LIMIT} из ${total} — уточните поиск</div>`:'');
+    el.querySelectorAll('.pk-item').forEach(b=>b.onclick=()=>{
+      const prod = shown[parseInt(b.dataset.i)];
+      root.innerHTML='';
+      onPick(prod);
+    });
+  }
+  const searchEl = root.querySelector('#pkSearch');
+  searchEl.addEventListener('input', e=>{ query = e.target.value; renderList(); });
+  root.querySelector('#pkClose').onclick = ()=>{ root.innerHTML=''; };
+  root.querySelector('#pkNew').onclick = ()=> openNewProductForm(query, onPick);
+  renderKinds(); renderList();
+}
+
+function openNewProductForm(prefillName, onPick){
+  const root = document.getElementById('pickerRoot');
+  const UNITS = ['кг','л','шт','г','порц'];
+  const f = {name:(prefillName||'').trim(), unit:'кг', kind:'p', article:''};
+  function render(){
+    root.innerHTML = `<div class="picker-bg"><div class="picker">
+      <div class="picker-head"><div class="picker-title">Новый продукт</div><button type="button" class="linkbtn" id="npBack">Назад</button></div>
+      <div class="setup-field"><label>Название</label><input type="text" id="npName" value="${esc(f.name)}"></div>
+      <div class="setup-field"><label>Единица измерения</label>
+        <div class="pillrow">${UNITS.map(u=>`<button type="button" class="pill ${u===f.unit?'active':''}" data-u="${u}">${u}</button>`).join('')}</div>
+      </div>
+      <div class="setup-field"><label>Что это</label>
+        <div class="pillrow">
+          <button type="button" class="pill ${f.kind==='p'?'active':''}" data-kind="p">Продукт</button>
+          <button type="button" class="pill ${f.kind==='pf'?'active':''}" data-kind="pf">Полуфабрикат</button>
+        </div>
+      </div>
+      <div class="setup-field"><label>Артикул (необязательно)</label><input type="text" id="npArticle" value="${esc(f.article)}"></div>
+      <button type="button" class="primary-btn" id="npSave">Сохранить и выбрать</button>
+    </div></div>`;
+    const sync = ()=>{ f.name = root.querySelector('#npName').value; f.article = root.querySelector('#npArticle').value; };
+    root.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{ sync(); f.unit=b.dataset.u; render(); });
+    root.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{ sync(); f.kind=b.dataset.kind; render(); });
+    root.querySelector('#npBack').onclick = ()=> openProductPicker(onPick);
+    root.querySelector('#npSave').onclick = async ()=>{
+      sync();
+      const name = f.name.trim();
+      if(!name){ alert('Введите название продукта.'); return; }
+      const prod = {name, unit:f.unit, kind:f.kind, article:f.article.trim()};
+      try{
+        await apiPost({action:'addProduct', code:getAdminCode(), product:prod});
+        EXTRA_PRODUCTS.push(prod);
+      }catch(e){ console.error(e); alert('Не удалось сохранить в общий список — продукт добавлен только в эту тех.карту.'); }
+      root.innerHTML='';
+      onPick({name:prod.name, unit:prod.unit, article:prod.article, kind:prod.kind});
+    };
+  }
+  render();
+}
+
+function openDishEditor(dish){
+  const isNew = !dish;
+  const d = dish ? JSON.parse(JSON.stringify(dish)) : {id:null, name:'', section:'', station:'Вок', type:'блюдо', method:'', yield:null, time:null, ingredients:[{name:'',unit:'кг',netto:0}]};
+  const root = document.getElementById('modalRoot');
+  const UNIT_OPTIONS = ['кг','л','шт','г','порц'];
+
+  function ingredientsHtml(){
+    return d.ingredients.map((ing,i)=>`
+      <div class="form-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+        <button type="button" class="pick-btn ${ing.name?'':'placeholder'}" data-ing-pick="${i}">
+          <span>${ing.name?esc(ing.name):'Выбрать продукт…'}${ing.article?`<span class="pick-sub">№${esc(ing.article)}</span>`:''}</span>
+          <span>▾</span>
+        </button>
+        <select data-ing-unit="${i}" style="flex:1 1 80px;">
+          ${UNIT_OPTIONS.map(u=>`<option ${u===ing.unit?'selected':''}>${u}</option>`).join('')}
+        </select>
+        <input type="number" step="any" data-ing-netto="${i}" placeholder="Кол-во" value="${ing.netto}" style="flex:1 1 100px;">
+        <button class="linkbtn" data-ing-del="${i}" style="color:#c0453a;">✕</button>
+      </div>`).join('');
+  }
+
+  function syncFromForm(){
+    const nameEl = root.querySelector('#dName');
+    if(!nameEl) return;
+    d.name = nameEl.value;
+    d.method = root.querySelector('#dMethod').value;
+    d.yield = root.querySelector('#dYield').value.trim() || null;
+    d.ingredients.forEach((ing,i)=>{
+      const u = root.querySelector(`[data-ing-unit="${i}"]`);
+      const q = root.querySelector(`[data-ing-netto="${i}"]`);
+      if(u) ing.unit = u.value;
+      if(q) ing.netto = q.value === '' ? 0 : parseFloat(q.value) || 0;
+    });
+  }
+
+  function render(){
+    root.innerHTML = `<div class="modal-bg" id="mbg"><div class="modal">
+      <h3>${isNew?'Новая тех.карта':'Изменить тех.карту'}</h3>
+      <div class="setup-field"><label>Название</label><input type="text" id="dName" value="${esc(d.name)}"></div>
+      <div class="setup-field"><label>Станция</label>
+        <div class="pillrow" id="dStationPills">
+          ${['Вок','Горячий цех','Суши станция'].map(s=>`<button type="button" class="pill ${s===d.station?'active':''}" data-station="${esc(s)}">${esc(s)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="setup-field"><label>Тип</label>
+        <div class="pillrow" id="dTypePills">
+          <button type="button" class="pill ${d.type==='блюдо'?'active':''}" data-type="блюдо">Готовое блюдо</button>
+          <button type="button" class="pill ${d.type==='заготовка'?'active':''}" data-type="заготовка">Заготовка</button>
+        </div>
+      </div>
+      <div class="setup-field"><label>Ингредиенты и граммовка</label><div id="ingList">${ingredientsHtml()}</div>
+        <button class="linkbtn" id="addIngBtn">+ Добавить ингредиент</button>
+      </div>
+      <div class="setup-field"><label>Способ приготовления</label><textarea id="dMethod" rows="4">${esc(d.method||'')}</textarea></div>
+      <div class="setup-field"><label>Выход (кг, необязательно)</label><input type="text" id="dYield" value="${esc(d.yield||'')}"></div>
+      <button class="primary-btn" id="dSaveBtn">Сохранить</button>
+      ${!isNew ? '<button class="ghost-btn" id="dDeleteBtn" style="margin-top:10px; color:#c0453a;">Удалить тех.карту</button>' : ''}
+      <button class="close" id="dCloseBtn">Отмена</button>
+    </div></div>`;
+
+    root.querySelector('#dCloseBtn').onclick = ()=>root.innerHTML='';
+    root.querySelector('#mbg').addEventListener('click', e=>{ if(e.target.id==='mbg') root.innerHTML=''; });
+
+    // добавить ингредиент = сразу открыть список продуктов
+    root.querySelector('#addIngBtn').onclick = ()=>{
+      syncFromForm();
+      openProductPicker((prod)=>{
+        const ing = {name:prod.name, unit:prod.unit, netto:0};
+        if(prod.article) ing.article = prod.article;
+        d.ingredients.push(ing);
+        render();
+      });
+    };
+    // выбрать/заменить продукт в существующей строке
+    root.querySelectorAll('[data-ing-pick]').forEach(btn=>{
+      btn.onclick = ()=>{
+        syncFromForm();
+        const i = parseInt(btn.dataset.ingPick);
+        openProductPicker((prod)=>{
+          d.ingredients[i].name = prod.name;
+          d.ingredients[i].unit = prod.unit;
+          if(prod.article) d.ingredients[i].article = prod.article; else delete d.ingredients[i].article;
+          render();
+        });
+      };
+    });
+
+    root.querySelectorAll('[data-station]').forEach(btn=>{
+      btn.onclick = ()=>{ syncFromForm(); d.station = btn.dataset.station; render(); };
+    });
+    root.querySelectorAll('[data-type]').forEach(btn=>{
+      btn.onclick = ()=>{ syncFromForm(); d.type = btn.dataset.type; render(); };
+    });
+    root.querySelectorAll('[data-ing-del]').forEach(btn=>{
+      btn.onclick = ()=>{ syncFromForm(); d.ingredients.splice(parseInt(btn.dataset.ingDel),1); render(); };
+    });
+
+    if(!isNew){
+      root.querySelector('#dDeleteBtn').onclick = async ()=>{
+        if(!confirm('Точно удалить тех.карту «'+d.name+'»?')) return;
+        try{ await apiPost({action:'deleteDish', code:getAdminCode(), id:d.id}); }
+        catch(e){ handleAdminErr(e); return; }
+        root.innerHTML='';
+        loadAdminDishes();
+      };
+    }
+
+    root.querySelector('#dSaveBtn').onclick = async ()=>{
+      syncFromForm();
+      d.name = d.name.trim();
+      d.method = (d.method||'').trim();
+      d.ingredients = d.ingredients.filter(ing=>ing.name);
+      if(!d.name || d.ingredients.length===0){ alert('Укажите название и выберите хотя бы один продукт.'); return; }
+      const body = {name:d.name, section:d.section||'', station:d.station, type:d.type, method:d.method, yield:d.yield, time:d.time, ingredients:d.ingredients};
+      if(!isNew) body.id = d.id;
+      const saveBtn = root.querySelector('#dSaveBtn');
+      saveBtn.disabled = true; saveBtn.textContent = 'Сохраняю…';
+      try{ await apiPost({action:'saveDish', code:getAdminCode(), dish:body}); }
+      catch(e){ saveBtn.disabled = false; saveBtn.textContent = 'Сохранить'; handleAdminErr(e); return; }
+      root.innerHTML='';
+      loadAdminDishes();
+    };
+  }
+  render();
+}
+</script>
+</body>
+</html>
